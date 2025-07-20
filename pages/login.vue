@@ -125,7 +125,7 @@ async function login() {
       password: form.value.password,
     })
     localStorage.setItem('token', response.data.user.token)
-    navigateTo('/dashboard')
+    navigateTo('/')
   } catch (error) {
     show.value = true
     message.value = error.response?.data?.message || 'Login failed. Please check your credentials.'
@@ -137,7 +137,7 @@ async function login() {
 
 onMounted(() => {
   if (localStorage.getItem('token')) {
-    navigateTo('/dashboard')
+    navigateTo('/')
   }
 })
 </script>
