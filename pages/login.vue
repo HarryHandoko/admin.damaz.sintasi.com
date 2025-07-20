@@ -125,6 +125,7 @@ async function login() {
       password: form.value.password,
     })
     localStorage.setItem('token', response.data.user.token)
+    localStorage.removeItem('redirected')
     navigateTo('/')
   } catch (error) {
     show.value = true

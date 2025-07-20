@@ -23,13 +23,16 @@ export default defineNuxtPlugin((nuxtApp) => {
       if (
         error.response &&
         error.response.status === 401 &&
-        window.location.pathname !== '/login'
+        window.location.pathname !== '/login' &&
+        !window.localStorage.getItem('redirected')
       ) {
+        window.localStorage.setItem('redirected', 'true')
         window.location.href = '/login'
       }
       return Promise.reject(error)
     }
   )
+
 
   // Example fetch on plugin init
   api.get('/users')
