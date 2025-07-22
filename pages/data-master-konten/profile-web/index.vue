@@ -163,7 +163,7 @@
             />
         </v-col>
 
-        <v-col cols="12" class="mb-15">
+        <!-- <v-col cols="12" class="mb-15">
           <label style="font-weight:500;display:block;margin-bottom:4px;">Komitmen Kami</label>
           <QuillEditor
               v-model:content="form.komitmen_kami"
@@ -178,7 +178,7 @@
                 ['clean']
               ]"
             />
-        </v-col>
+        </v-col> -->
 
         <v-col cols="12" class="mb-15">
           <label style="font-weight:500;display:block;margin-bottom:4px;">Visi</label>
@@ -214,9 +214,8 @@
             />
         </v-col>
 
-        <v-col cols="12" class="text-center">
+        <!-- <v-col cols="12" class="text-center">
           <div>
-            <!-- Embed YouTube preview -->
             <div v-if="youtubeVideoId">
               <iframe
                 :src="`https://www.youtube.com/embed/${youtubeVideoId}`"
@@ -231,6 +230,50 @@
             </div>
           </div>
           <v-text-field v-model="form.link_youtube" label="Link Youtube" variant="outlined" dense />
+        </v-col> -->
+
+        <v-col cols="12" class="text-center">
+          <div>
+            <img
+              v-if="bannerSambutanPreview"
+              :src="bannerSambutanPreview"
+              alt="Banner Sambutan"
+              style="height: 200px;  object-fit: cover; border-radius: 12px; border: 2px solid #eee;"
+            />
+            <div v-else style="height:120px;background:#f7f7f7;border-radius:12px;display:flex;align-items:center;justify-content:center;color:#bbb;">Banner Preview</div>
+          </div>
+          <v-file-input
+            label="Upload Banner Sambutan"
+            accept="image/*"
+            show-size
+            variant="outlined"
+            dense
+            clearable
+            @change="handleBannerSambutanChange"
+            class="mt-2"
+          />
+        </v-col>
+
+        <v-col cols="12" class="mb-3">
+          <v-text-field v-model="form.founder" label="Founder" variant="outlined" dense />
+        </v-col>
+
+        <v-col cols="12" class="mb-15">
+          <label style="font-weight:500;display:block;margin-bottom:4px;">Sambutan</label>
+          <QuillEditor
+              v-model:content="form.sambutan"
+              contentType="html"
+              class="quill-responsive"
+              :toolbar="[
+                ['bold', 'italic', 'underline', 'strike'],
+                [{ header: [1, 2, 3, false] }],
+                [{ list: 'ordered'}, { list: 'bullet' }],
+                [{ align: [] }],
+                ['link', 'image'],
+                ['clean'],
+                [{ font: [] }], 
+              ]"
+            />
         </v-col>
     </v-row>
 
@@ -251,12 +294,15 @@ const form = reactive({
   banner_about: null,
   banner_visi: null,
   banner_misi: null,
+  banner_sambutan: null,
   komitmen_kami: null,
   tentang_kami: null,
   visi: null,
   misi: null,
   logo: null,
   link_youtube: null,
+  sambutan: null,
+  founder: null,
   address: '',
   whatsapp: '',
   email: '',
@@ -272,6 +318,7 @@ const bannerPreview = ref(null)
 const bannerAboutPreview = ref(null)
 const bannerVisiPreview = ref(null)
 const bannerMisiPreview = ref(null)
+const bannerSambutanPreview = ref(null)
 const logoPreview = ref(null)
 const loading = ref(false)
 const successMsg = ref('')
@@ -283,8 +330,30 @@ const youtubeVideoId = computed(() => {
   // Regex for common YouTube URL formats
   const regExp = /^.*(youtu\.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/
   const match = form.link_youtube.match(regExp)
-  return (match && match[2].length === 11) ? match[2] : null
+  let url = null;
+  if(((match && match[2].length === 11) ? match[2] : null) == null){
+    url = form.link_youtube;
+  }else{
+    url =  (match && match[2].length === 11) ? match[2] : null
+  }
+
+  return url
 })
+
+function handleBannerSambutanChange(e) {
+  let file
+  if (Array.isArray(e)) file = e[0]
+  else if (e?.target?.files) file = e.target.files[0]
+  else file = e
+
+  if (file) {
+    form.banner_sambutan = file
+    bannerSambutanPreview.value = URL.createObjectURL(file)
+  } else {
+    form.banner_sambutan = null
+    bannerSambutanPreview.value = null
+  }
+}
 
 function handleBannerAboutChange(e) {
   let file
@@ -380,12 +449,15 @@ async function saveProfile() {
     formData.append('tentang_kami', form.tentang_kami)
     formData.append('visi', form.visi)
     formData.append('misi', form.misi)
+    formData.append('sambutan', form.sambutan)
+    formData.append('founder', form.founder)
     formData.append('link_youtube', youtubeVideoId.value)
     if (form.banner) formData.append('banner', form.banner)
     if (form.logo) formData.append('logo', form.logo)
     if (form.banner_about) formData.append('banner_about', form.banner_about)
     if (form.banner_visi) formData.append('banner_visi', form.banner_visi)
     if (form.banner_misi) formData.append('banner_misi', form.banner_misi)
+    if (form.banner_sambutan) formData.append('banner_sambutan', form.banner_sambutan)
 
     const response = await $api.post(`/master-content/web-profile-update`, formData, {
       headers: { 'Content-Type': 'multipart/form-data' }
@@ -417,12 +489,15 @@ async function getData () {
     form.visi = data.visi || ''
     form.misi = data.misi || ''
     form.link_youtube = data.link_youtube || ''
+    form.sambutan = data.sambutan || ''
+    form.founder = data.founder || ''
     // Set preview (assume you store only the filename and serve it from /uploads/web_profile/)
-    bannerPreview.value = data.banner ?? null
-    logoPreview.value = data.logo ?? null
-    bannerVisiPreview.value = data.banner_visi ?? null
-    bannerMisiPreview.value = data.banner_misi ?? null
-    bannerAboutPreview.value = data.banner_about ?? null
+    bannerPreview.value = data.banner ?? '/no-image.jpg'
+    logoPreview.value = data.logo ?? '/no-image.jpg'
+    bannerVisiPreview.value = data.banner_visi ?? '/no-image.jpg'
+    bannerMisiPreview.value = data.banner_misi ?? '/no-image.jpg'
+    bannerAboutPreview.value = data.banner_about ?? '/no-image.jpg'
+    bannerSambutanPreview.value = data.banner_sambutan ?? '/no-image.jpg'
     form.banner = null // will be replaced if upload new
     form.logo = null
   } catch (e) {
@@ -454,4 +529,59 @@ onMounted(async () => {
 .mt-4 { margin-top: 1.5rem; }
 .text-success { color: #28a745 }
 .text-error { color: #d32f2f }
+
+.ql-font-sans-serif {
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+}
+.ql-font-serif {
+  font-family: "Georgia", "Times New Roman", Times, serif;
+}
+.ql-font-monospace {
+  font-family: "Monaco", "Courier New", monospace;
+}
+.ql-font-arial {
+  font-family: Arial, Helvetica, sans-serif;
+}
+.ql-font-times-new-roman {
+  font-family: 'Times New Roman', Times, serif;
+}
+.ql-font-comic-sans {
+  font-family: 'Comic Sans MS', cursive, sans-serif;
+}
+.ql-font-courier-new {
+  font-family: 'Courier New', Courier, monospace;
+}
+.ql-font-georgia {
+  font-family: Georgia, serif;
+}
+.ql-font-impact {
+  font-family: Impact, Charcoal, sans-serif;
+}
+.ql-font-lucida {
+  font-family: 'Lucida Sans Unicode', 'Lucida Grande', sans-serif;
+}
+.ql-font-trebuchet {
+  font-family: 'Trebuchet MS', Helvetica, sans-serif;
+}
+.ql-font-verdana {
+  font-family: Verdana, Geneva, sans-serif;
+}
+.ql-font-palatino {
+  font-family: 'Palatino Linotype', Palatino, serif;
+}
+.ql-font-arial-black {
+  font-family: 'Arial Black', Gadget, sans-serif;
+}
+.ql-font-garamond {
+  font-family: Garamond, serif;
+}
+.ql-font-bookman {
+  font-family: 'Bookman Old Style', Bookman, serif;
+}
+.ql-font-comic {
+  font-family: 'Comic Sans MS', cursive, sans-serif;
+}
+
+/* tambahkan sesuai font pada whitelist */
+
 </style>
