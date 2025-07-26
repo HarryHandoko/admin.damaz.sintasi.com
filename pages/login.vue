@@ -83,6 +83,20 @@
                 </VBtn>
               </VCol>
 
+              <!-- login instead -->
+              <VCol
+                cols="12"
+                class="text-center text-base"
+              >
+                <span>Belum punya akun ?</span>
+                <NuxtLink
+                  class="text-primary ms-1"
+                  to="/register-ppdb"
+                >
+                  Daftar Sekarang
+                </NuxtLink>
+              </VCol>
+
               
             </VRow>
           </VForm>

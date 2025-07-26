@@ -1,0 +1,1407 @@
+<template>
+  <div>
+    <v-row>
+      <v-col cols="12">
+         <VCard class="pa-5">
+           <v-row>
+            <v-col cols="12" md="5">
+              <v-text-field
+                label="Cari Nama Siswa"
+                v-model="form.search"
+                dense
+                outlined
+              ></v-text-field>
+            </v-col>
+            <v-col cols="12" md="7" class="text-right">
+               <v-btn :loading="loading" :disabled="loading" type="submit" color="primary" @click="createRegister(null)">
+                <v-icon>bx bx-plus</v-icon> Pendaftaran Baru
+               </v-btn>
+            </v-col>
+           </v-row>
+          </VCard>
+      </v-col>
+
+      <v-col
+        v-for="(item, index) in dataRegister"
+        :key="index"
+        cols="12"
+        md="4"
+        style="cursor: pointer;"
+      >
+        <v-card
+          class="rounded-2xl elevation-10"
+          style="box-shadow: 0 10px 24px -8px #60a5fa33;"
+        >
+          <!-- Tombol Delete di kanan atas -->
+          <v-btn
+            icon
+            class="ma-2"
+            color="red"
+            style="position: absolute; top: 0; right: 0; z-index: 10;color:red"
+            @click.stop="deleteRegister(item)"
+          >
+            <v-icon size="30">bx bx-trash</v-icon>
+          </v-btn>
+
+          <v-row align="center" no-gutters class="pa-5" @click="createRegister(item)">
+            <v-col cols="12" md="3" class="flex justify-center items-center text-center">
+              <v-avatar size="70" class="elevation-5" style="border: 2px solid #38bdf8; box-shadow: 0 4px 18px 0 #38bdf833;">
+                <v-img src="/favicon.ico" cover alt="Avatar" />
+              </v-avatar>
+            </v-col>
+            <v-col cols="12" md="7" class="pl-0 md:pl-4 md:mt-0">
+              <div class="text-xl font-semibold text-gray-700 mb-1">
+                {{
+                  item.siswa != null
+                    ? (item.siswa.nama_depan ?? '-') + ' ' + (item.siswa.nama_belakang ?? '')
+                    : 'Nama Siswa'
+                }}
+              </div>
+              <div class="flex flex-col gap-1 text-gray-600 text-base">
+                <div>
+                  <span class="font-medium text-gray-500">Usia: </span>
+                  <b>{{ item.siswa != null ? item.siswa.usia + ' Th' : '0 Th' }}</b><br>
+                  <span class="font-medium text-gray-500">Jenjang: </span>
+                  <b>
+                    {{
+                      item.sekolah != null ? item.sekolah.name : 'Nama Sekolah'
+                    }}
+                    |
+                    {{
+                      item.sekolah_grade != null ? item.sekolah_grade.name : 'Grade'
+                    }}
+                  </b>
+                </div>
+              </div>
+            </v-col>
+          </v-row>
+
+          <v-col cols="12" class="pa-2 bg-primary" style="margin:0px">
+            {{
+              item.status_pendaftaran == 'P00'
+                ? 'Menunggu'
+                : item.status_pendaftaran == 'P01'
+                ? 'Diterima'
+                : item.status_pendaftaran == 'P02'
+                ? 'Ditolak'
+                : 'None'
+            }}
+          </v-col>
+        </v-card>
+      </v-col>
+
+    </v-row>
+
+    <!-- Dialog tambah menu -->
+    <v-dialog v-model="showCreateModal" max-width="700" persistent>
+      <v-card>
+        <v-card-title class="pa-6">
+          <v-row>
+            <v-col cols="11">
+              <span class="headline">Pendaftaran Baru</span>
+            </v-col>
+            <v-col cols="1" class="pa-2 text-center">
+              <v-icon style="cursor: pointer" @click="showCreateModal = false;getDataRegister()">bx bx-x</v-icon>
+            </v-col>
+          </v-row>
+        </v-card-title>
+        <v-form v-model="valid" @submit.prevent="handleCreateData">
+          <v-card-text style="margin-top: -30px;">
+
+
+            <v-row v-if="step == 0">
+              <!-- Informasi Sekolah -->
+              <v-col cols="12">
+                <div class="d-flex justify-space-between align-center">
+                  <b>Informasi Sekolah</b>
+                  <span @click="step=1" style="cursor : pointer;color:blue">Show Detail</span>
+                </div>
+                <div>Nama Sekolah: <b>{{ form.dataSekolah?.name || '-' }}</b></div>
+                <div>Jenjang Dituju: <b>{{ form.dataPPDB?.sekolah_grade.name || '-' }}</b></div>
+                <div>Tahun Ajaran: <b>2022/2023</b></div>
+              </v-col>
+
+              <!-- Data Calon Siswa -->
+              <v-col cols="12" class="mt-4" style="border-top:1px solid #d9d9d9">
+                <div class="d-flex justify-space-between align-center">
+                  <b>Data Calon Siswa</b>
+                  <span @click="step=2" style="cursor : pointer;color:blue">Show Detail</span>
+                </div>
+                <div>Nama Lengkap: <b>{{ form.nama_depan }} {{ form.nama_belakang }}</b></div>
+                <div>Jenis Kelamin: <b>{{ form.jenis_kelamin || '-' }}</b></div>
+                <div>Tempat Lahir: <b>{{ form.tempat_lahir }}</b></div>
+                <div>Tanggal Lahir: <b>{{ form.tgl_lahir }}</b></div>
+                <div>Status Pendaftaran: <b>{{ form.status_pendaftaran_siswa }}</b></div>
+                <div>Kebutuhan Khusus: <b>{{ form.kebutuhan_spesial == '1' ? 'Ya' : 'Tidak' }}</b></div>
+                <div>Bahasa Sehari-hari: <b>{{ form.bahasa_sehari_hari }}</b></div>
+                <div>Penghargaan: <b>{{ form.dataPPDB?.siswa_award.award }}</b></div>
+              </v-col>
+
+              <!-- Alamat -->
+              <v-col cols="12" class="mt-4" style="border-top:1px solid #d9d9d9">
+                <div class="d-flex justify-space-between align-center">
+                  <b>Alamat</b>
+                  <span @click="step=3" style="cursor : pointer;color:blue">Show Detail</span>
+                </div>
+                <div>Alamat Lengkap: <b>{{ form.alamat_siswa }}</b></div>
+                <div>RT/RW: <b>{{ form.rt_siswa }}/{{ form.rw_siswa }}</b></div>
+                <div>Kode Pos: <b>{{ form.zip_code_siswa }}</b></div>
+                <div>Provinsi: <b>{{ form.provinsi_id_siswa }}</b></div>
+                <div>Kota/Kabupaten: <b>{{ form.city_id_siswa }}</b></div>
+                <div>Kecamatan: <b>{{ form.district_id_siswa }}</b></div>
+                <div>Kelurahan/Desa: <b>{{ form.subdistrict_id_siswa }}</b></div>
+              </v-col>
+
+              <!-- Data Orang Tua -->
+              <v-col cols="12" class="mt-4" style="border-top:1px solid #d9d9d9">
+                <div class="d-flex justify-space-between align-center">
+                  <b>Data Orang Tua</b>
+                  <span @click="step=4" style="cursor : pointer;color:blue">Show Detail</span>
+                </div>
+                <div>Nama Ayah: <b>{{ form.nama_ayah }}</b></div>
+                <div>Pekerjaan Ayah: <b>{{ form.pekerjaan_ayah }}</b></div>
+                <div>Pendidikan Terakhir Ayah: <b>{{ form.pendidikan_terakhir_ayah }}</b></div>
+                <div>Penghasilan Ayah: <b>{{ form.penghasilan_ayah }}</b></div>
+                <div>Nama Ibu: <b>{{ form.nama_ibu }}</b></div>
+                <div>Pekerjaan Ibu: <b>{{ form.pekerjaan_ibu }}</b></div>
+                <div>Pendidikan Terakhir Ibu: <b>{{ form.pendidikan_terakhir_ibu }}</b></div>
+                <div>Penghasilan Ibu: <b>{{ form.penghasilan_ibu }}</b></div>
+              </v-col>
+
+              <!-- Ringkasan Pembayaran -->
+              <v-col cols="12" class="mt-4" style="border-top:1px solid #d9d9d9">
+                <div class="d-flex justify-space-between align-center">
+                  <b>Ringkasan Pembayaran</b>
+                  <span @click="step=5" style="cursor : pointer;color:blue">Show Detail</span>
+                </div>
+                <div>ID Registrasi: <b>{{ form.code_ppdb }}</b></div>
+                <div>Biaya Administrasi: <b>{{ formatRupiah(form.biaya_admin) }}</b></div>
+                <div>Status Pembayaran: 
+                  <span :style="form.payment_status == 'Menunggu' ? 'color:blue' : form.payment_status == 'Pembayaran Berhasil' ? 'color:green' : 'color:red'">
+                    <b>{{ form.payment_status }}</b>
+                  </span>
+                </div>
+              </v-col>
+            </v-row>
+
+
+            <v-row v-if="step == 1">
+              <v-col cols="12">
+                <b>Pendaftaran Perserta Didik</b>
+              </v-col>
+              <v-col cols="12" md="6">
+                <v-select
+                  v-model="form.sekolah_id"
+                  :items="sekolah"
+                  item-title="name"
+                  item-value="id"
+                  label="Sekolah"
+                  :rules="[v => !!v || 'Form harus dipilih']"
+                  required
+                  @update:model-value="getGrade()"
+                />
+              </v-col>
+
+              <v-col cols="12" md="6">
+                <v-select
+                  v-model="form.grade_id"
+                  :items="grade"
+                  item-title="name"
+                  item-value="id"
+                  label="Grade"
+                  :rules="[v => !!v || 'Form harus dipilih']"
+                  required
+                />
+              </v-col>
+            </v-row>
+
+            <v-row v-if="step == 2">
+              <v-col cols="12">
+                <b>Detail Siswa</b>
+              </v-col>
+              <v-col cols="12" sm="12" stlye="padding:0">
+                <div v-if="fotoPreviewFotoSiswa" class="mt-2 text-center">
+                  <img
+                    :src="fotoPreviewFotoSiswa"
+                    alt="Preview Foto"
+                    style="width: 120px; height: 120px; object-fit: cover; border-radius: 5%; border: 2px solid #eee;"
+                  />
+                </div>
+                <v-file-input
+                  label="Upload Foto"
+                  accept="image/*"
+                  show-size
+                  @change="handleFotoChangeFotoSiswa"
+                  class="mb-2"
+                />
+              </v-col>
+              <v-col cols="12" md="6">
+                <v-text-field
+                  v-model="form.nama_depan"
+                  label="Nama Depan"
+                  required
+                  :rules="[v => !!v || 'From harus diisi']"
+                />
+              </v-col>
+
+              <v-col cols="12" md="6">
+                <v-text-field
+                  v-model="form.nama_belakang"
+                  label="Nama Belakang"
+                  required
+                  :rules="[v => !!v || 'From harus diisi']"
+                />
+              </v-col>
+
+
+              <v-col cols="12" md="6">
+                <v-text-field
+                  v-model="form.nisn"
+                  label="NISN"
+                  required
+                  type="number"
+                  :rules="[v => !!v || 'From harus diisi']"
+                />
+              </v-col>
+
+              <v-col cols="12" md="6">
+                <v-select
+                  v-model="form.jenis_kelamin"
+                  :items="['Laki-laki','Perempuan']"
+                  label="Jenis Kelamin"
+                  :rules="[v => !!v || 'Jenis Kelamin harus dipilih']"
+                  required
+                  return-object="false"
+                />
+              </v-col>
+
+              <v-col cols="12" md="6">
+                <v-text-field
+                  v-model="form.tempat_lahir"
+                  label="Tempat Lahir"
+                  required
+                  :rules="[v => !!v || 'From harus diisi']"
+                />
+              </v-col>
+
+
+              <v-col cols="12" md="6">
+                <v-text-field
+                  v-model="form.tgl_lahir"
+                  label="Tanggal Lahir"
+                  type="date"
+                  required
+                  :rules="[v => !!v || 'From harus diisi']"
+                />
+              </v-col>
+
+
+
+              <v-col cols="12">
+                <v-select
+                  v-model="form.status_pendaftaran_siswa"
+                  :items="['Siswa Baru','Siswa Pindahan']"
+                  label="Status Pendaftaran"
+                  :rules="[v => !!v || 'Status Pendaftaran harus dipilih']"
+                  required
+                  return-object="false"
+                />
+              </v-col>
+
+
+              <v-col cols="12">
+                <v-select
+                  v-model="form.bahasa_sehari_hari"
+                  :items="['Bahasa Indonesia','Bahasa Arab','Bahasa Inggris','Bahasa Daerah']"
+                  label="Bahasa Sehari Hari"
+                  :rules="[v => !!v || 'Bahasa Sehari Hari harus dipilih']"
+                  required
+                  return-object="false"
+                />
+              </v-col>
+
+              <v-col cols="12">
+                <v-switch
+                  v-model="form.kebutuhan_spesial"
+                  label="Apakah memiliki kebutuhan khusus?"
+                  color="primary"
+                  inset
+                ></v-switch>
+              </v-col>
+
+
+              <v-col cols="12" v-if="form.dataSekolah != null ? form.dataSekolah.is_need_nem == '1' : false">
+                <v-text-field
+                  v-model="form.nilai_nem"
+                  label="NEM"
+                  required
+                  type="number"
+                  :rules="[v => !!v || 'From harus diisi']"
+                />
+              </v-col>
+
+
+
+              <v-col cols="12" v-if="form.dataSekolah != null ? form.dataSekolah.is_need_nem == '1' : false">
+
+                <div class="mb-2" v-if="form.dataPPDB.file_raport != null">
+                  <a :href="form.dataPPDB.file_raport" target="_blank"><v-icon>bx-file</v-icon> Raport</a>
+                </div>
+                <v-file-input
+                    label="Upload Raport Terakhir"
+                    show-size
+                    v-modal="form.file_raport"
+                    class="mb-2"
+                    @change="handleFileRaport"
+                  />
+              </v-col>
+              <v-col cols="12" v-if="form.dataSekolah != null">
+                <div class="mb-2" v-if="form.dataPPDB.file_akte_lahir != null">
+                   <a :href="form.dataPPDB.file_akte_lahir" target="_blank"><v-icon>bx-file</v-icon> Akte Lahir</a>
+                </div>
+                <v-file-input
+                    label="Upload Akte Lahir"
+                    show-size
+                    v-modal="form.file_akte_lahir"
+                    class="mb-2"
+                    @change="handleFileAkte"
+                  />
+              </v-col>
+              <v-col cols="12"  v-if="form.dataSekolah != null">
+
+                <div class="mb-2" v-if="form.dataPPDB.file_kartu_keluarga != null">
+                  <a :href="form.dataPPDB.file_kartu_keluarga" target="_blank"><v-icon>bx-file</v-icon> Kartu Keluarga</a>
+                  </div>
+                <v-file-input
+                    label="Upload Kartu Keluarga"
+                    show-size
+                    v-modal="form.file_kartu_keluarga"
+                    class="mb-2"
+                    @change="handleFileKK"
+                  />
+              </v-col>
+
+              <v-col cols="12">
+                <v-select
+                  v-model="form.award"
+                  :items="['Tidak ada','Ada']"
+                  label="Apakah memiliki prestasi?"
+                  required
+                  return-object="false"
+                />
+              </v-col>
+
+              <v-col cols="12" sm="12" stlye="padding:0" v-if="(form.award == 'Ada')">
+                <div v-if="fotoPreview" class="mt-2 text-center">
+                  <img
+                    :src="fotoPreview"
+                    alt="Preview Foto"
+                    style="width: auto; height: 120px; object-fit: cover; border-radius: 5%; border: 2px solid #eee;"
+                  />
+                </div>
+                <v-file-input
+                  label="Upload Foto"
+                  accept="image/*"
+                  show-size
+                  @change="handleFotoChange"
+                  class="mb-2"
+                />
+              </v-col>
+
+
+              <v-col cols="12" md="6"  v-if="(form.award == 'Ada')">
+                <v-text-field
+                  v-model="form.award_name"
+                  label="Nama Prestasi"
+                  required
+                  :rules="[v => !!v || 'From harus diisi']"
+                />
+              </v-col>
+
+
+              <v-col cols="12" md="6"  v-if="(form.award == 'Ada')">
+                <v-text-field
+                  v-model="form.award_date"
+                  label="Tanggal didapat"
+                  type="date"
+                  required
+                  :rules="[v => !!v || 'From harus diisi']"
+                />
+              </v-col>
+
+            </v-row>
+
+
+            <v-row v-if="step == 3">
+              <v-col cols="12">
+                <b>Alamat</b>
+              </v-col>
+              <v-col cols="12">
+                <v-textarea
+                  v-model="form.alamat_siswa"
+                  label="Alamat Lengkap"
+                  required
+                  :rules="[v => !!v || 'From harus diisi']"
+                />
+              </v-col>
+              <v-col cols="6" md="6">
+                <v-text-field
+                  v-model="form.rt_siswa"
+                  label="RT"
+                  required
+                  :rules="[v => !!v || 'From harus diisi']"
+                />
+              </v-col>
+              <v-col cols="6" md="6">
+                <v-text-field
+                  v-model="form.rw_siswa"
+                  label="RW"
+                  required
+                  :rules="[v => !!v || 'From harus diisi']"
+                />
+              </v-col>
+
+              <v-col cols="12">
+                <v-text-field
+                  v-model="form.zip_code_siswa"
+                  label="Kode Pos"
+                  required
+                  :rules="[v => !!v || 'From harus diisi']"
+                />
+              </v-col>
+
+
+               <v-col cols="12" md="6">
+                 <v-select
+                    v-model="form.provinsi_id_siswa"
+                    :items="provinceData"
+                    item-title="name"
+                    item-value="code"
+                    label="Provinsi"
+                    :rules="[v => !!v || 'Form harus dipilih']"
+                    required
+                    @update:model-value="getKota(form.provinsi_id_siswa)"
+                  />
+               </v-col>
+
+               <v-col cols="12" md="6">
+                 <v-select
+                    v-model="form.city_id_siswa"
+                    :items="cityData"
+                    item-title="name"
+                    item-value="code"
+                    label="Kota"
+                    :rules="[v => !!v || 'Form harus dipilih']"
+                    required
+                    @update:model-value="getKelurahan(form.city_id_siswa)"
+                  />
+               </v-col>
+
+               <v-col cols="12" md="6">
+                 <v-select
+                    v-model="form.district_id_siswa"
+                    :items="disctrictData"
+                    item-title="name"
+                    item-value="code"
+                    label="Kecamatan"
+                    :rules="[v => !!v || 'Form harus dipilih']"
+                    required
+                    @update:model-value="getVillage(form.district_id_siswa)"
+                  />
+               </v-col>
+
+               <v-col cols="12" md="6">
+                 <v-select
+                    v-model="form.subdistrict_id_siswa"
+                    :items="villageData"
+                    item-title="name"
+                    item-value="code"
+                    label="Desa"
+                    :rules="[v => !!v || 'Form harus dipilih']"
+                    required
+                  />
+               </v-col>
+            </v-row>
+
+
+            <v-row v-if="step == 4">
+              <v-col cols="12">
+                <b>Orang Tua Calon Siswa</b>
+              </v-col>
+              <v-col cols="12">
+                <v-text-field
+                  v-model="form.nama_ayah"
+                  label="Nama Ayah"
+                  required
+                  :rules="[v => !!v || 'From harus diisi']"
+                />
+              </v-col>
+              <v-col cols="12" md="6">
+                <v-select
+                  v-model="form.pendidikan_terakhir_ayah"
+                  :items="[
+                    'SD / MI',
+                    'SMP / MTs',
+                    'SMA / MA',
+                    'SMK / MAK',
+                    'Diploma',
+                    'Sarjana (S1)',
+                    'Magister (S2)',
+                    'Doktor (S3)'
+                  ]"
+                  label="Pendidikan Terakhir Ayah"
+                  :rules="[v => !!v || 'Pendidikan Terakhir Ayah harus dipilih']"
+                  required
+                  return-object="false"
+                />
+              </v-col>
+              <v-col cols="12" md="6">
+                <v-select
+                  v-model="form.pekerjaan_ayah"
+                  :items="['PNS','Pegawai Swasta','Pegawai BUMN','TNI/POLISI','GURU','DOSEN','Wirausaha','Tidak Bekerja','Lainnya']"
+                  label="Pekerjaan Ayah"
+                  :rules="[v => !!v || 'Pekerjaan Ayah harus dipilih']"
+                  required
+                  return-object="false"
+                />
+              </v-col>
+
+
+
+              <v-col cols="12">
+                <v-select
+                  v-model="form.penghasilan_ayah"
+                  :items="[
+                    'Kurang dari Rp 1.000.000',
+                    'Rp 1.000.000 – Rp 2.000.000',
+                    'Rp 2.000.000 – Rp 3.000.000',
+                    'Rp 3.000.000 – Rp 5.000.000',
+                    'Rp 5.000.000 – Rp 10.000.000',
+                    'Lebih dari Rp 10.000.000',
+                    'Tidak memiliki penghasilan'
+                  ]"
+                  label="Penghasilan Ayah"
+                  :rules="[v => !!v || 'Penghasilan Ayah harus dipilih']"
+                  required
+                  return-object="false"
+                />
+              </v-col>
+
+
+              <v-col cols="12">
+                <v-text-field
+                  v-model="form.nama_ibu"
+                  label="Nama Ibu"
+                  required
+                  :rules="[v => !!v || 'From harus diisi']"
+                />
+              </v-col>
+              <v-col cols="12" md="6">
+                <v-select
+                  v-model="form.pendidikan_terakhir_ibu"
+                  :items="[
+                    'SD / MI',
+                    'SMP / MTs',
+                    'SMA / MA',
+                    'SMK / MAK',
+                    'Diploma',
+                    'Sarjana (S1)',
+                    'Magister (S2)',
+                    'Doktor (S3)'
+                  ]"
+                  label="Pendidikan Terakhir Ibu"
+                  :rules="[v => !!v || 'Pendidikan Terakhir Ibu harus dipilih']"
+                  required
+                  return-object="false"
+                />
+              </v-col>
+              <v-col cols="12" md="6">
+                <v-select
+                  v-model="form.pekerjaan_ibu"
+                  :items="['PNS','Pegawai Swasta','Pegawai BUMN','TNI/POLISI','GURU','DOSEN','Wirausaha','Ibu Rumah Tangga','Lainnya']"
+                  label="Pekerjaan Ibu"
+                  :rules="[v => !!v || 'Pekerjaan Ibu harus dipilih']"
+                  required
+                  return-object="false"
+                />
+              </v-col>
+
+              <v-col cols="12">
+                <v-select
+                  v-model="form.penghasilan_ibu"
+                  :items="[
+                    'Kurang dari Rp 1.000.000',
+                    'Rp 1.000.000 – Rp 2.000.000',
+                    'Rp 2.000.000 – Rp 3.000.000',
+                    'Rp 3.000.000 – Rp 5.000.000',
+                    'Rp 5.000.000 – Rp 10.000.000',
+                    'Lebih dari Rp 10.000.000',
+                    'Tidak memiliki penghasilan'
+                  ]"
+                  label="Penghasilan Ibu"
+                  :rules="[v => !!v || 'Penghasilan Ibu harus dipilih']"
+                  required
+                  return-object="false"
+                />
+              </v-col>
+            </v-row>
+
+
+            <v-row v-if="step == 5">
+              <v-col cols="12">
+                <b>Summary</b>
+              </v-col>
+              <v-col cols="12" style="border-top:1px solid #d9d9d9">
+                <b>Pembayaran Administrasi</b>
+              </v-col>
+              <v-col cols="12" style="border-top:1px solid #d9d9d9">
+                ID Registrasi : <b>{{ form.code_ppdb }}</b>
+              </v-col>
+              <v-col cols="12" style="border-top:1px solid #d9d9d9">
+                Nama Calon Siswa : <b>{{ form.nama_depan }} {{ form.nama_belakang }}</b>
+              </v-col>
+              <v-col cols="12" style="border-top:1px solid #d9d9d9">
+                Nama Ayah : <b>{{ form.nama_ayah }}</b>
+              </v-col>
+              <v-col cols="12" style="border-top:1px solid #d9d9d9">
+                Biaya Admininstrasi : <b>{{ formatRupiah(form.biaya_admin) }}</b>
+              </v-col>
+              <v-col cols="12" style="border-top:1px solid #d9d9d9">
+                Status Pembayaran : <span :style="form.payment_status == 'Menunggu' ? 'color:blue' : form.payment_status == 'Pembayaran Berhasil' ? 'color:green' : 'color:red'"><b>{{ form.payment_status }}</b></span>
+              </v-col>
+
+              <v-col cols="12" sm="12" stlye="padding:0" >
+                <div v-if="fotoPreviewBukti" class="mt-2 text-center">
+                  <img
+                    :src="fotoPreviewBukti"
+                    alt="Preview Foto"
+                    style="width: auto; height: 120px; object-fit: cover; border-radius: 5%; border: 2px solid #eee;"
+                  />
+                </div>
+                <v-file-input
+                  label="Upload Foto"
+                  accept="image/*"
+                  show-size
+                  @change="handleFotoChangeBukti"
+                  class="mb-2"
+                />
+              </v-col>
+            </v-row>
+
+
+            <v-row v-if="step == 6" justify="center" align="center">
+              <v-col cols="12" class="text-center">
+                <!-- Animasi GIF sukses -->
+                <img
+                  src="/images/success.gif"
+                  alt="Success"
+                  style="max-width: 200px; margin-bottom: 20px;"
+                />
+                
+                <!-- Pesan sukses -->
+                <h3 class="mt-4">Pendaftaran Berhasil!</h3>
+                <p>Terima kasih telah mengisi formulir PPDB.</p>
+              </v-col>
+            </v-row>
+
+            <v-row class="d-none d-md-flex" v-if="step != 6 && step != 0">
+              <v-col cols="12" class="text-right">
+                  <v-row>
+                    <v-col cols="12" md="4">
+                      <v-btn color="error" variant="flat" class="mr-2" @click="showCreateModal = false;getDataRegister()" block>Batal</v-btn>
+                    </v-col>
+
+                    <v-col cols="12" md="4">
+                      <v-btn color="secondary" variant="flat" :disabled="loading || (form.dataPPDB?.is_submit == '1' ? false : step == 1)" block class="mr-2" :loading="loading"  @click="form.dataPPDB?.is_submit == '1' ? (step = 0, getDetail()) : (step = step - 1, getDetail())" >
+                        Kembali
+                      </v-btn>
+                    </v-col>
+
+                    <v-col cols="12" md="4">
+                       <v-btn color="primary" variant="flat" :disabled="loading" type="submit" :loading="loading" block>
+                          {{ step < 5 ? 'Simpan dan lanjut' : 'Kirim'}}
+                        </v-btn>
+                    </v-col>
+                  </v-row>
+              </v-col>
+            </v-row>
+
+            <v-row class="d-flex d-md-none" v-if="step != 6  && step != 0">
+              <v-col cols="12" class="text-right">
+                  <v-row>
+                    <v-col cols="6">
+                      <v-btn color="secondary" variant="flat" :disabled="loading || (form.dataPPDB?.is_submit == '1' ? false : step == 1)" block class="mr-2" :loading="loading" @click="form.dataPPDB?.is_submit == '1' ? (step = 0, getDetail()) : (step = step - 1, getDetail())">
+                        Kembali
+                      </v-btn>
+                    </v-col>
+                    <v-col cols="6">
+                       <v-btn color="primary" variant="flat" :disabled="loading" type="submit" :loading="loading" block>
+                          {{ step < 5 ? 'Simpan dan lanjut' : 'Kirim'}}
+                        </v-btn>
+                    </v-col>
+
+                    <v-col cols="12">
+                      <v-btn color="error" variant="flat" class="mr-2" @click="showCreateModal = false;getDataRegister()" block>Batal</v-btn>
+                    </v-col>
+                  </v-row>
+              </v-col>
+            </v-row>
+
+            <v-row v-if="step == 6 || step == 0">
+              <v-col cols="12" class="text-right">
+                  <v-row>
+                    <v-col cols="12">
+                      <v-btn color="primary" variant="flat" class="mr-2" @click="showCreateModal = false;getDataRegister()" block>Tutup</v-btn>
+                    </v-col>
+                  </v-row>
+              </v-col>
+            </v-row>    
+
+          </v-card-text>
+        </v-form>
+        </v-card>
+    </v-dialog>
+
+
+
+    <!-- Snackbar error -->
+    <v-snackbar v-model="show" color="error" timeout="3000">
+      {{ message }}
+    </v-snackbar>
+
+
+    <!-- Snackbar Sucess -->
+    <v-snackbar v-model="showSuccess" color="success" timeout="3000">
+      {{ message }}
+    </v-snackbar>
+    <!-- Dialog konfirmasi hapus -->
+    <ConfirmDialog
+      :modelValue="showConfirm"
+      :title="titleConfirm"
+      :message="messageConfirm"
+      :color="color"
+      @confirm="showModal(dataConfirm)"
+      @cancel="showConfirm = false"
+    />
+
+
+    <ConfirmDialog
+      :modelValue="showConfirmDelete"
+      :title="titleConfirmDelete"
+      :message="messageConfirmDelete"
+      :color="colorDelete"
+      @confirm="handleDelete(dataConfirmDelete)"
+      @cancel="showConfirmDelete = false"
+    />
+
+  </div>
+</template>
+<script setup>
+import { ref } from 'vue';
+import ConfirmDialog from '~/components/ConfirmDialog.vue';
+
+const { $api } = useNuxtApp()
+const loading = ref(false);
+const form = ref({
+  code_ppdb : null,
+  search : null,
+  nama_depan : null,
+  nama_belakang : null,
+  tempat_lahir : null,
+  tgl_lahir : null,
+  nisn : null,
+  kebutuhan_spesial: false,
+  bahasa_sehari_hari: null,
+  status_pendaftaran_siswa: null,
+  award : 'Tidak ada',
+  award_image : null,
+  award_name : null,
+  award_date: null,
+  foto_siswa: null,
+  nem: null,
+  file_raport: null,
+  file_akte_lahir: null,
+  file_kartu_keluarga: null,
+
+  alamat_siswa: null,
+  rt_siswa: null,
+  rw_siswa: null,
+  zip_code_siswa: null,
+  provinsi_id_siswa: null,
+  city_id_siswa: null,
+  district_id_siswa: null,
+  subdistrict_id_siswa: null,
+
+  nama_ayah : null,
+  pekerjaan_ayah : null,
+  pendidikan_terakhir_ayah : null,
+  penghasilan_ayah : null,
+  nama_ibu : null,
+  pekerjaan_ibu : null,
+  pendidikan_terakhir_ibu : null,
+  penghasilan_ibu : null,
+
+  sekolah_id: null,
+  grade_id : null,
+
+  biaya_admin : 0,
+  biaya_pendaftaran : 0,
+  payment_status : null,
+
+  bukti_transaksi : null,
+
+  dataSekolah : null,
+  dataPPDB : null
+});
+
+const sekolah = ref([]);
+const dataRegister = ref([]);
+const grade = ref([]);
+const show = ref(false);
+const message = ref(null);
+const showConfirm = ref(false);
+const titleConfirm = ref(null);
+const messageConfirm = ref(null);
+const dataConfirm = ref(null);
+const color = ref('error');
+const step = ref(1);
+const fotoPreview = ref(null);
+const fotoPreviewBukti = ref(null);
+const fotoPreviewFotoSiswa = ref(null);
+
+
+const showConfirmDelete = ref(false);
+const titleConfirmDelete = ref(null);
+const messageConfirmDelete = ref(null);
+const dataConfirmDelete = ref(null);
+const colorDelete = ref('error');
+
+const showCreateModal = ref(false)
+
+
+function createRegister(data) {
+  if(data == null){
+    Object.keys(form.value).forEach(k => {
+      form.value[k] = null;
+    });
+    fotoPreview.value = '/no-image.jpg'
+    fotoPreviewBukti.value = '/no-image.jpg'
+    fotoPreviewFotoSiswa.value = '/no-image.jpg'
+    color.value = 'primary';
+    titleConfirm.value = 'Konfirmasi Pendataran';
+    messageConfirm.value = 'Yakin ingin mendaftar baru?';
+    dataConfirm.value = data;
+    showConfirm.value = true;
+  }else{
+    color.value = 'primary';
+    titleConfirm.value = 'Lanjutkan pendaftaran';
+    messageConfirm.value = 'Yakin ingin melanjutkan pendaftaran?';
+    dataConfirm.value = data;
+    showConfirm.value = true;
+  }
+}
+
+function showModal(data) {
+  step.value = data.is_submit == '1' ? 0 : 1;
+  fotoPreview.value='/no-image.jpg';
+  showConfirm.value = false;
+  showCreateModal.value = true;
+  if(data == null){
+    register()
+  }else{
+    form.value.sekolah_id = data.sekolah_id
+    getGrade()
+    form.value.grade_id = data.grade_id
+    form.value.code_ppdb = data.code_pendaftaran
+    form.value.nama_depan = data.siswa.nama_depan
+    form.value.nama_belakang = data.siswa.nama_belakang
+    form.value.tgl_lahir = data.siswa.tgl_lahir
+    form.value.tempat_lahir = data.siswa.tempat_lahir
+    form.value.jenis_kelamin = data.siswa.jenis_kelamin
+    form.value.nisn = data.siswa.nisn
+    form.value.status_pendaftaran_siswa = data.status_pendaftaran_siswa
+    form.value.bahasa_sehari_hari = data.siswa.bahasa_sehari_hari
+    form.value.kebutuhan_spesial = data.siswa.kebutuhan_spesial == '1' ? true : false
+    form.value.award = data.siswa_award != null ? 'Ada' : 'Tidak Ada'
+    form.value.biaya_admin = data.biaya_admin
+    form.value.biaya_pendaftaran = data.biaya_pendaftaran
+    form.value.dataSekolah = data.sekolah
+    form.value.dataPPDB = data
+    fotoPreviewFotoSiswa.value = data.siswa.foto_siswa
+    form.value.nilai_nem = data.nem
+
+
+    if(data.siswa_award != null){
+      form.value.award_name = data.siswa_award.award
+      form.value.award_date = data.siswa_award.tgl_didapat
+      fotoPreview.value = data.siswa_award.image
+    }
+    
+    if(data.siswa_address != null){
+      form.value.alamat_siswa = data.siswa_address.alamat
+      form.value.rt_siswa = data.siswa_address.rt
+      form.value.rw_siswa = data.siswa_address.rw
+      getProvince()
+      form.value.provinsi_id_siswa = data.siswa_address.provinsi_id
+      getKota(form.value.provinsi_id_siswa)
+      form.value.city_id_siswa = data.siswa_address.city_id
+      getKelurahan(form.value.city_id_siswa)
+      form.value.district_id_siswa = data.siswa_address.district_id
+      getVillage(form.value.district_id_siswa)
+      form.value.subdistrict_id_siswa = data.siswa_address.subdistrict_id
+      form.value.zip_code_siswa = data.siswa_address.zip_code
+    }
+
+
+    if(data.siswa_parent != null){
+      form.value.nama_ayah = data.siswa_parent.nama_ayah
+      form.value.pekerjaan_ayah = data.siswa_parent.pekerjaan_ayah
+      form.value.pendidikan_terakhir_ayah = data.siswa_parent.pendidikan_terakhir_ayah
+      form.value.penghasilan_ayah = data.siswa_parent.penghasilan_ayah
+
+
+      form.value.nama_ibu = data.siswa_parent.nama_ibu
+      form.value.pekerjaan_ibu = data.siswa_parent.pekerjaan_ibu
+      form.value.pendidikan_terakhir_ibu = data.siswa_parent.pendidikan_terakhir_ibu
+      form.value.penghasilan_ibu = data.siswa_parent.penghasilan_ibu
+    }
+
+    if(data.payment == null){
+      form.value.payment_status = 'Belum dibayar'
+    }else{
+      fotoPreviewBukti.value = data.payment.bukti_transfer
+      form.value.payment_status = data.payment.status_payment == '00' ? 'Menunggu' : data.payment.status_payment == '01' ? 'Pembayaran Berhasil' : 'Pembayaran Ditolak'
+    }
+  }
+}
+
+async function handleCreateData() {
+  loading.value = true
+  try {
+    const formData = new FormData();
+
+    // Tambahkan semua data dari form.value ke FormData
+    for (const key in form.value) {
+      if (form.value.hasOwnProperty(key)) {
+        formData.append(key, form.value[key]);
+      }
+    }
+    if(step.value == 1 && (form.value.sekolah_id == null || form.value.grade_id == null)){
+      show.value = true;
+      message.value = 'Harap isi form dengan lengkap';
+    }else if (
+      step.value === 2 &&
+      (
+        !form.value.nama_depan ||
+        !form.value.nama_belakang ||
+        !fotoPreviewFotoSiswa.value ||
+        !form.value.nisn ||
+        !form.value.jenis_kelamin ||
+        !form.value.status_pendaftaran_siswa ||
+        !form.value.tempat_lahir ||
+        !form.value.tgl_lahir ||
+        !form.value.bahasa_sehari_hari ||
+        (!form.value.dataPPDB?.file_kartu_keluarga && !form.value.file_kartu_keluarga) ||
+        (!form.value.dataPPDB?.file_akte_lahir && !form.value.file_akte_lahir) ||
+        (
+          form.value.dataSekolah?.is_need_nem === '1' &&
+          (
+            !form.value.nilai_nem ||
+            (
+              !form.value.dataPPDB?.file_raport &&
+              !form.value.file_raport
+            )
+          )
+        )
+      )
+    ) {
+      show.value = true;
+      message.value = 'Harap isi form dengan lengkap';
+    }else if(step.value == 3 && (
+      form.value.alamat_siswa == null ||
+      form.value.rt_siswa == null ||
+      form.value.rw_siswa == null ||
+      form.value.provinsi_id_siswa == null ||
+      form.value.city_id_siswa == null ||
+      form.value.district_id_siswa == null ||
+      form.value.subdistrict_id_siswa == null ||
+      form.value.zip_code_siswa == null
+    )){
+      show.value = true;
+      message.value = 'Harap isi form dengan lengkap';
+    }else if(step.value == 4 && (
+      form.value.nama_ayah == null ||
+      form.value.pekerjaan_ayah == null ||
+      form.value.pendidikan_terakhir_ayah == null ||
+      form.value.penghasilan_ayah == null ||
+      form.value.nama_ibu== null ||
+      form.value.pekerjaan_ibu== null ||
+      form.value.pendidikan_terakhir_ibu== null ||
+      form.value.penghasilan_ibu== null
+    )){
+      show.value = true;
+      message.value = 'Harap isi form dengan lengkap';
+    }else{
+      // Tambahkan nilai step secara eksplisit
+      formData.append('step', step.value);
+
+      const {data} = await $api.post(`/register-ppdb/update-form`, formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data'
+        }
+      });
+      step.value = parseInt(step.value) + 1;
+      form.value.code_ppdb = data.data.code_pendaftaran
+      getDetail()
+    }
+  } catch (error) {
+    show.value = true;
+    message.value = 'Server Error.';
+  } finally {
+    loading.value = false;
+  }
+}
+
+
+async function getRole() {
+  loading.value = true
+  try {
+    const data = await $api.get(`/master-data/sekolah/get-select`)
+    sekolah.value = data.data.data;
+  } catch (error) {
+    // show.value = true
+    // message.value = error.response?.data?.message || 'Gagal Mendapatkan Data.'
+  } finally {
+    loading.value = false
+  }
+}
+
+
+
+async function getGrade() {
+  loading.value = true
+  try {
+    const data = await $api.post(`/master-data/sekolah/get-select-grade`,{
+      sekolah_id : form.value.sekolah_id
+    })
+    grade.value = data.data.data;
+  } catch (error) {
+    // show.value = true
+    // message.value = error.response?.data?.message || 'Gagal Mendapatkan Data.'
+  } finally {
+    loading.value = false
+  }
+}
+
+
+
+
+async function getDataRegister() {
+  loading.value = true
+  try {
+    const data = await $api.post(`/register-ppdb/get-data`)
+    dataRegister.value = data.data.data;
+  } catch (error) {
+    // show.value = true
+    // message.value = error.response?.data?.message || 'Gagal Mendapatkan Data.'
+  } finally {
+    loading.value = false
+  }
+}
+
+
+async function register() {
+  loading.value = true
+  try {
+    const data = await $api.post(`/register-ppdb/create`,form.value);
+    form.value.code_ppdb = data.data.data.code_pendaftaran;
+  } catch (error) {
+    show.value = true;
+    message.value = 'Server Error.';
+  } finally {
+    loading.value = false;
+  }
+}
+
+
+
+function handleFotoChange(e) {
+  let file
+  if (Array.isArray(e)) file = e[0]
+  else if (e?.target?.files) file = e.target.files[0]
+  else file = e
+
+  if (file) {
+    form.value.award_image = file
+    fotoPreview.value = URL.createObjectURL(file)
+  } else {
+    form.value.award_image = null
+    fotoPreview.value = '/no-image.jpg'
+  }
+}
+
+
+function handleFotoChangeBukti(e) {
+  let file
+  if (Array.isArray(e)) file = e[0]
+  else if (e?.target?.files) file = e.target.files[0]
+  else file = e
+
+  if (file) {
+    form.value.bukti_transaksi = file
+    fotoPreviewBukti.value = URL.createObjectURL(file)
+  } else {
+    form.value.bukti_transaksi = null
+    fotoPreviewBukti.value = '/no-image.jpg'
+  }
+}
+
+
+
+function handleFotoChangeFotoSiswa(e) {
+  let file
+  if (Array.isArray(e)) file = e[0]
+  else if (e?.target?.files) file = e.target.files[0]
+  else file = e
+
+  if (file) {
+    form.value.foto_siswa = file
+    fotoPreviewFotoSiswa.value = URL.createObjectURL(file)
+  } else {
+    form.value.foto_siswa = null
+    fotoPreviewFotoSiswa.value = '/no-image.jpg'
+  }
+}
+
+const provinceData = ref([]);
+const cityData = ref([]);
+const disctrictData = ref([]);
+const villageData = ref([]);
+
+async function getProvince() {
+  loading.value = true;
+  try {
+    const {data} = await $api.get('/province/get-data');
+    provinceData.value = data.data
+  } catch (error) {
+    show.value = true;
+    message.value = 'Server Error.';
+  } finally {
+    loading.value = false;
+  }
+}
+
+
+async function getKota(Params) {
+  loading.value = true;
+  try {
+    const {data} = await $api.post('/city/get-data',{
+      province_id : Params
+    });
+    cityData.value = data.data
+  } catch (error) {
+    show.value = true;
+    message.value = 'Server Error.';
+  } finally {
+    loading.value = false;
+  }
+}
+
+
+async function getKelurahan(Params) {
+  loading.value = true;
+  try {
+    const {data} = await $api.post('/district/get-data',{
+      city_id : Params
+    });
+    disctrictData.value = data.data
+  } catch (error) {
+    show.value = true;
+    message.value = 'Server Error.';
+  } finally {
+    loading.value = false;
+  }
+}
+
+async function getVillage(Params) {
+  loading.value = true;
+  try {
+    const {data} = await $api.post('/village/get-data',{
+      district_id : Params
+    });
+    villageData.value = data.data
+  } catch (error) {
+    show.value = true;
+    message.value = 'Server Error.';
+  } finally {
+    loading.value = false;
+  }
+}
+
+const formatRupiah = (value) => {
+  if (!value) return 'Rp 0'
+  return new Intl.NumberFormat('id-ID', {
+    style: 'currency',
+    currency: 'IDR',
+    minimumFractionDigits: 0
+  }).format(value)
+}
+
+
+
+function deleteRegister(data) {
+    colorDelete.value = 'error';
+    titleConfirmDelete.value = 'Batalkan pendaftaran';
+    messageConfirmDelete.value = 'Yakin ingin Membatalkan pendaftaran?';
+    dataConfirmDelete.value = data;
+    showConfirmDelete.value = true;
+}
+const showSuccess = ref(false);
+
+async function handleDelete (dataDelete) {
+  loading.value = true
+  try {
+    const data = await $api.post(`/register-ppdb/delete`,dataDelete);
+    showSuccess.value = true;
+    message.value = 'Berhasil dibatalkan';
+    showConfirmDelete.value = false;
+
+    getDataRegister()
+  } catch (error) {
+    show.value = true;
+    message.value = 'Server Error.';
+  } finally {
+    loading.value = false;
+  }
+}
+
+
+
+
+function handleFileRaport(e) {
+  let file
+  if (Array.isArray(e)) file = e[0]
+  else if (e?.target?.files) file = e.target.files[0]
+  else file = e
+
+  if (file) {
+    form.value.file_raport = file
+  } else {
+    form.value.file_raport = null
+  }
+}
+
+function handleFileAkte(e) {
+  let file
+  if (Array.isArray(e)) file = e[0]
+  else if (e?.target?.files) file = e.target.files[0]
+  else file = e
+
+  if (file) {
+    form.value.file_akte_lahir = file
+  } else {
+    form.value.file_akte_lahir = null
+  }
+}
+
+
+function handleFileKK(e) {
+  let file
+  if (Array.isArray(e)) file = e[0]
+  else if (e?.target?.files) file = e.target.files[0]
+  else file = e
+
+  if (file) {
+    form.value.file_kartu_keluarga = file
+  } else {
+    form.value.file_kartu_keluarga = null
+  }
+}
+
+async function getDetail(){
+  loading.value = true
+  try {
+    const {data} = await $api.post(`/register-ppdb/get-detail`,{
+      register_id : form.value.code_ppdb
+    });
+    const dataDetail = data.data[0]
+    form.value.sekolah_id = dataDetail.sekolah_id
+    getGrade()
+    form.value.grade_id = dataDetail.grade_id
+    form.value.code_ppdb = dataDetail.code_pendaftaran
+    form.value.nama_depan = dataDetail.siswa.nama_depan
+    form.value.nama_belakang = dataDetail.siswa.nama_belakang
+    form.value.tgl_lahir = dataDetail.siswa.tgl_lahir
+    form.value.tempat_lahir = dataDetail.siswa.tempat_lahir
+    form.value.jenis_kelamin = dataDetail.siswa.jenis_kelamin
+    form.value.nisn = dataDetail.siswa.nisn
+    form.value.status_pendaftaran_siswa = dataDetail.status_pendaftaran_siswa
+    form.value.bahasa_sehari_hari = dataDetail.siswa.bahasa_sehari_hari
+    form.value.kebutuhan_spesial = dataDetail.siswa.kebutuhan_spesial == '1' ? true : false
+    form.value.award = dataDetail.siswa_award != null ? 'Ada' : 'Tidak Ada'
+    form.value.biaya_admin = dataDetail.biaya_admin
+    form.value.biaya_pendaftaran = dataDetail.biaya_pendaftaran
+    form.value.dataSekolah = dataDetail.sekolah
+    form.value.dataPPDB = dataDetail
+    fotoPreviewFotoSiswa.value = dataDetail.siswa.foto_siswa ?? '/no-image.jpg'
+    form.value.nilai_nem = dataDetail.nem ?? null
+
+
+    if(dataDetail.siswa_award != null){
+      form.value.award_name = dataDetail.siswa_award.award
+      form.value.award_date = dataDetail.siswa_award.tgl_didapat
+      fotoPreview.value = dataDetail.siswa_award.image
+    }
+    
+    if(dataDetail.siswa_address != null){
+      form.value.alamat_siswa = dataDetail.siswa_address.alamat
+      form.value.rt_siswa = dataDetail.siswa_address.rt
+      form.value.rw_siswa = dataDetail.siswa_address.rw
+      getProvince()
+      form.value.provinsi_id_siswa = dataDetail.siswa_address.provinsi_id
+      getKota(form.value.provinsi_id_siswa)
+      form.value.city_id_siswa = dataDetail.siswa_address.city_id
+      getKelurahan(form.value.city_id_siswa)
+      form.value.district_id_siswa = dataDetail.siswa_address.district_id
+      getVillage(form.value.district_id_siswa)
+      form.value.subdistrict_id_siswa = dataDetail.siswa_address.subdistrict_id
+      form.value.zip_code_siswa = dataDetail.siswa_address.zip_code
+    }
+
+
+    if(dataDetail.siswa_parent != null){
+      form.value.nama_ayah = dataDetail.siswa_parent.nama_ayah
+      form.value.pekerjaan_ayah = dataDetail.siswa_parent.pekerjaan_ayah
+      form.value.pendidikan_terakhir_ayah = dataDetail.siswa_parent.pendidikan_terakhir_ayah
+      form.value.penghasilan_ayah = dataDetail.siswa_parent.penghasilan_ayah
+
+
+      form.value.nama_ibu = dataDetail.siswa_parent.nama_ibu
+      form.value.pekerjaan_ibu = dataDetail.siswa_parent.pekerjaan_ibu
+      form.value.pendidikan_terakhir_ibu = dataDetail.siswa_parent.pendidikan_terakhir_ibu
+      form.value.penghasilan_ibu = dataDetail.siswa_parent.penghasilan_ibu
+    }
+
+    if(dataDetail.payment == null){
+      form.value.payment_status = 'Belum dibayar'
+    }else{
+      fotoPreviewBukti.value = dataDetail.payment.bukti_transfer
+      form.value.payment_status = dataDetail.payment.status_payment == '00' ? 'Menunggu' : dataDetail.payment.status_payment == '01' ? 'Pembayaran Berhasil' : 'Pembayaran Ditolak'
+    }
+  } catch (error) {
+    show.value = true;
+    message.value = 'Server Error.';
+  } finally {
+    loading.value = false;
+  }
+}
+
+onMounted(() => {
+  getRole()
+  getDataRegister()
+  fotoPreview.value = '/no-image.jpg'
+  fotoPreviewBukti.value = '/no-image.jpg'
+  fotoPreviewFotoSiswa.value = '/no-image.jpg'
+  getProvince()
+})
+</script>

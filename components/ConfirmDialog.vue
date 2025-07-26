@@ -12,7 +12,7 @@
       <v-card-actions>
         <v-spacer></v-spacer>
         <v-btn variant="text" @click="cancel">Batal</v-btn>
-        <v-btn color="error" variant="flat" @click="ok">Ya</v-btn>
+        <v-btn :color="color ?? 'error'" variant="flat" @click="ok">Ya</v-btn>
       </v-card-actions>
     </v-card>
   </v-dialog>
@@ -24,10 +24,11 @@ const props = defineProps({
   modelValue: Boolean,
   title: String,
   message: String,
+  color: String,
 })
 const emits = defineEmits(['update:modelValue', 'confirm', 'cancel'])
 
-
+const colors = ref(null);
 function ok() {
   emits('confirm')
   props.modelValue = false
@@ -36,4 +37,5 @@ function cancel() {
   emits('cancel')
   props.modelValue = false
 }
+
 </script>
