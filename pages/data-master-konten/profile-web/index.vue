@@ -275,6 +275,28 @@
               ]"
             />
         </v-col>
+
+        <v-col cols="12" class="text-center">
+
+
+          <!-- Link Download Brosur -->
+          <div v-if="brosurFile != null" class="mt-2">
+            <a :href="brosurFile" target="_blank" class="text-blue-600 underline inline-flex items-center">
+              <i class="bx bx-file text-6xl mr-1"></i> <br>Download Brosur
+            </a>
+          </div>
+          <v-file-input
+            label="Upload Brosur"
+            accept=".pdf,.doc,.docx,.ppt,.pptx"
+            show-size
+            variant="outlined"
+            dense
+            clearable
+            @change="handleBrosurChange"
+            class="mt-4"
+            prepend-icon="bx bx-file"
+          />
+        </v-col>
     </v-row>
 
     <v-btn :loading="loading" :disabled="loading" type="submit" color="primary" class="mt-4" block>Simpan</v-btn>
@@ -306,6 +328,7 @@ const form = reactive({
   address: '',
   whatsapp: '',
   email: '',
+  brosur: null,
   social: {
     fb: '',
     ig: '',
@@ -458,6 +481,7 @@ async function saveProfile() {
     if (form.banner_visi) formData.append('banner_visi', form.banner_visi)
     if (form.banner_misi) formData.append('banner_misi', form.banner_misi)
     if (form.banner_sambutan) formData.append('banner_sambutan', form.banner_sambutan)
+    if (form.brosur) formData.append('brosur', form.brosur)
 
     const response = await $api.post(`/master-content/web-profile-update`, formData, {
       headers: { 'Content-Type': 'multipart/form-data' }
@@ -498,12 +522,30 @@ async function getData () {
     bannerMisiPreview.value = data.banner_misi ?? '/no-image.jpg'
     bannerAboutPreview.value = data.banner_about ?? '/no-image.jpg'
     bannerSambutanPreview.value = data.banner_sambutan ?? '/no-image.jpg'
+    brosurFile.value = data.brosur ?? null
     form.banner = null // will be replaced if upload new
     form.logo = null
   } catch (e) {
     // It's OK if empty for first setup
   } finally {
     loading.value = false
+  }
+}
+
+
+const brosurFile = ref(null)
+function handleBrosurChange(e) {
+  let file
+  if (Array.isArray(e)) file = e[0]
+  else if (e?.target?.files) file = e.target.files[0]
+  else file = e
+
+  if (file) {
+    form.brosur = file
+    brosurFile.value = URL.createObjectURL(file)
+  } else {
+    form.brosur = null
+    brosurFile.value = null
   }
 }
 
