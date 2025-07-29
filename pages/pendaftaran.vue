@@ -35,18 +35,80 @@
           <!-- Tombol Delete di kanan atas -->
           <v-btn
             icon
-            class="ma-2"
+            class="ma-2 mb-4"
             color="red"
             style="position: absolute; top: 0; right: 0; z-index: 10;color:red"
             @click.stop="deleteRegister(item)"
+            v-if="item.is_daftar_ulang == 0"
           >
-            <v-icon size="30">bx bx-trash</v-icon>
+            <v-icon size="30"  v-if="!loading">bx bx-trash</v-icon>
+            <v-progress-circular
+                v-else
+                indeterminate
+                color="primary"
+                size="30"
+              />
+          </v-btn>
+
+
+          <v-btn
+            icon
+            class="ma-2"
+            color="red"
+            :style="item.is_daftar_ulang == 0 ? `position: absolute; top: 40px; right: 0; z-index: 10;color:blue` : `position: absolute; top: 0px; right: 0; z-index: 10;color:blue`"
+            @click.stop="printData(item)"
+            v-if="item.is_submit == '1'"
+          >
+            <v-icon size="30" v-if="!loading">bx bx-printer</v-icon>
+            <v-progress-circular
+                v-else
+                indeterminate
+                color="primary"
+                size="30"
+              />
+          </v-btn>
+
+
+          <v-btn
+            icon
+            class="ma-2"
+            color="red"
+            :style="item.is_daftar_ulang == 1 ? `position: absolute; top: 43px; right: 0; z-index: 10;color:blue` : `display: none`"
+            @click.stop="printDataKTS(item)"
+            v-if="item.is_submit == '1'"
+          >
+            <v-icon size="30" v-if="!loading">bx bx-id-card</v-icon>
+            <v-progress-circular
+                v-else
+                indeterminate
+                color="primary"
+                size="30"
+              />
+          </v-btn>
+
+
+
+          <v-btn
+            icon
+            class="ma-2"
+            color="red"
+            :style="item.is_daftar_ulang == 0 ? `position: absolute; top: 40px; right: 0; z-index: 10;color:blue` : `position: absolute; top: 0px; right: 0; z-index: 10;color:blue`"
+            @click.stop="printData(item)"
+            v-if="item.is_submit == '1'"
+          >
+            <v-icon size="30" v-if="!loading">bx bx-printer</v-icon>
+            <v-progress-circular
+                v-else
+                indeterminate
+                color="primary"
+                size="30"
+              />
           </v-btn>
 
           <v-row align="center" no-gutters class="pa-5" @click="createRegister(item)">
             <v-col cols="12" md="3" class="flex justify-center items-center text-center">
               <v-avatar size="70" class="elevation-5" style="border: 2px solid #38bdf8; box-shadow: 0 4px 18px 0 #38bdf833;">
-                <v-img src="/favicon.ico" cover alt="Avatar" />
+                <v-img :src="item.siswa.foto_siswa != null ? item.siswa.foto_siswa : '/favicon.ico'" cover alt="Avatar" />
               </v-avatar>
             </v-col>
             <v-col cols="12" md="7" class="pl-0 md:pl-4 md:mt-0">
@@ -76,13 +138,41 @@
             </v-col>
           </v-row>
 
-          <v-col cols="12" class="pa-2 bg-primary" style="margin:0px">
+          <v-col cols="12"  v-if="item.is_daftar_ulang == '0'" :class="
+              item.status_pendaftaran == 'P00'
+                ? 'pa-2 bg-warning'
+                : item.status_pendaftaran == 'P01'
+                ? 'pa-2 bg-primary'
+                : item.status_pendaftaran == 'P02'
+                ? 'pa-2 bg-error'
+                : 'None'
+            " style="margin:0px">
             {{
               item.status_pendaftaran == 'P00'
                 ? 'Menunggu'
                 : item.status_pendaftaran == 'P01'
                 ? 'Diterima'
                 : item.status_pendaftaran == 'P02'
+                ? 'Ditolak'
+                : 'None'
+            }}
+          </v-col>
+
+          <v-col cols="12"  v-if="item.is_daftar_ulang == '1'" :class="
+              item.registrasi_ulang?.status_pembayaran == '00'
+                ? 'pa-2 bg-warning'
+                : item.registrasi_ulang?.status_pembayaran == '01'
+                ? 'pa-2 bg-primary'
+                : item.registrasi_ulang?.status_pembayaran == '02'
+                ? 'pa-2 bg-error'
+                : 'None'
+            " style="margin:0px">
+            {{
+              item.registrasi_ulang?.status_pembayaran == '00'
+                ? 'Menunggu'
+                : item.registrasi_ulang?.status_pembayaran == '01'
+                ? 'Diterima'
+                : item.registrasi_ulang?.status_pembayaran == '02'
                 ? 'Ditolak'
                 : 'None'
             }}
@@ -98,7 +188,7 @@
         <v-card-title class="pa-6">
           <v-row>
             <v-col cols="11">
-              <span class="headline">Pendaftaran Baru</span>
+              <span class="headline">Pendaftaran Peserta Didik Baru</span>
             </v-col>
             <v-col cols="1" class="pa-2 text-center">
               <v-icon style="cursor: pointer" @click="showCreateModal = false;getDataRegister()">bx bx-x</v-icon>
@@ -114,18 +204,18 @@
               <v-col cols="12">
                 <div class="d-flex justify-space-between align-center">
                   <b>Informasi Sekolah</b>
-                  <span @click="step=1" style="cursor : pointer;color:blue">Show Detail</span>
+                  <span @click="step=1" v-if="form.dataPPDB?.status_pendaftaran == 'P00'" style="cursor : pointer;color:blue">Show Detail</span>
                 </div>
                 <div>Nama Sekolah: <b>{{ form.dataSekolah?.name || '-' }}</b></div>
                 <div>Jenjang Dituju: <b>{{ form.dataPPDB?.sekolah_grade.name || '-' }}</b></div>
-                <div>Tahun Ajaran: <b>2022/2023</b></div>
+                <div>Tahun Ajaran: <b>{{ getTahunAjaran(form.dataPPDB?.created_at) }}</b></div>
               </v-col>
 
               <!-- Data Calon Siswa -->
               <v-col cols="12" class="mt-4" style="border-top:1px solid #d9d9d9">
                 <div class="d-flex justify-space-between align-center">
                   <b>Data Calon Siswa</b>
-                  <span @click="step=2" style="cursor : pointer;color:blue">Show Detail</span>
+                  <span @click="step=2" v-if="form.dataPPDB?.status_pendaftaran == 'P00'" style="cursor : pointer;color:blue">Show Detail</span>
                 </div>
                 <div>Nama Lengkap: <b>{{ form.nama_depan }} {{ form.nama_belakang }}</b></div>
                 <div>Jenis Kelamin: <b>{{ form.jenis_kelamin || '-' }}</b></div>
@@ -134,29 +224,29 @@
                 <div>Status Pendaftaran: <b>{{ form.status_pendaftaran_siswa }}</b></div>
                 <div>Kebutuhan Khusus: <b>{{ form.kebutuhan_spesial == '1' ? 'Ya' : 'Tidak' }}</b></div>
                 <div>Bahasa Sehari-hari: <b>{{ form.bahasa_sehari_hari }}</b></div>
-                <div>Penghargaan: <b>{{ form.dataPPDB?.siswa_award.award }}</b></div>
+                <div>Penghargaan: <b>{{  form.dataPPDB?.siswa_award?.award }}</b></div>
               </v-col>
 
               <!-- Alamat -->
               <v-col cols="12" class="mt-4" style="border-top:1px solid #d9d9d9">
                 <div class="d-flex justify-space-between align-center">
                   <b>Alamat</b>
-                  <span @click="step=3" style="cursor : pointer;color:blue">Show Detail</span>
+                  <span @click="step=3" v-if="form.dataPPDB?.status_pendaftaran == 'P00'" style="cursor : pointer;color:blue">Show Detail</span>
                 </div>
                 <div>Alamat Lengkap: <b>{{ form.alamat_siswa }}</b></div>
-                <div>RT/RW: <b>{{ form.rt_siswa }}/{{ form.rw_siswa }}</b></div>
-                <div>Kode Pos: <b>{{ form.zip_code_siswa }}</b></div>
-                <div>Provinsi: <b>{{ form.provinsi_id_siswa }}</b></div>
-                <div>Kota/Kabupaten: <b>{{ form.city_id_siswa }}</b></div>
-                <div>Kecamatan: <b>{{ form.district_id_siswa }}</b></div>
-                <div>Kelurahan/Desa: <b>{{ form.subdistrict_id_siswa }}</b></div>
+                <div>RT/RW: <b>{{ form.dataPPDB?.siswa_address.rt }}/{{ form.dataPPDB?.siswa_address.rw }}</b></div>
+                <div>Kode Pos: <b>{{ form.dataPPDB?.siswa_address.zip_code }}</b></div>
+                <div>Provinsi: <b>{{ form.dataPPDB?.siswa_address.provinsi }}</b></div>
+                <div>Kota/Kabupaten: <b>{{ form.dataPPDB?.siswa_address.kota }}</b></div>
+                <div>Kecamatan: <b>{{ form.dataPPDB?.siswa_address.district }}</b></div>
+                <div>Kelurahan/Desa: <b>{{ form.dataPPDB?.siswa_address.desa }}</b></div>
               </v-col>
 
               <!-- Data Orang Tua -->
               <v-col cols="12" class="mt-4" style="border-top:1px solid #d9d9d9">
                 <div class="d-flex justify-space-between align-center">
                   <b>Data Orang Tua</b>
-                  <span @click="step=4" style="cursor : pointer;color:blue">Show Detail</span>
+                  <span @click="step=4" v-if="form.dataPPDB?.status_pendaftaran == 'P00'" style="cursor : pointer;color:blue">Show Detail</span>
                 </div>
                 <div>Nama Ayah: <b>{{ form.nama_ayah }}</b></div>
                 <div>Pekerjaan Ayah: <b>{{ form.pekerjaan_ayah }}</b></div>
@@ -172,7 +262,7 @@
               <v-col cols="12" class="mt-4" style="border-top:1px solid #d9d9d9">
                 <div class="d-flex justify-space-between align-center">
                   <b>Ringkasan Pembayaran</b>
-                  <span @click="step=5" style="cursor : pointer;color:blue">Show Detail</span>
+                  <span @click="step=5" v-if="form.dataPPDB?.status_pendaftaran == 'P00'" style="cursor : pointer;color:blue">Show Detail</span>
                 </div>
                 <div>ID Registrasi: <b>{{ form.code_ppdb }}</b></div>
                 <div>Biaya Administrasi: <b>{{ formatRupiah(form.biaya_admin) }}</b></div>
@@ -665,6 +755,18 @@
               </v-col>
               <v-col cols="12" style="border-top:1px solid #d9d9d9">
                 Biaya Admininstrasi : <b>{{ formatRupiah(form.biaya_admin) }}</b>
+
+                <p style="margin-bottom:0px"><strong>Informasi Pembayaran:</strong></p>
+
+                <div v-if="dataBank && dataBank.length">
+                  <div v-for="(bank, index) in dataBank" :key="index" style="margin-bottom: 12px;">
+                    <p style="margin-bottom: 0px"><strong>Bank :</strong> {{ bank.name }}</p>
+                    <p style="margin-bottom: 0px">
+                      <strong>Rekening :</strong> {{ bank.no_rek }} (A/N {{ bank.nama_akun_bank }})
+                    </p>
+                  </div>
+                </div>
+
               </v-col>
               <v-col cols="12" style="border-top:1px solid #d9d9d9">
                 Status Pembayaran : <span :style="form.payment_status == 'Menunggu' ? 'color:blue' : form.payment_status == 'Pembayaran Berhasil' ? 'color:green' : 'color:red'"><b>{{ form.payment_status }}</b></span>
@@ -686,6 +788,7 @@
                   class="mb-2"
                 />
               </v-col>
+
             </v-row>
 
 
@@ -704,7 +807,70 @@
               </v-col>
             </v-row>
 
-            <v-row class="d-none d-md-flex" v-if="step != 6 && step != 0">
+            
+            <v-row v-if="step == 7">
+              <v-col cols="12" style="border-top:1px solid #d9d9d9">
+                <b>Pendaftaran Ulang</b>
+              </v-col>
+              <v-col cols="12" style="border-top:1px solid #d9d9d9">
+                ID Daftar Ulang : <b>{{ formDaftarUlang.code_registrasi_ulang }}</b>
+              </v-col>
+              <v-col cols="12" style="border-top:1px solid #d9d9d9">
+                Nama Calon Siswa : <b>{{ form.nama_depan }} {{ form.nama_belakang }}</b>
+              </v-col>
+              <v-col cols="12" style="border-top:1px solid #d9d9d9">
+                Nama Ayah : <b>{{ form.nama_ayah }}</b>
+              </v-col>
+              <v-col cols="12" style="border-top:1px solid #d9d9d9">
+                Sekolah : <b>{{ form.dataPPDB?.sekolah.name }}</b>
+              </v-col>
+              <v-col cols="12" style="border-top:1px solid #d9d9d9">
+                Jenjang : <b>{{ form.dataPPDB?.sekolah_grade.name }}</b>
+              </v-col>
+              <v-col cols="12" style="border-top:1px solid #d9d9d9">
+                Jenjang : <b>{{ form.dataPPDB?.status_pendaftaran_siswa }}</b>
+              </v-col>
+              <v-col cols="12" style="border-top:1px solid #d9d9d9">
+                Biaya Admininstrasi : <b>{{ formatRupiah(formDaftarUlang.biaya_pendaftaran) }}</b>
+
+                <p style="margin-bottom:10px"><strong>Informasi Pembayaran:</strong></p>
+
+                <div v-if="dataBank && dataBank.length">
+                  <div v-for="(bank, index) in dataBank" :key="index" style="margin-bottom: 12px;">
+                    <p style="margin-bottom: 0px"><strong>Bank :</strong> {{ bank.name }}</p>
+                    <p style="margin-bottom: 0px">
+                      <strong>Rekening :</strong> {{ bank.no_rek }} (A/N {{ bank.nama_akun_bank }})
+                    </p>
+                  </div>
+                </div>
+
+              </v-col>
+              <v-col cols="12" style="border-top:1px solid #d9d9d9" v-if="formDaftarUlang.data?.bukti_pembayaran != null">
+                Status Pembayaran : <span :style="formDaftarUlang.data.status_pembayaran == '00' ? 'color:blue' : formDaftarUlang.data.status_pembayaran == '01' ? 'color:green' : 'color:red'"><b>{{ formDaftarUlang.data.status_pembayaran == '00' ? 'Menunggu Verifikasi' : formDaftarUlang.data.status_pembayaran == '01' ? 'Pembayaran Berhasil' : 'Pembayaran ditolak' }}</b></span>
+              </v-col>
+
+              <v-col cols="12" sm="12" stlye="padding:0" >
+                <div v-if="foto_bukti_regis_ulang" class="mt-2 text-center">
+                  <img
+                    :src="foto_bukti_regis_ulang"
+                    alt="Preview Foto"
+                    style="width: auto; height: 120px; object-fit: cover; border-radius: 5%; border: 2px solid #eee;"
+                  />
+                </div>
+                <v-file-input
+                v-if="formDaftarUlang.data?.bukti_pembayaran == null"
+                  label="Upload Foto"
+                  accept="image/*"
+                  show-size
+                  @change="handleFotoChangeBuktiRegisUlang"
+                  class="mb-2"
+                />
+              </v-col>
+
+            </v-row>
+
+
+            <v-row class="d-none d-md-flex" v-if="step != 6 && step != 0 && step != 7">
               <v-col cols="12" class="text-right">
                   <v-row>
                     <v-col cols="12" md="4">
@@ -726,7 +892,7 @@
               </v-col>
             </v-row>
 
-            <v-row class="d-flex d-md-none" v-if="step != 6  && step != 0">
+            <v-row class="d-flex d-md-none" v-if="step != 6  && step != 0  && step != 7">
               <v-col cols="12" class="text-right">
                   <v-row>
                     <v-col cols="6">
@@ -750,8 +916,30 @@
             <v-row v-if="step == 6 || step == 0">
               <v-col cols="12" class="text-right">
                   <v-row>
-                    <v-col cols="12">
-                      <v-btn color="primary" variant="flat" class="mr-2" @click="showCreateModal = false;getDataRegister()" block>Tutup</v-btn>
+                    <v-col :cols="form.dataPPDB?.status_pendaftaran == 'P01' ? '6' : '12'">
+                      <v-btn color="primary" variant="flat" class="mr-2" :loading="loading" @click="showCreateModal = false;getDataRegister()" block>Tutup</v-btn>
+                    </v-col>
+
+                    <v-col cols="6" v-if="form.dataPPDB?.status_pendaftaran == 'P01'">
+                      <v-btn color="warning" variant="flat" class="mr-2" :loading="loading" @click="daftarUlang(form.dataPPDB)" block>
+                       Daftar Ulang
+                      </v-btn>
+                    </v-col>
+                  </v-row>
+              </v-col>
+            </v-row>    
+
+            <v-row v-if="step == 7">
+              <v-col cols="12" class="text-right">
+                  <v-row>
+                    <v-col :cols="form.dataPPDB?.status_pendaftaran == 'P01' && formDaftarUlang.data?.bukti_pembayaran == null ? '6' : '12'">
+                      <v-btn color="secondary" variant="flat" class="mr-2" :loading="loading" @click="step = 0" block>Kembali</v-btn>
+                    </v-col>
+
+                    <v-col cols="6" v-if="formDaftarUlang.data?.bukti_pembayaran == null">
+                       <v-btn color="primary"  variant="flat" :disabled="loading" @click="submitPayRegistrasiUlang" :loading="loading" block>
+                          Kirim
+                        </v-btn>
                     </v-col>
                   </v-row>
               </v-col>
@@ -854,6 +1042,13 @@ const form = ref({
   dataPPDB : null
 });
 
+const formDaftarUlang = ref({
+  code_registrasi_ulang : null,
+  biaya_pendaftaran : 0,
+  bukti_pembayaran : null,
+  data : null
+});
+const foto_bukti_regis_ulang = ref(null);
 const sekolah = ref([]);
 const dataRegister = ref([]);
 const grade = ref([]);
@@ -878,6 +1073,11 @@ const colorDelete = ref('error');
 
 const showCreateModal = ref(false)
 
+function getTahunAjaran(dateString) {
+  if (!dateString) return '-'
+  const year = new Date(dateString).getFullYear()
+  return `${year}/${year + 1}`
+}
 
 function createRegister(data) {
   if(data == null){
@@ -902,13 +1102,14 @@ function createRegister(data) {
 }
 
 function showModal(data) {
-  step.value = data.is_submit == '1' ? 0 : 1;
   fotoPreview.value='/no-image.jpg';
   showConfirm.value = false;
   showCreateModal.value = true;
   if(data == null){
+    step.value = 1;
     register()
   }else{
+    step.value = data.is_submit == '1' ? 0 : 1;
     form.value.sekolah_id = data.sekolah_id
     getGrade()
     form.value.grade_id = data.grade_id
@@ -1173,6 +1374,22 @@ function handleFotoChangeFotoSiswa(e) {
   }
 }
 
+
+function handleFotoChangeBuktiRegisUlang(e) {
+  let file
+  if (Array.isArray(e)) file = e[0]
+  else if (e?.target?.files) file = e.target.files[0]
+  else file = e
+
+  if (file) {
+    formDaftarUlang.value.bukti_pembayaran = file
+    foto_bukti_regis_ulang.value = URL.createObjectURL(file)
+  } else {
+    formDaftarUlang.value.bukti_pembayaran = null
+    foto_bukti_regis_ulang.value = '/no-image.jpg'
+  }
+}
+
 const provinceData = ref([]);
 const cityData = ref([]);
 const disctrictData = ref([]);
@@ -1396,12 +1613,150 @@ async function getDetail(){
   }
 }
 
+
+const dataBank = ref(null);
+async function getBankAccount() {
+  loading.value = true;
+  try {
+    const {data} = await $api.get('/master-data/bank-account/get-payment');
+    dataBank.value = data.data
+  } catch (error) {
+    show.value = true;
+    message.value = 'Server Error.';
+  } finally {
+    loading.value = false;
+  }
+}
+
+
+async function printData(data) {
+  loading.value = true
+  try {
+    const response = await $api.post('/register-ppdb/generate-pdf', data)
+
+    const downloadUrl = response.data.download_url
+    if (downloadUrl) {
+      window.open(downloadUrl, '_blank') // 👈 buka di tab baru
+    } else {
+      show.value = true
+      message.value = 'Gagal mendapatkan link unduhan.'
+    }
+  } catch (error) {
+    show.value = true
+    message.value = error.response?.data?.message || 'Terjadi kesalahan saat mencetak.'
+  } finally {
+    loading.value = false
+  }
+}
+
+async function daftarUlang(data){
+  if(data.is_daftar_ulang == '1'){
+    getDaftarUlang(data)
+    step.value = 7;
+  }else{
+    loading.value = true
+    try {
+      const response = await $api.post('/register-ppdb/daftar-ulang', data)
+
+      // showSuccess.value = true
+      // message.value = 'Pendaftaran Ulang berhasil dibuat.'
+      // showCreateModal.value = false;
+      getDaftarUlang(data)
+      step.value = 7;
+    } catch (error) {
+      show.value = true
+      message.value = 'Terjadi kesalahan.'
+    } finally {
+      loading.value = false
+    }
+  }
+}
+
+
+async function getDaftarUlang(dataProp){
+  loading.value = true
+  try {
+    const {data} = await $api.post('/register-ppdb/get-daftar-ulang', {
+      id : dataProp.id
+    })
+    formDaftarUlang.value.biaya_pendaftaran = data.data.biaya_pendaftaran
+    formDaftarUlang.value.code_registrasi_ulang = data.data.code_registrasi_ulang
+    formDaftarUlang.value.bukti_pembayaran = data.data.bukti_pembayaran
+    foto_bukti_regis_ulang.value = data.data.bukti_pembayaran
+    formDaftarUlang.value.data = data.data
+  } catch (error) {
+    show.value = true
+    message.value = error.message
+  } finally {
+    loading.value = false
+  }
+}
+
+async function submitPayRegistrasiUlang() {
+  loading.value = true
+  try {
+    const formData = new FormData();
+    if(formDaftarUlang.value.bukti_pembayaran == null){
+      show.value = true
+      message.value = 'Bukti pembayaran belum di upload.'
+    }else{
+        for (const key in formDaftarUlang.value) {
+          if (formDaftarUlang.value.hasOwnProperty(key)) {
+            formData.append(key, formDaftarUlang.value[key]);
+          }
+        }
+        const {data} = await $api.post(`/register-ppdb/pay-reg-ulang`, formData, {
+          headers: {
+            'Content-Type': 'multipart/form-data'
+          }
+        });
+
+        formDaftarUlang.value.biaya_pendaftaran = 0;
+        formDaftarUlang.value.bukti_pembayaran = null;
+        formDaftarUlang.value.code_registrasi_ulang = null;
+        foto_bukti_regis_ulang.value = null;
+        getDaftarUlang(data.data)
+        step.value=7;
+    }
+    
+  } catch (error) {
+    show.value = true
+    message.value = 'Terjadi kesalahan.'
+  } finally {
+    loading.value = false
+  }
+}
+
+async function printDataKTS(data) {
+  loading.value = true
+  try {
+    const response = await $api.post('/register-ppdb/generate-kts-pdf', {
+      register_id : data.id
+    })
+
+    const downloadUrl = response.data.download_url
+    if (downloadUrl) {
+      window.open(downloadUrl, '_blank') // 👈 buka di tab baru
+    } else {
+      show.value = true
+      message.value = 'Gagal mendapatkan link unduhan.'
+    }
+  } catch (error) {
+    show.value = true
+    message.value = error.response?.data?.message || 'Terjadi kesalahan saat mencetak.'
+  } finally {
+    loading.value = false
+  }
+}
+
 onMounted(() => {
   getRole()
   getDataRegister()
   fotoPreview.value = '/no-image.jpg'
   fotoPreviewBukti.value = '/no-image.jpg'
   fotoPreviewFotoSiswa.value = '/no-image.jpg'
+  foto_bukti_regis_ulang.value = '/no-image.jpg'
   getProvince()
+  getBankAccount()
 })
 </script>
