@@ -1,6 +1,9 @@
 <template>
   <div>
-    <v-row>
+    <div v-if="is_email_verifikasi == 0">
+      <confirmEmail :data="dataUsers"/>
+    </div>
+    <v-row v-if="is_email_verifikasi == 1">
       <v-col cols="12">
          <VCard class="pa-5">
            <v-row>
@@ -987,6 +990,7 @@
 <script setup>
 import { ref } from 'vue';
 import ConfirmDialog from '~/components/ConfirmDialog.vue';
+import confirmEmail from '~/components/confirmEmail.vue';
 
 const { $api } = useNuxtApp()
 const loading = ref(false);
@@ -1048,6 +1052,8 @@ const formDaftarUlang = ref({
   bukti_pembayaran : null,
   data : null
 });
+const is_email_verifikasi = ref(null);
+const dataUsers = ref(null);
 const foto_bukti_regis_ulang = ref(null);
 const sekolah = ref([]);
 const dataRegister = ref([]);
@@ -1749,6 +1755,14 @@ async function printDataKTS(data) {
   }
 }
 
+async function fetchUser() {
+  try {
+    const response = await $api.get('/users')
+    is_email_verifikasi.value = response.data.is_active_email;
+    dataUsers.value = response.data
+  } catch (error) {
+  }
+}
 onMounted(() => {
   getRole()
   getDataRegister()
@@ -1758,5 +1772,6 @@ onMounted(() => {
   foto_bukti_regis_ulang.value = '/no-image.jpg'
   getProvince()
   getBankAccount()
+  fetchUser()
 })
 </script>
