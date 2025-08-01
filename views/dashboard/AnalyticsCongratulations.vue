@@ -1,10 +1,28 @@
-<script setup lang="ts">
-import { useTheme } from 'vuetify'
+<script setup>
 import illustrationJohnDark from '@images/cards/illustration-john-dark.png'
 import illustrationJohnLight from '@images/cards/illustration-john-light.png'
-
+import { useTheme } from 'vuetify'
+const router = useRouter()
 const { global } = useTheme()
 const illustrationJohn = computed(() => global.name.value === 'dark' ? illustrationJohnDark : illustrationJohnLight)
+
+
+const { $api } = useNuxtApp()
+const data = ref(null)
+const profile = ref(null);
+
+async function fetchUser() {
+  try {
+    const response = await $api.get('/users')
+    data.value = response.data;
+    profile.value = response.data.foto_profile ?? '/no-image.jpg'
+  } catch (error) {
+  }
+}
+
+onMounted(() => {
+  fetchUser();
+}); 
 </script>
 
 <template>
@@ -18,21 +36,22 @@ const illustrationJohn = computed(() => global.name.value === 'dark' ? illustrat
       >
         <VCardItem class="pb-3">
           <VCardTitle class="text-primary">
-            Congratulations John! 🎉
+            Selamat Datang, {{data?.nama_depan}}! 🎉
           </VCardTitle>
         </VCardItem>
 
         <VCardText>
-          You have done 72% more sales today.
-          <br>
-          Check your new raising badge in your profile.
-          <br>
+
+            {{data?.role_name == 'Admin' ? 'Admin panel untuk manajemen konten website sekolah dan penerimaan peserta didik baru' 
+            : 'Wesbite Pendaftaran Peserta Didik Baru'}}
+           <br>
           <VBtn
             variant="tonal"
-            class="mt-6"
+            class="mt-1"
             size="small"
+            @click="data?.role_name == 'Admin' ? router.push('/ppdb') : router.push('/pendaftaran')"
           >
-            View Badges
+            {{data?.role_name == 'Admin' ? 'Cek Pendaftaran' : 'Daftar Sekarang'}}
           </VBtn>
         </VCardText>
       </VCol>

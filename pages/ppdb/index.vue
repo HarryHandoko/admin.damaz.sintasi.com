@@ -366,10 +366,10 @@ const showSuccess = ref(false);
 
 // Kartu statistik
 const statsCards = ref([
-  { title: 'Total Pendaftar', count: 120, bgColor: '#E3F2FD', textColor: '#1E88E5', icon: 'bx-user' },
-  { title: 'Diterima', count: 45, bgColor: '#E8F5E9', textColor: '#43A047', icon: 'bx-check-circle' },
-  { title: 'Ditolak', count: 30, bgColor: '#FFEBEE', textColor: '#E53935', icon: 'bx-x-circle' },
-  { title: 'Dalam Proses', count: 45, bgColor: '#FFF8E1', textColor: '#FB8C00', icon: 'bx-time' }
+  { title: 'Total Pendaftar', count: 0, bgColor: '#E3F2FD', textColor: '#1E88E5', icon: 'bx-user' },
+  { title: 'Diterima', count: 0, bgColor: '#E8F5E9', textColor: '#43A047', icon: 'bx-check-circle' },
+  { title: 'Ditolak', count: 0, bgColor: '#FFEBEE', textColor: '#E53935', icon: 'bx-x-circle' },
+  { title: 'Dalam Proses', count: 0, bgColor: '#FFF8E1', textColor: '#FB8C00', icon: 'bx-time' }
 ])
 
 // Header tabel

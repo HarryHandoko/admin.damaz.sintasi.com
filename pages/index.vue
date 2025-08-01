@@ -3,128 +3,80 @@
     <!-- 👉 Congratulations -->
     <VCol
       cols="12"
-      md="8"
     >
       <AnalyticsCongratulations />
     </VCol>
+  </VRow>
 
-    <VCol
-      cols="12"
-      sm="4"
-    >
-      <VRow>
-        <!-- 👉 Profit -->
-        <VCol
-          cols="12"
-          md="6"
-        >
-          <CardStatisticsVertical
-            v-bind="{
-              title: 'Profit',
-              image: chart,
-              stats: '$12,628',
-              change: 72.80,
-            }"
-          />
-        </VCol>
 
-        <!-- 👉 Sales -->
-        <VCol
-          cols="12"
-          md="6"
-        >
-          <CardStatisticsVertical
-            v-bind="{
-              title: 'Sales',
-              image: wallet,
-              stats: '$4,679',
-              change: 28.42,
-            }"
-          />
-        </VCol>
-      </VRow>
-    </VCol>
 
-    <VCol
-      cols="12"
-      sm="8"
-      md="4"
-      order="1"
-      order-md="2"
-    >
-      <VRow>
-        <!-- 👉 Payments -->
-        <VCol
-          cols="12"
-          sm="6"
-        >
-          <CardStatisticsVertical
-            v-bind=" {
-              title: 'Payments',
-              image: paypal,
-              stats: '$2,468',
-              change: -14.82,
-            }"
-          />
-        </VCol>
-
-        <!-- 👉 Revenue -->
-        <VCol
-          cols="12"
-          sm="6"
-        >
-          <CardStatisticsVertical
-            v-bind="{
-              title: 'Transactions',
-              image: card,
-              stats: '$14,857',
-              change: 28.14,
-            }"
-          />
-        </VCol>
-      </VRow>
-
-      <VRow>
-        <!-- 👉 Profit Report -->
-        <VCol
-          cols="12"
-          sm="12"
-        >
-          <AnalyticsProfitReport />
-        </VCol>
-      </VRow>
-    </VCol>
-
-    <!-- 👉 Order Statistics -->
-    <VCol
-      cols="12"
-      md="4"
-      sm="6"
-      order="3"
-    >
-      <AnalyticsOrderStatistics />
-    </VCol>
-
-    <!-- 👉 Tabs chart -->
-    <VCol
-      cols="12"
-      md="4"
-      sm="6"
-      order="3"
-    >
-      <AnalyticsFinanceTabs />
+  <!-- Statistik Cards -->
+  <VRow class="mb-6">
+    <VCol cols="12" sm="6" md="3" v-for="(card, index) in statsCards" :key="index">
+      <VCard class="text-center" :style="`background-color: ${card.bgColor}; color: ${card.textColor}`">
+        <VCardText>
+          <VIcon size="36" class="mb-2">{{ card.icon }}</VIcon>
+          <div class="text-h6" :style="`color:${card.textColor}`">{{ card.title }}</div>
+          <div class="text-h4 font-weight-bold" :style="`color:${card.textColor}`">{{ card.count }}</div>
+        </VCardText>
+      </VCard>
     </VCol>
   </VRow>
 </template>
-<script setup lang="ts">
-import AnalyticsCongratulations from '@/views/dashboard/AnalyticsCongratulations.vue'
-import AnalyticsFinanceTabs from '@/views/dashboard/AnalyticsFinanceTab.vue'
-import AnalyticsOrderStatistics from '@/views/dashboard/AnalyticsOrderStatistics.vue'
-import AnalyticsProfitReport from '@/views/dashboard/AnalyticsProfitReport.vue'
+<script setup>
+import AnalyticsCongratulations from '@/views/dashboard/AnalyticsCongratulations.vue';
 
-// 👉 Images
-import chart from '@images/cards/chart-success.png'
-import card from '@images/cards/credit-card-primary.png'
-import paypal from '@images/cards/paypal-error.png'
-import wallet from '@images/cards/wallet-info.png'
+const { $api } = useNuxtApp()
+
+// Kartu statistik
+const statsCards = ref([
+  { title: 'Total Pendaftar', count: 0, bgColor: '#E3F2FD', textColor: '#1E88E5', icon: 'bx-user' },
+  { title: 'Diterima', count: 0, bgColor: '#E8F5E9', textColor: '#43A047', icon: 'bx-check-circle' },
+  { title: 'Ditolak', count: 0, bgColor: '#FFEBEE', textColor: '#E53935', icon: 'bx-x-circle' },
+  { title: 'Dalam Proses', count: 0, bgColor: '#FFF8E1', textColor: '#FB8C00', icon: 'bx-time' }
+])
+
+
+
+async function getStat() {
+  try {
+    const {data} = await $api.get('/register-ppdb/statistik-pendaftar');
+    statsCards.value = [
+      {
+        title: 'Total Pendaftar',
+        count: data.data.total,
+        bgColor: '#E3F2FD',
+        textColor: '#1E88E5',
+        icon: 'bx-user',
+      },
+      {
+        title: 'Diterima',
+        count: data.data.diterima,
+        bgColor: '#E8F5E9',
+        textColor: '#43A047',
+        icon: 'bx-check-circle',
+      },
+      {
+        title: 'Ditolak',
+        count: data.data.ditolak,
+        bgColor: '#FFEBEE',
+        textColor: '#E53935',
+        icon: 'bx-x-circle',
+      },
+      {
+        title: 'Dalam Proses',
+        count: data.data.diproses,
+        bgColor: '#FFF8E1',
+        textColor: '#FB8C00',
+        icon: 'bx-time',
+      },
+    ]
+  } catch (error) {
+  } finally {
+  }
+}
+
+onMounted(() => {
+  getStat()
+})
 </script>

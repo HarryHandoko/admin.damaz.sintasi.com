@@ -76,7 +76,7 @@
           />
         </div>
         <div v-else @click="startEdit('biaya_admin'+item.id)" style="cursor:pointer">
-          {{ item.biaya_admin }}
+         {{ new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' ,minimumFractionDigits: 0, maximumFractionDigits: 0  }).format(item.biaya_admin) }}
         </div>
       </template>
       <!-- biaya_pendaftaran edit inline -->
@@ -93,7 +93,7 @@
           />
         </div>
         <div v-else @click="startEdit('biaya_pendaftaran'+item.id)" style="cursor:pointer">
-         {{ item.biaya_pendaftaran }}
+          {{ new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR',minimumFractionDigits: 0, maximumFractionDigits: 0  }).format(item.biaya_pendaftaran) }}
         </div>
       </template>
 
@@ -194,7 +194,7 @@
     </v-data-table>
 
     <!-- Dialog tambah menu -->
-    <v-dialog v-model="showCreateModal" max-width="400" persistent>
+    <v-dialog v-model="showCreateModal" max-width="700" persistent>
       <v-card>
         <v-card-title class="pa-6">
           <span class="headline">Form {{ (form.sekolah_id == null || form.sekolah_id == '') ? 'Sekolah' : 'Grade' }}</span>
@@ -214,7 +214,7 @@
                 accept="image/*"
                 show-size
                 @change="handleFotoChange"
-                class="mb-2"
+                class="mb-4"
               />
             </v-col>
 
@@ -222,7 +222,18 @@
               v-model="form.name"
               :label="(form.sekolah_id == null || form.sekolah_id == '') ? 'Nama Sekolah' : 'Nama Grade'"
               required
-              class="mb-2"
+              class="mb-4"
+              :rules="[v => !!v || 'From harus diisi']"
+            />
+
+
+
+            <v-text-field
+              v-if="(form.sekolah_id == null || form.sekolah_id == '')"
+              v-model="form.slug"
+              :label="'Slug'"
+              required
+              class="mb-4"
               :rules="[v => !!v || 'From harus diisi']"
             />
 
@@ -231,7 +242,7 @@
               label="Biaya admin"
               required
               type="number"
-              class="mb-2"
+              class="mb-4"
               :rules="[v => !!v || 'Biaya admin harus diisi']"
               v-if=" (form.sekolah_id == null || form.sekolah_id == '')"
             />
@@ -242,10 +253,94 @@
               label="Biaya Pendaftaran"
               required
               type="number"
-              class="mb-2"
+              class="mb-4"
               :rules="[v => !!v || 'Biaya Pendaftaran harus diisi']"
               v-if=" (form.sekolah_id == null || form.sekolah_id == '')"
             />
+
+
+            <v-col cols="12">
+              <v-switch
+                v-model="form.is_need_nem"
+                inset
+                label="Apakah Menggunakan NEM?"
+                color="success"
+                hide-details
+                @change="onToggleActive(form)"
+                v-if=" (form.sekolah_id == null || form.sekolah_id == '')"
+              />
+            </v-col>
+
+            <v-col cols="12" sm="12" stlye="padding:0" v-if="(form.sekolah_id == null || form.sekolah_id == '')">
+              <div v-if="fotoPreviewSekolah" class="mt-2 text-center">
+                <img
+                  :src="fotoPreviewSekolah"
+                  alt="Preview Foto"
+                  style="width: auto; height: 120px; object-fit: cover; border-radius: 5%; border: 2px solid #eee;"
+                />
+              </div>
+              <v-file-input
+                label="Upload Foto"
+                accept="image/*"
+                show-size
+                @change="handleFotoChangeSekolah"
+                class="mb-4"
+              />
+            </v-col>
+
+            <v-col cols="12" class="mb-11" v-if="(form.sekolah_id == null || form.sekolah_id == '')">
+              <label style="font-weight:500;display:block;margin-bottom:4px;">Konten</label>
+              <QuillEditor
+                  v-model:content="form.kontent"
+                  contentType="html"
+                  class="quill-responsive"
+                  :toolbar="[
+                    ['bold', 'italic', 'underline', 'strike'],
+                    [{ header: [1, 2, 3, false] }],
+                    [{ list: 'ordered'}, { list: 'bullet' }],
+                    [{ align: [] }],
+                    ['link', 'image'],
+                    ['clean']
+                  ]"
+                />
+            </v-col>
+
+
+
+
+            <v-col cols="12" sm="12" stlye="padding:0" v-if="(form.sekolah_id == null || form.sekolah_id == '')">
+              <div v-if="fotoPreviewSekolahDetail" class="mt-2 text-center">
+                <img
+                  :src="fotoPreviewSekolahDetail"
+                  alt="Preview Foto"
+                  style="width: auto; height: 120px; object-fit: cover; border-radius: 5%; border: 2px solid #eee;"
+                />
+              </div>
+              <v-file-input
+                label="Upload Foto Detail"
+                accept="image/*"
+                show-size
+                @change="handleFotoChangeSekolahDetail"
+                class="mb-4"
+              />
+            </v-col>
+
+            <v-col cols="12" class="mb-11" v-if="(form.sekolah_id == null || form.sekolah_id == '')">
+              <label style="font-weight:500;display:block;margin-bottom:4px;">Konten Detail</label>
+              <QuillEditor
+                  v-model:content="form.kontent_detail"
+                  contentType="html"
+                  class="quill-responsive"
+                  :toolbar="[
+                    ['bold', 'italic', 'underline', 'strike'],
+                    [{ header: [1, 2, 3, false] }],
+                    [{ list: 'ordered'}, { list: 'bullet' }],
+                    [{ align: [] }],
+                    ['link', 'image'],
+                    ['clean']
+                  ]"
+                />
+            </v-col>
 
         </v-card-text>
         <v-card-actions>
@@ -298,6 +393,9 @@ const items = ref([])
 const loading = ref(false)
 const showCreateModal = ref(false)
 const fotoPreview = ref('/no-image.jpg')
+const fotoPreviewSekolah = ref('/no-image.jpg')
+const fotoPreviewSekolahDetail = ref('/no-image.jpg')
+
 
 const pagination = reactive({
   itemsPerPage: 10,
@@ -313,8 +411,14 @@ const form = reactive({
   sekolah_id : null,
   name: '',
   logo: null,
+  foto_kontent_sekolah: null,
   biaya_admin : 0,
   biaya_pendaftaran : 0,
+  is_need_nem : 0,
+  kontent : null,
+  kontent_detail: null,
+  foto_kontent: null,
+  slug: null
 })
 const valid = ref(true);
 
@@ -378,9 +482,14 @@ function showModalDialog (item,type) {
   if(item == null){
     Object.keys(form).forEach(k => form[k] = null)
     fotoPreview.value = '/no-image.jpg'
+    fotoPreviewSekolah.value = '/no-image.jpg'
+    fotoPreviewSekolahDetail.value = '/no-image.jpg'
   }else if(type == 'edit'){
     Object.keys(form).forEach(k => form[k] = item[k] ?? '')
     fotoPreview.value = item.logo ? item.logo : '/no-image.jpg'
+    fotoPreviewSekolah.value = item.foto_kontent_sekolah ? item.foto_kontent_sekolah : '/no-image.jpg'
+    fotoPreviewSekolahDetail.value = item.foto_kontent ? item.foto_kontent : '/no-image.jpg'
+    form.is_need_nem = item.is_need_nem == '1' ? true : false;
   }else{
     form.sekolah_id = item.id;
   }
@@ -433,7 +542,12 @@ async function handleCreateData() {
     formData.append('sekolah_id', form.sekolah_id)
     formData.append('biaya_admin', form.biaya_admin)
     formData.append('biaya_pendaftaran', form.biaya_pendaftaran)
+    formData.append('kontent', form.kontent)
+    formData.append('kontent_detail', form.kontent_detail)
+    formData.append('slug', form.slug)
     formData.append('logo', form.logo) // Pastikan form.logo adalah File
+    formData.append('foto_kontent_sekolah', form.foto_kontent_sekolah) // Pastikan form.logo adalah File
+    formData.append('foto_kontent', form.foto_kontent) // Pastikan form.logo adalah File
 
     if(form.sekolah_id == null && form.id == null){
 
@@ -445,12 +559,31 @@ async function handleCreateData() {
         return
       }
 
+
+      // Cek validasi file jika perlu
+      if (!form.foto_kontent_sekolah) {
+        show.value = true
+        message.value = 'Foto Sekolah harus diupload.'
+        loading.value = false
+        return
+      }
+
+
+
+      // Cek validasi file jika perlu
+      if (!form.foto_kontent) {
+        show.value = true
+        message.value = 'Foto Sekolah Detail harus diupload.'
+        loading.value = false
+        return
+      }
+
       await $api.post('/master-data/sekolah/post', formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },
       })
-    }else if(form.sekolah_id == null && form.id != null){
+    }else if((form.sekolah_id == null || form.sekolah_id == '') && form.id != null){
       await $api.post('/master-data/sekolah/update', formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
@@ -471,6 +604,12 @@ async function handleCreateData() {
     form.logo = null
     form.id = null
     form.sekolah_id = null
+    form.is_need_nem = 0
+    form.foto_kontent = null
+    form.foto_kontent_sekolah = null
+    form.kontent = null
+    form.kontent_detail = null
+    form.slug = null
     getData()
   } catch (error) {
     show.value = true
@@ -511,6 +650,53 @@ function handleFotoChange(e) {
   } else {
     form.logo = null
     fotoPreview.value = '/no-image.jpg'
+  }
+}
+
+function handleFotoChangeSekolah(e) {
+  let file
+  if (Array.isArray(e)) file = e[0]
+  else if (e?.target?.files) file = e.target.files[0]
+  else file = e
+
+  if (file) {
+    form.foto_kontent_sekolah = file
+    fotoPreviewSekolah.value = URL.createObjectURL(file)
+  } else {
+    form.foto_kontent_sekolah = null
+    fotoPreviewSekolah.value = '/no-image.jpg'
+  }
+}
+
+
+
+
+function handleFotoChangeSekolahDetail(e) {
+  let file
+  if (Array.isArray(e)) file = e[0]
+  else if (e?.target?.files) file = e.target.files[0]
+  else file = e
+
+  if (file) {
+    form.foto_kontent = file
+    fotoPreviewSekolahDetail.value = URL.createObjectURL(file)
+  } else {
+    form.foto_kontent = null
+    fotoPreviewSekolahDetail.value = '/no-image.jpg'
+  }
+}
+
+
+async function onToggleActive(item) {
+  try {
+    item.is_need_nem = item.is_need_nem == true ? 1 : 0;
+    await $api.post(`/master-data/sekolah/update`, {
+      ...item
+    });
+  } catch (error) {
+  } finally{
+    form.is_need_nem = item.is_need_nem == '1' ? true : false;
+    getData()
   }
 }
 
