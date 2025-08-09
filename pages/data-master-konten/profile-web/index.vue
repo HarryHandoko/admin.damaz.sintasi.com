@@ -66,6 +66,9 @@
         <v-text-field v-model="form.social.fb" label="Facebook" variant="outlined" dense />
       </v-col>
       <v-col cols="12" md="6" class="mb-3">
+        <v-text-field v-model="form.social.tiktok" label="Tiktok" variant="outlined" dense />
+      </v-col>
+      <v-col cols="12" md="6" class="mb-3">
         <v-text-field v-model="form.social.ig" label="Instagram" variant="outlined" dense />
       </v-col>
       <v-col cols="12" md="6" class="mb-3">
@@ -276,6 +279,31 @@
             />
         </v-col>
 
+
+
+
+        <v-col cols="12" class="text-center">
+          <div>
+            <img
+              v-if="KopSuratPreview"
+              :src="KopSuratPreview"
+              alt="Kop Surat"
+              style="height: 200px;  object-fit: cover; border-radius: 12px; border: 2px solid #eee;"
+            />
+            <div v-else style="height:120px;background:#f7f7f7;border-radius:12px;display:flex;align-items:center;justify-content:center;color:#bbb;">Banner Preview</div>
+          </div>
+          <v-file-input
+            label="Upload Kop Surat"
+            accept="image/*"
+            show-size
+            variant="outlined"
+            dense
+            clearable
+            @change="handleKopSuratChange"
+            class="mt-2"
+          />
+        </v-col>
+
         <v-col cols="12" class="text-center">
 
 
@@ -316,6 +344,7 @@ const form = reactive({
   banner_about: null,
   banner_visi: null,
   banner_misi: null,
+  kopsurat : null,
   banner_sambutan: null,
   komitmen_kami: null,
   tentang_kami: null,
@@ -333,7 +362,8 @@ const form = reactive({
     fb: '',
     ig: '',
     youtube: '',
-    wa: ''
+    wa: '',
+    tiktok: ''
   }
 })
 
@@ -342,6 +372,7 @@ const bannerAboutPreview = ref(null)
 const bannerVisiPreview = ref(null)
 const bannerMisiPreview = ref(null)
 const bannerSambutanPreview = ref(null)
+const KopSuratPreview = ref(null)
 const logoPreview = ref(null)
 const loading = ref(false)
 const successMsg = ref('')
@@ -409,18 +440,18 @@ function handleBannerVisiChange(e) {
   }
 }
 
-function handleBannerMisiChange(e) {
+function handleKopSuratChange(e) {
   let file
   if (Array.isArray(e)) file = e[0]
   else if (e?.target?.files) file = e.target.files[0]
   else file = e
 
   if (file) {
-    form.banner_misi = file
-    bannerMisiPreview.value = URL.createObjectURL(file)
+    form.kopsurat = file
+    KopSuratPreview.value = URL.createObjectURL(file)
   } else {
-    form.banner_misi = null
-    bannerMisiPreview.value = null
+    form.kopsurat = null
+    KopSuratPreview.value = null
   }
 }
 
@@ -465,6 +496,7 @@ async function saveProfile() {
     formData.append('whatsapp', form.whatsapp)
     formData.append('email', form.email)
     formData.append('social_fb', form.social.fb)
+    formData.append('tiktok', form.social.tiktok)
     formData.append('social_ig', form.social.ig)
     formData.append('social_youtube', form.social.youtube)
     formData.append('social_wa', form.social.wa)
@@ -478,6 +510,7 @@ async function saveProfile() {
     if (form.banner) formData.append('banner', form.banner)
     if (form.logo) formData.append('logo', form.logo)
     if (form.banner_about) formData.append('banner_about', form.banner_about)
+    if (form.kopsurat) formData.append('kopsurat', form.kopsurat)
     if (form.banner_visi) formData.append('banner_visi', form.banner_visi)
     if (form.banner_misi) formData.append('banner_misi', form.banner_misi)
     if (form.banner_sambutan) formData.append('banner_sambutan', form.banner_sambutan)
@@ -506,6 +539,7 @@ async function getData () {
     form.email = data.email || ''
     form.social.fb = data.social_fb || ''
     form.social.ig = data.social_ig || ''
+    form.social.tiktok = data.tiktok || ''
     form.social.youtube = data.social_youtube || ''
     form.social.wa = data.social_wa || ''
     form.tentang_kami = data.tentang_kami || ''
@@ -522,6 +556,7 @@ async function getData () {
     bannerMisiPreview.value = data.banner_misi ?? '/no-image.jpg'
     bannerAboutPreview.value = data.banner_about ?? '/no-image.jpg'
     bannerSambutanPreview.value = data.banner_sambutan ?? '/no-image.jpg'
+    KopSuratPreview.value = data.kopsurat ?? '/no-image.jpg'
     brosurFile.value = data.brosur ?? null
     form.banner = null // will be replaced if upload new
     form.logo = null

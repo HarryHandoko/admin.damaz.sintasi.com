@@ -179,6 +179,7 @@
                 </v-dialog>
               </VCol>
               <VCol cols="12" md="8">
+                <p><strong>No Formulir:</strong> {{ selectedItem.code_pendaftaran }}</p>
                 <p><strong>Nama Siswa:</strong> {{ selectedItem.siswa.nama_depan }} {{ selectedItem.siswa.nama_belakang }}</p>
                 <p><strong>Jenis Kelamin:</strong> {{ selectedItem.siswa.jenis_kelamin }}</p>
                 <p><strong>Tempat, Tanggal Lahir:</strong> {{ selectedItem.siswa.tempat_lahir }}, {{ formatDate(selectedItem.siswa.tgl_lahir) }}</p>
@@ -254,8 +255,8 @@
                 <p><strong>Dokumen:</strong></p>
                 <VList dense>
                   <VListItem v-if="selectedItem.sekolah.is_need_nem == '1'">
-                    <VListItemTitle>Raport</VListItemTitle>
-                    <VListItemSubtitle><a :href="selectedItem.file_raport" target="_blank">Lihat Raport</a></VListItemSubtitle>
+                    <VListItemTitle>Ijazah</VListItemTitle>
+                    <VListItemSubtitle><a :href="selectedItem.file_raport" target="_blank">Lihat Ijazah</a></VListItemSubtitle>
                   </VListItem>
                   <VListItem>
                     <VListItemTitle>Kartu Keluarga</VListItemTitle>

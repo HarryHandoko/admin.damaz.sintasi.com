@@ -110,7 +110,7 @@
       </template>
       <!-- Delete -->
       <template #item.aksi="{ item }">
-        <v-btn icon color="error" @click="confirmDeleteData(item)">
+        <v-btn icon color="error" @click="confirmDeleteData(item,'sekolah')">
           <v-icon>bx bx-trash</v-icon>
         </v-btn>
 
@@ -172,8 +172,16 @@
                   <v-icon>bx bx-menu</v-icon>
                 </template>
                 <!-- Delete -->
-                <template #item.aksi="{ item }">
-                  <v-btn icon color="error" @click="confirmDeleteData(item)">
+                <template #item.aksi="props">
+                  <v-btn icon class="mr-1" :disabled="props.item.sort == '1'" @click="updateSort(props.item,'up')">
+                    <v-icon>bx bx-chevron-up</v-icon>
+                  </v-btn>
+
+                  <v-btn icon color="secondary mr-1"  :disabled="item.grade.length == (props.index +1)" @click="updateSort(props.item,'down')">
+                    <v-icon>bx bx-chevron-down</v-icon>
+                  </v-btn>
+
+                  <v-btn icon color="error" @click="confirmDeleteData(props.item,'grade')">
                     <v-icon>bx bx-trash</v-icon>
                   </v-btn>
                 </template>
@@ -227,6 +235,15 @@
             />
 
 
+            <v-text-field
+              v-if="(form.sekolah_id == null || form.sekolah_id == '')"
+              v-model="form.code_formulir"
+              :label="'Kode Formulir'"
+              required
+              class="mb-4"
+              :rules="[v => !!v || 'From harus diisi']"
+            />
+
 
             <v-text-field
               v-if="(form.sekolah_id == null || form.sekolah_id == '')"
@@ -266,7 +283,18 @@
                 label="Apakah Menggunakan NEM?"
                 color="success"
                 hide-details
-                @change="onToggleActive(form)"
+                v-if=" (form.sekolah_id == null || form.sekolah_id == '')"
+              />
+            </v-col>
+
+
+            <v-col cols="12">
+              <v-switch
+                v-model="form.is_need_test"
+                inset
+                label="Apakah Membutuhkan Seleksi Test?"
+                color="success"
+                hide-details
                 v-if=" (form.sekolah_id == null || form.sekolah_id == '')"
               />
             </v-col>
@@ -363,7 +391,7 @@
       :modelValue="showConfirmDelete"
       title="Konfirmasi Hapus"
       :message="`Apakah Anda yakin ingin menghapus ${DataToDelete?.name}?`"
-      @confirm="handleDeleteData"
+      @confirm="handleDeleteData(TypeToDelete)"
       @cancel="showConfirmDelete = false"
     />
   </v-card>
@@ -415,9 +443,11 @@ const form = reactive({
   biaya_admin : 0,
   biaya_pendaftaran : 0,
   is_need_nem : 0,
+  is_need_test : 0,
   kontent : null,
   kontent_detail: null,
   foto_kontent: null,
+  code_formulir: null,
   slug: null
 })
 const valid = ref(true);
@@ -429,10 +459,12 @@ const editingRow = ref(null)
 
 const showConfirmDelete = ref(false)
 const DataToDelete = ref(null)
+const TypeToDelete = ref(null)
 
-function confirmDeleteData(Data) {
+function confirmDeleteData(Data,type) {
   DataToDelete.value = Data
   showConfirmDelete.value = true
+  TypeToDelete.value = type
 }
 
 function startEdit(item) {
@@ -490,6 +522,7 @@ function showModalDialog (item,type) {
     fotoPreviewSekolah.value = item.foto_kontent_sekolah ? item.foto_kontent_sekolah : '/no-image.jpg'
     fotoPreviewSekolahDetail.value = item.foto_kontent ? item.foto_kontent : '/no-image.jpg'
     form.is_need_nem = item.is_need_nem == '1' ? true : false;
+    form.is_need_test = item.is_need_test == '1' ? true : false;
   }else{
     form.sekolah_id = item.id;
   }
@@ -543,7 +576,10 @@ async function handleCreateData() {
     formData.append('biaya_admin', form.biaya_admin)
     formData.append('biaya_pendaftaran', form.biaya_pendaftaran)
     formData.append('kontent', form.kontent)
+    formData.append('code_formulir', form.code_formulir)
     formData.append('kontent_detail', form.kontent_detail)
+    formData.append('is_need_nem', form.is_need_nem)
+    formData.append('is_need_test', form.is_need_test)
     formData.append('slug', form.slug)
     formData.append('logo', form.logo) // Pastikan form.logo adalah File
     formData.append('foto_kontent_sekolah', form.foto_kontent_sekolah) // Pastikan form.logo adalah File
@@ -598,19 +634,22 @@ async function handleCreateData() {
     }
 
     showCreateModal.value = false
+    getData()
+
     form.name = ''
     form.biaya_admin = 0
     form.biaya_pendaftaran = 0
     form.logo = null
     form.id = null
     form.sekolah_id = null
+    form.code_formulir = null
     form.is_need_nem = 0
+    form.is_need_test = 0
     form.foto_kontent = null
     form.foto_kontent_sekolah = null
     form.kontent = null
     form.kontent_detail = null
     form.slug = null
-    getData()
   } catch (error) {
     show.value = true
     message.value = error.response?.data?.message || 'Gagal membuat Data'
@@ -620,12 +659,18 @@ async function handleCreateData() {
 }
 
 
-async function handleDeleteData() {
+async function handleDeleteData(type) {
   loading.value = true
   try {
-    await $api.post(`/master-data/sekolah/delete`,{
-      id: DataToDelete.value.id,
-    })
+    if(type == 'sekolah'){
+      await $api.post(`/master-data/sekolah/delete`,{
+        id: DataToDelete.value.id,
+      })
+    }else{
+      await $api.post(`/master-data/sekolah-grade/delete`,{
+        id: DataToDelete.value.id,
+      })
+    }
     getData()
   } catch (error) {
     show.value = true
@@ -697,6 +742,26 @@ async function onToggleActive(item) {
   } finally{
     form.is_need_nem = item.is_need_nem == '1' ? true : false;
     getData()
+  }
+}
+
+
+
+
+
+async function updateSort (item,type){
+  loading.value = true
+  try {
+    await $api.post(`/master-data/sekolah/update-sort`,{
+      id: item.id,
+      type: type
+    })
+    getData()
+  } catch (error) {
+    show.value = true
+    message.value = error.response?.data?.message || 'Gagal Mengupdate Grade.'
+  } finally {
+    loading.value = false
   }
 }
 

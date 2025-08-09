@@ -26,7 +26,7 @@ export default defineNuxtPlugin((nuxtApp) => {
         error.response.status === 401 &&
         window.location.pathname !== '/login' &&
         window.location.pathname !== '/register-ppdb' &&
-        (localStorage.getItem('redirected') == 'true' || !localStorage.getItem('redirected'))
+       (!localStorage.getItem('token') || localStorage.getItem('token') == null)
       ) {
         localStorage.setItem('redirected', 'true')
         window.location.href = '/login'

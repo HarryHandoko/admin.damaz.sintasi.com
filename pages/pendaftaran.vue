@@ -221,9 +221,20 @@
                   <span @click="step=2" v-if="form.dataPPDB?.status_pendaftaran == 'P00'" style="cursor : pointer;color:blue">Show Detail</span>
                 </div>
                 <div>Nama Lengkap: <b>{{ form.nama_depan }} {{ form.nama_belakang }}</b></div>
+                <div>NIK: <b>{{ form.nik || '-' }}</b></div>
+                <div>No. Akte Kelahiran: <b>{{ form.no_akte_kelahiran || '-' }}</b></div>
                 <div>Jenis Kelamin: <b>{{ form.jenis_kelamin || '-' }}</b></div>
                 <div>Tempat Lahir: <b>{{ form.tempat_lahir }}</b></div>
                 <div>Tanggal Lahir: <b>{{ form.tgl_lahir }}</b></div>
+                <div>Agama: <b>{{ form.agama || '-' }}</b></div>
+                <div>Anak ke: <b>{{ form.anak_ke || '-' }}</b></div>
+                <div>Jumlah Saudara: <b>{{ form.jumlah_saudara || '-' }}</b></div>
+                <div>Hobby: <b>{{ form.hobby || '-' }}</b></div>
+                <div>Cita - Cita: <b>{{ form.cita_cita || '-' }}</b></div>
+                <div>Tinggi Badan: <b>{{ form.tinggi_badan || '-' }}</b></div>
+                <div>Berat Badan: <b>{{ form.berat_badan || '-' }}</b></div>
+                <div>Riwayat Kesehatan : <b>{{ form.riwayat_kesehatan || '-' }}</b></div>
+                <div>No. Handphone : <b>{{ form.no_handphone || '-' }}</b></div>
                 <div>Status Pendaftaran: <b>{{ form.status_pendaftaran_siswa }}</b></div>
                 <div>Kebutuhan Khusus: <b>{{ form.kebutuhan_spesial == '1' ? 'Ya' : 'Tidak' }}</b></div>
                 <div>Bahasa Sehari-hari: <b>{{ form.bahasa_sehari_hari }}</b></div>
@@ -236,6 +247,7 @@
                   <b>Alamat</b>
                   <span @click="step=3" v-if="form.dataPPDB?.status_pendaftaran == 'P00'" style="cursor : pointer;color:blue">Show Detail</span>
                 </div>
+                <div>Jarak Rumah Ke Sekolah : <b>{{ form.jarak_rumah_sekolah }}</b></div>
                 <div>Alamat Lengkap: <b>{{ form.alamat_siswa }}</b></div>
                 <div>RT/RW: <b>{{ form.dataPPDB?.siswa_address.rt }}/{{ form.dataPPDB?.siswa_address.rw }}</b></div>
                 <div>Kode Pos: <b>{{ form.dataPPDB?.siswa_address.zip_code }}</b></div>
@@ -252,13 +264,26 @@
                   <span @click="step=4" v-if="form.dataPPDB?.status_pendaftaran == 'P00'" style="cursor : pointer;color:blue">Show Detail</span>
                 </div>
                 <div>Nama Ayah: <b>{{ form.nama_ayah }}</b></div>
+                <div>NIK Ayah: <b>{{ form.nik_ayah }}</b></div>
                 <div>Pekerjaan Ayah: <b>{{ form.pekerjaan_ayah }}</b></div>
                 <div>Pendidikan Terakhir Ayah: <b>{{ form.pendidikan_terakhir_ayah }}</b></div>
                 <div>Penghasilan Ayah: <b>{{ form.penghasilan_ayah }}</b></div>
+                <div>Alamat: <b>{{ form.alamat_ayah }}</b></div>
+
+                <br>
                 <div>Nama Ibu: <b>{{ form.nama_ibu }}</b></div>
+                <div>NIK Ibu: <b>{{ form.nik_ibu }}</b></div>
                 <div>Pekerjaan Ibu: <b>{{ form.pekerjaan_ibu }}</b></div>
                 <div>Pendidikan Terakhir Ibu: <b>{{ form.pendidikan_terakhir_ibu }}</b></div>
                 <div>Penghasilan Ibu: <b>{{ form.penghasilan_ibu }}</b></div>
+                <div>Alamat: <b>{{ form.alamat_ibu }}</b></div>
+                <br>
+                <div>Nama Wali: <b>{{ form.nama_wali }}</b></div>
+                <div>NIK Wali: <b>{{ form.nik_wali }}</b></div>
+                <div>Pekerjaan Wali: <b>{{ form.pekerjaan_wali }}</b></div>
+                <div>Pendidikan Terakhir Wali: <b>{{ form.pendidikan_terakhir_wali }}</b></div>
+                <div>Penghasilan Wali: <b>{{ form.penghasilan_wali }}</b></div>
+                <div>Alamat: <b>{{ form.alamat_wali }}</b></div>
               </v-col>
 
               <!-- Ringkasan Pembayaran -->
@@ -291,7 +316,7 @@
                   label="Sekolah"
                   :rules="[v => !!v || 'Form harus dipilih']"
                   required
-                  @update:model-value="getGrade()"
+                  @update:model-value="getGrade();form.grade_id = null"
                 />
               </v-col>
 
@@ -357,6 +382,39 @@
                 />
               </v-col>
 
+
+              <v-col cols="12" md="6">
+                <v-text-field
+                  v-model="form.no_akte_kelahiran"
+                  label="No Akte Kelahiran"
+                  required
+                  type="number"
+                  :rules="[v => !!v || 'From harus diisi']"
+                />
+              </v-col>
+
+              <v-col cols="12">
+                <v-text-field
+                  v-model="form.nik"
+                  label="NIK"
+                  required
+                  type="number"
+                  :rules="[v => !!v || 'From harus diisi']"
+                />
+              </v-col>
+
+
+              <v-col cols="12" md="6">
+                <v-select
+                  v-model="form.agama"
+                  :items="['Islam','Kristen','Budha','Hindu','Konghucu']"
+                  label="Agama"
+                  :rules="[v => !!v || 'Agama harus dipilih']"
+                  required
+                  return-object="false"
+                />
+              </v-col>
+
               <v-col cols="12" md="6">
                 <v-select
                   v-model="form.jenis_kelamin"
@@ -387,10 +445,114 @@
                   :rules="[v => !!v || 'From harus diisi']"
                 />
               </v-col>
+              
+
+              <v-col cols="12" md="6">
+                <v-text-field
+                  v-model="form.anak_ke"
+                  label="Anak Ke"
+                  required
+                  type="number"
+                  :rules="[v => !!v || 'From harus diisi']"
+                />
+              </v-col>
 
 
+
+              <v-col cols="12" md="6">
+                <v-text-field
+                  v-model="form.jumlah_saudara"
+                  label="Jumlah Saudara"
+                  required
+                  type="number"
+                  :rules="[v => !!v || 'From harus diisi']"
+                />
+              </v-col>
+
+
+
+              <v-col cols="12" md="6">
+                <v-select
+                  v-model="form.goldarah"
+                  :items="['O','A','B','AB']"
+                  label="Golongan Darah"
+                  :rules="[v => !!v || 'Golongan Darah harus dipilih']"
+                  required
+                  return-object="false"
+                />
+              </v-col>
+
+              <v-col cols="12" md="6">
+                <v-text-field
+                  v-model="form.kewarganegaraan"
+                  label="Kewarganegaraan"
+                  required
+                  :rules="[v => !!v || 'From harus diisi']"
+                />
+              </v-col>
+
+
+
+              <v-col cols="12" md="6">
+                <v-text-field
+                  v-model="form.hobby"
+                  label="Hobby"
+                  required
+                  :rules="[v => !!v || 'From harus diisi']"
+                />
+              </v-col>
+
+
+              <v-col cols="12" md="6">
+                <v-text-field
+                  v-model="form.cita_cita"
+                  label="Cita - Cita"
+                  required
+                  :rules="[v => !!v || 'From harus diisi']"
+                />
+              </v-col>
+
+              <v-col cols="12" md="6">
+                <v-text-field
+                  v-model="form.tinggi_badan"
+                  label="Tinggi Badan"
+                  required
+                  type="number"
+                  :rules="[v => !!v || 'From harus diisi']"
+                />
+              </v-col>
+
+              <v-col cols="12" md="6">
+                <v-text-field
+                  v-model="form.berat_badan"
+                  label="Berat Badan"
+                  required
+                  type="number"
+                  :rules="[v => !!v || 'From harus diisi']"
+                />
+              </v-col>
+
+
+
+              <v-col cols="12" >
+                <v-text-field
+                  v-model="form.no_handphone"
+                  label="No Handphone"
+                  required
+                  type="number"
+                />
+              </v-col>
 
               <v-col cols="12">
+                <v-textarea
+                  v-model="form.riwayat_kesehatan"
+                  label="Riwayat Kesehatan"
+                  required
+                />
+              </v-col>
+
+
+              <v-col cols="12" md="6">
                 <v-select
                   v-model="form.status_pendaftaran_siswa"
                   :items="['Siswa Baru','Siswa Pindahan']"
@@ -398,6 +560,37 @@
                   :rules="[v => !!v || 'Status Pendaftaran harus dipilih']"
                   required
                   return-object="false"
+                />
+              </v-col>
+
+              <v-col cols="12" md="6">
+                <v-text-field
+                  v-model="form.asal_sekolah"
+                  label="Asal Sekolah"
+                  required
+                  :rules="form.status_pendaftaran_siswa === 'Siswa Pindahan' 
+                          ? [v => !!v || 'Form harus diisi'] 
+                          : []"
+                />
+              </v-col>
+
+
+              <v-col cols="12" md="6" v-if="form.status_pendaftaran_siswa == 'Siswa Pindahan'">
+                <v-text-field
+                  v-model="form.jenjang_terakhir"
+                  label="Jenjang Terakhir"
+                  required
+                  :rules="[v => !!v || 'From harus diisi']"
+                />
+              </v-col>
+
+
+              <v-col cols="12" md="6" v-if="form.status_pendaftaran_siswa == 'Siswa Pindahan' && form.dataPPDB != null">
+                <v-text-field
+                  v-model="form.dataPPDB.sekolah_grade.name"
+                  label="Jenjang Lanjutan"
+                  required
+                  readonly
                 />
               </v-col>
 
@@ -438,10 +631,10 @@
               <v-col cols="12" v-if="form.dataSekolah != null ? form.dataSekolah.is_need_nem == '1' : false">
 
                 <div class="mb-2" v-if="form.dataPPDB.file_raport != null">
-                  <a :href="form.dataPPDB.file_raport" target="_blank"><v-icon>bx-file</v-icon> Raport</a>
+                  <a :href="form.dataPPDB.file_raport" target="_blank"><v-icon>bx-file</v-icon> Ijazah</a>
                 </div>
                 <v-file-input
-                    label="Upload Raport Terakhir"
+                    label="Upload Ijazah Terakhir"
                     show-size
                     v-modal="form.file_raport"
                     class="mb-2"
@@ -526,6 +719,17 @@
 
 
             <v-row v-if="step == 3">
+              <v-col cols="12">
+                <b>Jarak Rumah ke Sekolah</b>
+              </v-col>
+              <v-col cols="12">
+                <v-text-field
+                  v-model="form.jarak_rumah_sekolah"
+                  label="Jarak Rumah ke Sekolah"
+                  required
+                  :rules="[v => !!v || 'From harus diisi']"
+                />
+              </v-col>
               <v-col cols="12">
                 <b>Alamat</b>
               </v-col>
@@ -621,7 +825,7 @@
               <v-col cols="12">
                 <b>Orang Tua Calon Siswa</b>
               </v-col>
-              <v-col cols="12">
+              <v-col cols="12" md='6'>
                 <v-text-field
                   v-model="form.nama_ayah"
                   label="Nama Ayah"
@@ -629,6 +833,33 @@
                   :rules="[v => !!v || 'From harus diisi']"
                 />
               </v-col>
+
+              <v-col cols="12" md='6'>
+                <v-text-field
+                  v-model="form.nik_ayah"
+                  label="NIK Ayah"
+                  required
+                  :rules="[v => !!v || 'From harus diisi']"
+                />
+              </v-col>
+
+
+              <v-col cols="12" md='6'>
+                <v-text-field
+                  v-model="form.no_telepon_ayah"
+                  label="No Telepon"
+                  required
+                />
+              </v-col>
+
+              <v-col cols="12" md='6'>
+                <v-text-field
+                  v-model="form.no_hp_ayah"
+                  label="No Handphone"
+                  required
+                />
+              </v-col>
+
               <v-col cols="12" md="6">
                 <v-select
                   v-model="form.pendidikan_terakhir_ayah"
@@ -660,7 +891,6 @@
               </v-col>
 
 
-
               <v-col cols="12">
                 <v-select
                   v-model="form.penghasilan_ayah"
@@ -680,13 +910,53 @@
                 />
               </v-col>
 
+              <v-col cols="12">
+                <v-checkbox
+                  v-model="form.is_same_address_ayah"
+                  label="Apakah alamat sama dengan siswa ?"
+                  @click="updateSameAddress('ayah')"
+                />
+              </v-col>
 
               <v-col cols="12">
+                <v-textarea
+                  v-model="form.alamat_ayah"
+                  label="Alamat"
+                  required
+                  :rules="[v => !!v || 'From harus diisi']"
+                />
+              </v-col>
+               <v-divider class="mb-2 mt-2" />
+              <v-col cols="12"  md='6'>
                 <v-text-field
                   v-model="form.nama_ibu"
                   label="Nama Ibu"
                   required
                   :rules="[v => !!v || 'From harus diisi']"
+                />
+              </v-col>
+
+              <v-col cols="12" md='6'>
+                <v-text-field
+                  v-model="form.nik_ibu"
+                  label="NIK Ibu"
+                  required
+                  :rules="[v => !!v || 'From harus diisi']"
+                />
+              </v-col>
+              <v-col cols="12" md='6'>
+                <v-text-field
+                  v-model="form.no_telepon_ayah"
+                  label="No Telepon"
+                  required
+                />
+              </v-col>
+
+              <v-col cols="12" md='6'>
+                <v-text-field
+                  v-model="form.no_hp_ayah"
+                  label="No Handphone"
+                  required
                 />
               </v-col>
               <v-col cols="12" md="6">
@@ -737,6 +1007,123 @@
                   return-object="false"
                 />
               </v-col>
+
+              <v-col cols="12">
+                <v-checkbox
+                  v-model="form.is_same_address_ibu"
+                  label="Apakah alamat sama dengan siswa ?"
+                  @click="updateSameAddress('ibu')"
+                />
+              </v-col>
+
+              <v-col cols="12">
+                <v-textarea
+                  v-model="form.alamat_ibu"
+                  label="Alamat"
+                  required
+                  :rules="[v => !!v || 'From harus diisi']"
+                />
+              </v-col>
+
+              <v-divider class="mb-2 mt-2" />
+
+              <v-col cols="12"  md='6'>
+                <v-text-field
+                  v-model="form.nama_wali"
+                  label="Nama Wali"
+                  required
+                  :rules="[v => !!v || 'From harus diisi']"
+                />
+              </v-col>
+
+              <v-col cols="12" md='6'>
+                <v-text-field
+                  v-model="form.nik_wali"
+                  label="NIK Wali"
+                  required
+                  :rules="[v => !!v || 'From harus diisi']"
+                />
+              </v-col>
+              <v-col cols="12" md='6'>
+                <v-text-field
+                  v-model="form.no_telepon_ayah"
+                  label="No Telepon"
+                  required
+                />
+              </v-col>
+
+              <v-col cols="12" md='6'>
+                <v-text-field
+                  v-model="form.no_hp_ayah"
+                  label="No Handphone"
+                  required
+                />
+              </v-col>
+              <v-col cols="12" md="6">
+                <v-select
+                  v-model="form.pendidikan_terakhir_wali"
+                  :items="[
+                    'SD / MI',
+                    'SMP / MTs',
+                    'SMA / MA',
+                    'SMK / MAK',
+                    'Diploma',
+                    'Sarjana (S1)',
+                    'Magister (S2)',
+                    'Doktor (S3)'
+                  ]"
+                  label="Pendidikan Terakhir Wali"
+                  :rules="[v => !!v || 'Pendidikan Terakhir Wali harus dipilih']"
+                  required
+                  return-object="false"
+                />
+              </v-col>
+              <v-col cols="12" md="6">
+                <v-select
+                  v-model="form.pekerjaan_wali"
+                  :items="['PNS','Pegawai Swasta','Pegawai BUMN','TNI/POLISI','GURU','DOSEN','Wirausaha','Ibu Rumah Tangga','Lainnya']"
+                  label="Pekerjaan Wali"
+                  :rules="[v => !!v || 'Pekerjaan Wali harus dipilih']"
+                  required
+                  return-object="false"
+                />
+              </v-col>
+
+              <v-col cols="12">
+                <v-select
+                  v-model="form.penghasilan_wali"
+                  :items="[
+                    'Kurang dari Rp 1.000.000',
+                    'Rp 1.000.000 – Rp 2.000.000',
+                    'Rp 2.000.000 – Rp 3.000.000',
+                    'Rp 3.000.000 – Rp 5.000.000',
+                    'Rp 5.000.000 – Rp 10.000.000',
+                    'Lebih dari Rp 10.000.000',
+                    'Tidak memiliki penghasilan'
+                  ]"
+                  label="Penghasilan Wali"
+                  :rules="[v => !!v || 'Penghasilan Wali harus dipilih']"
+                  required
+                  return-object="false"
+                />
+              </v-col>
+
+              <v-col cols="12">
+                <v-checkbox
+                  v-model="form.is_same_address_wali"
+                  label="Apakah alamat sama dengan siswa ?"
+                  @click="updateSameAddress('wali')"
+                />
+              </v-col>
+
+              <v-col cols="12">
+                <v-textarea
+                  v-model="form.alamat_wali"
+                  label="Alamat"
+                  required
+                  :rules="[v => !!v || 'From harus diisi']"
+                />
+              </v-col>
             </v-row>
 
 
@@ -759,16 +1146,26 @@
               <v-col cols="12" style="border-top:1px solid #d9d9d9">
                 Biaya Admininstrasi : <b>{{ formatRupiah(form.biaya_admin) }}</b>
 
-                <p style="margin-bottom:0px"><strong>Informasi Pembayaran:</strong></p>
+                <p style="margin-bottom:10px"><strong>Informasi Pembayaran:</strong></p>
 
-                <div v-if="dataBank && dataBank.length">
-                  <div v-for="(bank, index) in dataBank" :key="index" style="margin-bottom: 12px;">
-                    <p style="margin-bottom: 0px"><strong>Bank :</strong> {{ bank.name }}</p>
-                    <p style="margin-bottom: 0px">
-                      <strong>Rekening :</strong> {{ bank.no_rek }} (A/N {{ bank.nama_akun_bank }})
-                    </p>
-                  </div>
-                </div>
+                
+                <v-row style="margin-bottom: 12px;">
+                  <v-col cols="12" md="6" v-if="dataBank && dataBank.length" v-for="(bank, index) in dataBank" :key="index" >
+                      
+                      <v-card class="text-center" style="width: 200px; height: 150px;">
+                        <v-img
+                          :src="bank.image"
+                          cover
+                          width="100%"
+                          height="100%"
+                        ></v-img>
+                      </v-card>
+                      <p style="margin-bottom: 0px"><strong>Bank :</strong> {{ bank.name }}</p>
+                      <p style="margin-bottom: 0px">
+                        <strong>Rekening :</strong> {{ bank.no_rek }} (A/N {{ bank.nama_akun_bank }})
+                      </p>
+                  </v-col>
+                </v-row>
 
               </v-col>
               <v-col cols="12" style="border-top:1px solid #d9d9d9">
@@ -836,16 +1233,25 @@
               <v-col cols="12" style="border-top:1px solid #d9d9d9">
                 Biaya Admininstrasi : <b>{{ formatRupiah(formDaftarUlang.biaya_pendaftaran) }}</b>
 
-                <p style="margin-bottom:10px"><strong>Informasi Pembayaran:</strong></p>
+                <p style="margin-bottom:15px"><strong>Informasi Pembayaran:</strong></p>
 
-                <div v-if="dataBank && dataBank.length">
-                  <div v-for="(bank, index) in dataBank" :key="index" style="margin-bottom: 12px;">
-                    <p style="margin-bottom: 0px"><strong>Bank :</strong> {{ bank.name }}</p>
-                    <p style="margin-bottom: 0px">
-                      <strong>Rekening :</strong> {{ bank.no_rek }} (A/N {{ bank.nama_akun_bank }})
-                    </p>
-                  </div>
-                </div>
+                <v-row style="margin-bottom: 12px;">
+                  <v-col cols="12" md="6" v-if="dataBank && dataBank.length" v-for="(bank, index) in dataBank" :key="index" >
+                      
+                      <v-card class="text-center" style="width: 200px; height: 150px;">
+                        <v-img
+                          :src="bank.image"
+                          cover
+                          width="100%"
+                          height="100%"
+                        ></v-img>
+                      </v-card>
+                      <p style="margin-bottom: 0px"><strong>Bank :</strong> {{ bank.name }}</p>
+                      <p style="margin-bottom: 0px">
+                        <strong>Rekening :</strong> {{ bank.no_rek }} (A/N {{ bank.nama_akun_bank }})
+                      </p>
+                  </v-col>
+                </v-row>
 
               </v-col>
               <v-col cols="12" style="border-top:1px solid #d9d9d9" v-if="formDaftarUlang.data?.bukti_pembayaran != null">
@@ -1000,8 +1406,23 @@ const form = ref({
   nama_depan : null,
   nama_belakang : null,
   tempat_lahir : null,
+  asal_sekolah : null,
+  goldarah : null,
+  kewarganegaraan : null,
+  jenjang_terakhir: null,
   tgl_lahir : null,
   nisn : null,
+  no_akte_kelahiran : null,
+  agama : null,
+  nik : null,
+  anak_ke : null,
+  hobby : null,
+  cita_cita : null,
+  jumlah_saudara : null,
+  tinggi_badan : null,
+  berat_badan : null,
+  riwayat_kesehatan : null,
+  no_handphone : null,
   kebutuhan_spesial: false,
   bahasa_sehari_hari: null,
   status_pendaftaran_siswa: null,
@@ -1015,6 +1436,7 @@ const form = ref({
   file_akte_lahir: null,
   file_kartu_keluarga: null,
 
+  jarak_rumah_sekolah : null,
   alamat_siswa: null,
   rt_siswa: null,
   rw_siswa: null,
@@ -1025,13 +1447,35 @@ const form = ref({
   subdistrict_id_siswa: null,
 
   nama_ayah : null,
+  nik_ayah : null,
+  no_telepon_ayah : null,
+  no_hp_ayah : null,
   pekerjaan_ayah : null,
   pendidikan_terakhir_ayah : null,
   penghasilan_ayah : null,
+  alamat_ayah : null,
+  is_same_address_ayah: null,
+
   nama_ibu : null,
+  nik_ibu : null,
+  no_telepon_ibu : null,
+  no_hp_ibu : null,
   pekerjaan_ibu : null,
   pendidikan_terakhir_ibu : null,
   penghasilan_ibu : null,
+  alamat_ibu : null,
+  is_same_address_ibu : null,
+
+
+  nama_wali : null,
+  nik_wali : null,
+  no_telepon_wali : null,
+  no_hp_wali : null,
+  pekerjaan_wali : null,
+  pendidikan_terakhir_wali : null,
+  penghasilan_wali : null,
+  alamat_wali : null,
+  is_same_address_wali : null,
 
   sekolah_id: null,
   grade_id : null,
@@ -1126,6 +1570,21 @@ function showModal(data) {
     form.value.tempat_lahir = data.siswa.tempat_lahir
     form.value.jenis_kelamin = data.siswa.jenis_kelamin
     form.value.nisn = data.siswa.nisn
+    form.value.no_akte_kelahiran = data.siswa.no_akte_kelahiran
+    form.value.agama = data.siswa.agama
+    form.value.nik = data.siswa.nik
+    form.value.anak_ke = data.siswa.anak_ke
+    form.value.hobby = data.siswa.hobby
+    form.value.goldarah = data.siswa.goldarah
+    form.value.kewarganegaraan = data.siswa.kewarganegaraan
+    form.value.cita_cita = data.siswa.cita_cita
+    form.value.jumlah_saudara = data.siswa.jumlah_saudara
+    form.value.tinggi_badan = data.siswa.tinggi_badan
+    form.value.berat_badan = data.siswa.berat_badan
+    form.value.riwayat_kesehatan = data.siswa.riwayat_kesehatan
+    form.value.no_handphone = data.siswa.no_handphone
+    form.value.asal_sekolah = data.asal_sekolah
+    form.value.jenjang_terakhir = data.jenjang_terakhir
     form.value.status_pendaftaran_siswa = data.status_pendaftaran_siswa
     form.value.bahasa_sehari_hari = data.siswa.bahasa_sehari_hari
     form.value.kebutuhan_spesial = data.siswa.kebutuhan_spesial == '1' ? true : false
@@ -1145,6 +1604,7 @@ function showModal(data) {
     }
     
     if(data.siswa_address != null){
+      form.value.jarak_rumah_sekolah = data.siswa_address.jarak_rumah_sekolah
       form.value.alamat_siswa = data.siswa_address.alamat
       form.value.rt_siswa = data.siswa_address.rt
       form.value.rw_siswa = data.siswa_address.rw
@@ -1162,15 +1622,37 @@ function showModal(data) {
 
     if(data.siswa_parent != null){
       form.value.nama_ayah = data.siswa_parent.nama_ayah
+      form.value.nik_ayah = data.siswa_parent.nik_ayah
       form.value.pekerjaan_ayah = data.siswa_parent.pekerjaan_ayah
       form.value.pendidikan_terakhir_ayah = data.siswa_parent.pendidikan_terakhir_ayah
       form.value.penghasilan_ayah = data.siswa_parent.penghasilan_ayah
+      form.value.no_hp_ayah = data.siswa_parent.no_hp_ayah
+      form.value.no_telepon_ayah = data.siswa_parent.no_telepon_ayah
+      form.value.alamat_ayah = data.siswa_parent.alamat_ayah
+      form.value.is_same_address_ayah = data.siswa_parent.is_same_address_ayah  == 'true' ? true : false;
 
 
       form.value.nama_ibu = data.siswa_parent.nama_ibu
+      form.value.nik_ibu = data.siswa_parent.nik_ibu
       form.value.pekerjaan_ibu = data.siswa_parent.pekerjaan_ibu
       form.value.pendidikan_terakhir_ibu = data.siswa_parent.pendidikan_terakhir_ibu
       form.value.penghasilan_ibu = data.siswa_parent.penghasilan_ibu
+      form.value.no_hp_ibu = data.siswa_parent.no_hp_ibu
+      form.value.no_telepon_ibu = data.siswa_parent.no_telepon_ibu
+      form.value.alamat_ibu = data.siswa_parent.alamat_ibu
+      form.value.is_same_address_ibu = data.siswa_parent.is_same_address_ibu  == 'true' ? true : false;
+
+
+
+      form.value.nama_wali = data.siswa_parent.nama_wali
+      form.value.nik_wali = data.siswa_parent.nik_wali
+      form.value.pekerjaan_wali = data.siswa_parent.pekerjaan_wali
+      form.value.pendidikan_terakhir_wali = data.siswa_parent.pendidikan_terakhir_wali
+      form.value.penghasilan_wali = data.siswa_parent.penghasilan_wali
+      form.value.no_hp_wali = data.siswa_parent.no_hp_wali
+      form.value.no_telepon_wali = data.siswa_parent.no_telepon_wali
+      form.value.alamat_wali = data.siswa_parent.alamat_wali
+      form.value.is_same_address_wali = data.siswa_parent.is_same_address_wali  == 'true' ? true : false;
     }
 
     if(data.payment == null){
@@ -1208,6 +1690,17 @@ async function handleCreateData() {
         !form.value.tempat_lahir ||
         !form.value.tgl_lahir ||
         !form.value.bahasa_sehari_hari ||
+        !form.value.no_akte_kelahiran ||
+        !form.value.nik ||
+        !form.value.agama ||
+        !form.value.anak_ke ||
+        !form.value.hobby ||
+        !form.value.kewarganegaraan ||
+        !form.value.goldarah ||
+        !form.value.cita_cita ||
+        !form.value.jumlah_saudara ||
+        !form.value.tinggi_badan ||
+        !form.value.berat_badan ||
         (!form.value.dataPPDB?.file_kartu_keluarga && !form.value.file_kartu_keluarga) ||
         (!form.value.dataPPDB?.file_akte_lahir && !form.value.file_akte_lahir) ||
         (
@@ -1218,6 +1711,12 @@ async function handleCreateData() {
               !form.value.dataPPDB?.file_raport &&
               !form.value.file_raport
             )
+          )
+        ) || (
+          form.value.status_pendaftaran_siswa === 'Siswa Pindahan' &&
+          (
+            !form.value.sekolah_asal ||
+            !form.value.jenjang_terakhir
           )
         )
       )
@@ -1232,22 +1731,36 @@ async function handleCreateData() {
       form.value.city_id_siswa == null ||
       form.value.district_id_siswa == null ||
       form.value.subdistrict_id_siswa == null ||
-      form.value.zip_code_siswa == null
+      form.value.zip_code_siswa == null || 
+      form.value.jarak_rumah_sekolah == null
     )){
       show.value = true;
       message.value = 'Harap isi form dengan lengkap';
     }else if(step.value == 4 && (
       form.value.nama_ayah == null ||
+      form.value.nik_ayah == null ||
       form.value.pekerjaan_ayah == null ||
       form.value.pendidikan_terakhir_ayah == null ||
       form.value.penghasilan_ayah == null ||
+      form.value.alamat_ayah == null ||
+      form.value.nik_ibu== null ||
       form.value.nama_ibu== null ||
       form.value.pekerjaan_ibu== null ||
       form.value.pendidikan_terakhir_ibu== null ||
-      form.value.penghasilan_ibu== null
+      form.value.penghasilan_ibu== null||
+      form.value.alamat_ibu == null || 
+      form.value.nik_wali == null ||
+      form.value.nama_wali == null ||
+      form.value.pekerjaan_wali == null ||
+      form.value.pendidikan_terakhir_wali == null ||
+      form.value.penghasilan_wali == null||
+      form.value.alamat_wali  == null
     )){
       show.value = true;
       message.value = 'Harap isi form dengan lengkap';
+    }else if(step.value == 5 && (form.value.bukti_transaksi == null)){
+      show.value = true;
+      message.value = 'Bukti Pembayaran belum diupload';
     }else{
       // Tambahkan nilai step secara eksplisit
       formData.append('step', step.value);
@@ -1558,6 +2071,21 @@ async function getDetail(){
     form.value.tempat_lahir = dataDetail.siswa.tempat_lahir
     form.value.jenis_kelamin = dataDetail.siswa.jenis_kelamin
     form.value.nisn = dataDetail.siswa.nisn
+    form.value.nik = dataDetail.siswa.nik
+    form.value.agama = dataDetail.siswa.agama
+    form.value.no_akte_kelahiran = dataDetail.siswa.no_akte_kelahiran
+    form.value.anak_ke = dataDetail.siswa.anak_ke
+    form.value.hobby = dataDetail.siswa.hobby
+    form.value.cita_cita = dataDetail.siswa.cita_cita
+    form.value.jumlah_saudara = dataDetail.siswa.jumlah_saudara
+    form.value.goldarah = dataDetail.siswa.goldarah
+    form.value.kewarganegaraan = dataDetail.siswa.kewarganegaraan
+    form.value.tinggi_badan = dataDetail.siswa.tinggi_badan
+    form.value.berat_badan = dataDetail.siswa.berat_badan
+    form.value.riwayat_kesehatan = dataDetail.siswa.riwayat_kesehatan
+    form.value.no_handphone = dataDetail.siswa.no_handphone
+    form.value.asal_sekolah = dataDetail.asal_sekolah
+    form.value.jenjang_terakhir = dataDetail.jenjang_terakhir
     form.value.status_pendaftaran_siswa = dataDetail.status_pendaftaran_siswa
     form.value.bahasa_sehari_hari = dataDetail.siswa.bahasa_sehari_hari
     form.value.kebutuhan_spesial = dataDetail.siswa.kebutuhan_spesial == '1' ? true : false
@@ -1577,6 +2105,7 @@ async function getDetail(){
     }
     
     if(dataDetail.siswa_address != null){
+      form.value.jarak_rumah_sekolah = dataDetail.siswa_address.jarak_rumah_sekolah
       form.value.alamat_siswa = dataDetail.siswa_address.alamat
       form.value.rt_siswa = dataDetail.siswa_address.rt
       form.value.rw_siswa = dataDetail.siswa_address.rw
@@ -1594,15 +2123,36 @@ async function getDetail(){
 
     if(dataDetail.siswa_parent != null){
       form.value.nama_ayah = dataDetail.siswa_parent.nama_ayah
+      form.value.nik_ayah = dataDetail.siswa_parent.nik_ayah
       form.value.pekerjaan_ayah = dataDetail.siswa_parent.pekerjaan_ayah
       form.value.pendidikan_terakhir_ayah = dataDetail.siswa_parent.pendidikan_terakhir_ayah
       form.value.penghasilan_ayah = dataDetail.siswa_parent.penghasilan_ayah
+      form.value.no_hp_ayah = dataDetail.siswa_parent.no_hp_ayah
+      form.value.no_telepon_ayah = dataDetail.siswa_parent.no_telepon_ayah
+      form.value.alamat_ayah = dataDetail.siswa_parent.alamat_ayah
+      form.value.is_same_address_ayah = dataDetail.siswa_parent.is_same_address_ayah  == 'true' ? true : false;
 
 
       form.value.nama_ibu = dataDetail.siswa_parent.nama_ibu
+      form.value.nik_ibu = dataDetail.siswa_parent.nik_ibu
       form.value.pekerjaan_ibu = dataDetail.siswa_parent.pekerjaan_ibu
       form.value.pendidikan_terakhir_ibu = dataDetail.siswa_parent.pendidikan_terakhir_ibu
       form.value.penghasilan_ibu = dataDetail.siswa_parent.penghasilan_ibu
+      form.value.no_hp_ibu = dataDetail.siswa_parent.no_hp_ibu
+      form.value.no_telepon_ibu = dataDetail.siswa_parent.no_telepon_ibu
+      form.value.alamat_ibu = dataDetail.siswa_parent.alamat_ibu
+      form.value.is_same_address_ibu = dataDetail.siswa_parent.is_same_address_ibu  == 'true' ? true : false;
+
+
+      form.value.nama_wali = dataDetail.siswa_parent.nama_wali
+      form.value.nik_wali = dataDetail.siswa_parent.nik_wali
+      form.value.pekerjaan_wali = dataDetail.siswa_parent.pekerjaan_wali
+      form.value.pendidikan_terakhir_wali = dataDetail.siswa_parent.pendidikan_terakhir_wali
+      form.value.penghasilan_wali = dataDetail.siswa_parent.penghasilan_wali
+      form.value.no_hp_wali = dataDetail.siswa_parent.no_hp_wali
+      form.value.no_telepon_wali = dataDetail.siswa_parent.no_telepon_wali
+      form.value.alamat_wali = dataDetail.siswa_parent.alamat_wali
+      form.value.is_same_address_wali = dataDetail.siswa_parent.is_same_address_wali == 'true' ? true : false;
     }
 
     if(dataDetail.payment == null){
@@ -1761,6 +2311,22 @@ async function fetchUser() {
     is_email_verifikasi.value = response.data.is_active_email;
     dataUsers.value = response.data
   } catch (error) {
+  }
+}
+
+async function updateSameAddress(type){
+  const alamat = form.value.dataPPDB.siswa_address.alamat +', Kel/Des. '+ form.value.dataPPDB.siswa_address.desa
+                              +', Kec. '+ form.value.dataPPDB.siswa_address.district+', '+ form.value.dataPPDB.siswa_address.kota
+                              + ' Prov. ' +form.value.dataPPDB.siswa_address.provinsi + ' ' +form.value.dataPPDB.siswa_address.zip_code;
+  if(type == 'ayah'){ 
+    form.value.alamat_ayah = alamat;
+  }
+
+  if(type == 'ibu'){ 
+    form.value.alamat_ibu = alamat;
+  }
+  if(type == 'wali'){ 
+    form.value.alamat_wali = alamat;
   }
 }
 onMounted(() => {
