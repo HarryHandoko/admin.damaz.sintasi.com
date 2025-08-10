@@ -60,7 +60,7 @@
             color="red"
             :style="item.is_daftar_ulang == 0 ? `position: absolute; top: 40px; right: 0; z-index: 10;color:blue` : `position: absolute; top: 0px; right: 0; z-index: 10;color:blue`"
             @click.stop="printData(item)"
-            v-if="item.is_submit == '1'"
+            v-if="item.is_submit == '1'  && item.status_pendaftaran == 'P01'"
           >
             <v-icon size="30" v-if="!loading">bx bx-printer</v-icon>
             <v-progress-circular
@@ -78,7 +78,7 @@
             color="red"
             :style="item.is_daftar_ulang == 1 ? `position: absolute; top: 43px; right: 0; z-index: 10;color:blue` : `display: none`"
             @click.stop="printDataKTS(item)"
-            v-if="item.is_submit == '1'"
+            v-if="item.is_submit == '1' && item.registrasi_ulang?.status_pembayaran == '01'"
           >
             <v-icon size="30" v-if="!loading">bx bx-id-card</v-icon>
             <v-progress-circular
@@ -97,7 +97,7 @@
             color="red"
             :style="item.is_daftar_ulang == 0 ? `position: absolute; top: 40px; right: 0; z-index: 10;color:blue` : `position: absolute; top: 0px; right: 0; z-index: 10;color:blue`"
             @click.stop="printData(item)"
-            v-if="item.is_submit == '1'"
+            v-if="item.is_submit == '1'  && item.status_pendaftaran == 'P01'"
           >
             <v-icon size="30" v-if="!loading">bx bx-printer</v-icon>
             <v-progress-circular
@@ -154,7 +154,10 @@
               item.status_pendaftaran == 'P00'
                 ? 'Menunggu'
                 : item.status_pendaftaran == 'P01'
-                ? 'Diterima'
+                  ? item.is_need_test == '1' ? 
+                   ( item.status_test == '00' ? 'Disetujui Seleksi Test akan dilaksanakan pada ' + item.tgl_test  : 
+                      item.status_test == '01' ? 'Lulus Tes Seleksi'  :  'Tidak Lulus Tes Seleksi')
+                  : 'Disetujui'
                 : item.status_pendaftaran == 'P02'
                 ? 'Ditolak'
                 : 'None'
@@ -946,7 +949,7 @@
               </v-col>
               <v-col cols="12" md='6'>
                 <v-text-field
-                  v-model="form.no_telepon_ayah"
+                  v-model="form.no_telepon_ibu"
                   label="No Telepon"
                   required
                 />
@@ -954,7 +957,7 @@
 
               <v-col cols="12" md='6'>
                 <v-text-field
-                  v-model="form.no_hp_ayah"
+                  v-model="form.no_hp_ibu"
                   label="No Handphone"
                   required
                 />
@@ -1046,7 +1049,7 @@
               </v-col>
               <v-col cols="12" md='6'>
                 <v-text-field
-                  v-model="form.no_telepon_ayah"
+                  v-model="form.no_telepon_wali"
                   label="No Telepon"
                   required
                 />
@@ -1054,7 +1057,7 @@
 
               <v-col cols="12" md='6'>
                 <v-text-field
-                  v-model="form.no_hp_ayah"
+                  v-model="form.no_hp_wali"
                   label="No Handphone"
                   required
                 />
@@ -1325,13 +1328,13 @@
             <v-row v-if="step == 6 || step == 0">
               <v-col cols="12" class="text-right">
                   <v-row>
-                    <v-col :cols="form.dataPPDB?.status_pendaftaran == 'P01' ? '6' : '12'">
+                    <v-col >
                       <v-btn color="primary" variant="flat" class="mr-2" :loading="loading" @click="showCreateModal = false;getDataRegister()" block>Tutup</v-btn>
                     </v-col>
 
-                    <v-col cols="6" v-if="form.dataPPDB?.status_pendaftaran == 'P01'">
+                    <v-col v-if="form.dataPPDB?.status_pendaftaran == 'P01' && (form.dataPPDB?.is_need_test == '1' ? form.dataPPDB?.status_test == '01' : true) && (form.dataPPDB.registrasi_ulang != null ? form.dataPPDB.registrasi_ulang?.status_pembayaran =='00' : true)">
                       <v-btn color="warning" variant="flat" class="mr-2" :loading="loading" @click="daftarUlang(form.dataPPDB)" block>
-                       Daftar Ulang
+                       Daftar Ulang 
                       </v-btn>
                     </v-col>
                   </v-row>

@@ -333,7 +333,119 @@
                 />
             </v-col>
 
+            <v-col cols="12" class="text-center">
+              <div>
+                <img
+                  v-if="bannerSambutanPreview"
+                  :src="bannerSambutanPreview"
+                  alt="Banner Sambutan"
+                  style="height: 200px;  object-fit: cover; border-radius: 12px; border: 2px solid #eee;"
+                />
+                <div v-else style="height:120px;background:#f7f7f7;border-radius:12px;display:flex;align-items:center;justify-content:center;color:#bbb;">Banner Preview</div>
+              </div>
+              <v-file-input
+                label="Upload Banner Sambutan"
+                accept="image/*"
+                show-size
+                variant="outlined"
+                dense
+                clearable
+                @change="handleBannerSambutanChange"
+                class="mt-2"
+              />
+            </v-col>
 
+            <v-col cols="12" class="mb-15">
+              <label style="font-weight:500;display:block;margin-bottom:4px;">Sambutan</label>
+              <QuillEditor
+                  v-model:content="form.sambutan_kepala_unit"
+                  contentType="html"
+                  class="quill-responsive"
+                  :toolbar="[
+                    ['bold', 'italic', 'underline', 'strike'],
+                    [{ header: [1, 2, 3, false] }],
+                    [{ list: 'ordered'}, { list: 'bullet' }],
+                    [{ align: [] }],
+                    ['link', 'image'],
+                    ['clean'],
+                    [{ font: [] }], 
+                  ]"
+                />
+            </v-col>
+
+
+
+            <v-col cols="12" sm="12" stlye="padding:0" v-if="(form.sekolah_id == null || form.sekolah_id == '')">
+              <div v-if="fotoGuruUnit" class="mt-2 text-center">
+                <img
+                  :src="fotoGuruUnit"
+                  alt="Preview Foto"
+                  style="width: auto; height: 120px; object-fit: cover; border-radius: 5%; border: 2px solid #eee;"
+                />
+              </div>
+              <v-file-input
+                label="Upload Foto Guru Unit"
+                accept="image/*"
+                show-size
+                @change="handleGuruUnit"
+                class="mb-4"
+              />
+            </v-col>
+
+
+
+            <v-col cols="12" class="mb-11" v-if="(form.sekolah_id == null || form.sekolah_id == '')">
+              <label style="font-weight:500;display:block;margin-bottom:4px;">Moto</label>
+              <QuillEditor
+                  v-model:content="form.moto"
+                  contentType="html"
+                  class="quill-responsive"
+                  :toolbar="[
+                    ['bold', 'italic', 'underline', 'strike'],
+                    [{ header: [1, 2, 3, false] }],
+                    [{ list: 'ordered'}, { list: 'bullet' }],
+                    [{ align: [] }],
+                    ['link', 'image'],
+                    ['clean']
+                  ]"
+                />
+            </v-col>
+
+            <v-col cols="12" class="mb-11" v-if="(form.sekolah_id == null || form.sekolah_id == '')">
+              <label style="font-weight:500;display:block;margin-bottom:4px;">Visi</label>
+              <QuillEditor
+                  v-model:content="form.visi"
+                  contentType="html"
+                  class="quill-responsive"
+                  :toolbar="[
+                    ['bold', 'italic', 'underline', 'strike'],
+                    [{ header: [1, 2, 3, false] }],
+                    [{ list: 'ordered'}, { list: 'bullet' }],
+                    [{ align: [] }],
+                    ['link', 'image'],
+                    ['clean']
+                  ]"
+                />
+            </v-col>
+
+
+
+            <v-col cols="12" class="mb-11" v-if="(form.sekolah_id == null || form.sekolah_id == '')">
+              <label style="font-weight:500;display:block;margin-bottom:4px;">Misi</label>
+              <QuillEditor
+                  v-model:content="form.misi"
+                  contentType="html"
+                  class="quill-responsive"
+                  :toolbar="[
+                    ['bold', 'italic', 'underline', 'strike'],
+                    [{ header: [1, 2, 3, false] }],
+                    [{ list: 'ordered'}, { list: 'bullet' }],
+                    [{ align: [] }],
+                    ['link', 'image'],
+                    ['clean']
+                  ]"
+                />
+            </v-col>
 
 
             <v-col cols="12" sm="12" stlye="padding:0" v-if="(form.sekolah_id == null || form.sekolah_id == '')">
@@ -448,7 +560,13 @@ const form = reactive({
   kontent_detail: null,
   foto_kontent: null,
   code_formulir: null,
-  slug: null
+  slug: null,
+  foto_kepala_unit: null,
+  sambutan_kepala_unit : null,
+  visi : null,
+  misi : null,
+  moto : null,
+  foto_guru_unit : null
 })
 const valid = ref(true);
 
@@ -516,11 +634,15 @@ function showModalDialog (item,type) {
     fotoPreview.value = '/no-image.jpg'
     fotoPreviewSekolah.value = '/no-image.jpg'
     fotoPreviewSekolahDetail.value = '/no-image.jpg'
+    bannerSambutanPreview.value = '/no-image.jpg'
+    fotoGuruUnit.value = '/no-image.jpg'
   }else if(type == 'edit'){
     Object.keys(form).forEach(k => form[k] = item[k] ?? '')
     fotoPreview.value = item.logo ? item.logo : '/no-image.jpg'
     fotoPreviewSekolah.value = item.foto_kontent_sekolah ? item.foto_kontent_sekolah : '/no-image.jpg'
     fotoPreviewSekolahDetail.value = item.foto_kontent ? item.foto_kontent : '/no-image.jpg'
+    bannerSambutanPreview.value = item.foto_kepala_unit ? item.foto_kepala_unit : '/no-image.jpg'
+    fotoGuruUnit.value = item.foto_guru_unit ? item.foto_guru_unit : '/no-image.jpg'
     form.is_need_nem = item.is_need_nem == '1' ? true : false;
     form.is_need_test = item.is_need_test == '1' ? true : false;
   }else{
@@ -581,8 +703,14 @@ async function handleCreateData() {
     formData.append('is_need_nem', form.is_need_nem)
     formData.append('is_need_test', form.is_need_test)
     formData.append('slug', form.slug)
+    formData.append('visi', form.visi)
+    formData.append('misi', form.misi)
+    formData.append('moto', form.moto)
     formData.append('logo', form.logo) // Pastikan form.logo adalah File
     formData.append('foto_kontent_sekolah', form.foto_kontent_sekolah) // Pastikan form.logo adalah File
+    formData.append('sambutan_kepala_unit', form.sambutan_kepala_unit) // Pastikan form.logo adalah File
+    formData.append('foto_kepala_unit', form.foto_kepala_unit) // Pastikan form.logo adalah File
+    formData.append('foto_guru_unit', form.foto_guru_unit) // Pastikan form.logo adalah File
     formData.append('foto_kontent', form.foto_kontent) // Pastikan form.logo adalah File
 
     if(form.sekolah_id == null && form.id == null){
@@ -600,6 +728,23 @@ async function handleCreateData() {
       if (!form.foto_kontent_sekolah) {
         show.value = true
         message.value = 'Foto Sekolah harus diupload.'
+        loading.value = false
+        return
+      }
+
+
+      // Cek validasi file jika perlu
+      if (!form.foto_kepala_unit) {
+        show.value = true
+        message.value = 'Foto Kepala Unit harus diupload.'
+        loading.value = false
+        return
+      }
+
+      // Cek validasi file jika perlu
+      if (!form.foto_guru_unit) {
+        show.value = true
+        message.value = 'Foto Guru Unit harus diupload.'
         loading.value = false
         return
       }
@@ -647,6 +792,12 @@ async function handleCreateData() {
     form.is_need_test = 0
     form.foto_kontent = null
     form.foto_kontent_sekolah = null
+    form.sambutan_kepala_unit = null
+    form.foto_kepala_unit = null
+    form.foto_guru_unit = null
+    form.visi = null
+    form.misi = null
+    form.moto = null
     form.kontent = null
     form.kontent_detail = null
     form.slug = null
@@ -762,6 +913,43 @@ async function updateSort (item,type){
     message.value = error.response?.data?.message || 'Gagal Mengupdate Grade.'
   } finally {
     loading.value = false
+  }
+}
+
+
+const bannerSambutanPreview =  ref('/no-image.jpg');
+
+function handleBannerSambutanChange(e) {
+  let file
+  if (Array.isArray(e)) file = e[0]
+  else if (e?.target?.files) file = e.target.files[0]
+  else file = e
+
+  if (file) {
+    form.foto_kepala_unit = file
+    bannerSambutanPreview.value = URL.createObjectURL(file)
+  } else {
+    form.foto_kepala_unit = null
+    bannerSambutanPreview.value = null
+  }
+}
+
+
+
+const fotoGuruUnit =  ref('/no-image.jpg');
+
+function handleGuruUnit(e) {
+  let file
+  if (Array.isArray(e)) file = e[0]
+  else if (e?.target?.files) file = e.target.files[0]
+  else file = e
+
+  if (file) {
+    form.foto_guru_unit = file
+    fotoGuruUnit.value = URL.createObjectURL(file)
+  } else {
+    form.foto_guru_unit = null
+    fotoGuruUnit.value = null
   }
 }
 

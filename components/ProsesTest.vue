@@ -1,131 +1,135 @@
 <template>
   <div>
-    <!-- Tabs Navigation -->
-    <VTabs v-model="activeTab" background-color="primary" dark>
-      <VTab> Pendaftaran Admisi </VTab>
-      <VTab> Proses Test </VTab>
-      <VTab> Pendaftaran Ulang </VTab>
-    </VTabs>
 
-    <VWindow v-model="activeTab">
-      <!-- Tab 1: Pendaftar Admisi -->
-      <VWindowItem :value="0">
-        <!-- Filter Section -->
-        <VCard class="mb-6 pa-4">
-          <VRow>
-            <VCol cols="12" md="4">
-              <VSelect
-                v-model="filter.status"
-                :items="statusOptions"
-                label="Filter Status"
-                dense
-                outlined
-                clearable
-              />
-            </VCol>
-            <VCol cols="12" md="4">
-              <VTextField
-                v-model="filter.keyword"
-                label="Cari Nama / Email"
-                dense
-                outlined
-                clearable
-              />
-            </VCol>
-            <VCol cols="12" md="3">
-              <VBtn color="primary" @click="getData">Terapkan Filter</VBtn>
-            </VCol>
-            <VCol md="1">
-              <VBtn color="warning" @click="getData">
-                <v-icon>bx-refresh</v-icon>
-              </VBtn>
-            </VCol>
-          </VRow>
+    <VCard class="mb-6 pa-4">
+      <VRow>
+        <VCol cols="12" md="4">
+          <VSelect
+            v-model="filter.status"
+            :items="statusOptions"
+            label="Filter Status"
+            dense
+            outlined
+            clearable
+          />
+        </VCol>
+        <VCol cols="12" md="4">
+          <VTextField
+            v-model="filter.keyword"
+            label="Cari Nama / Email"
+            dense
+            outlined
+            clearable
+          />
+        </VCol>
+        <VCol cols="12" md="3">
+          <VBtn color="primary" @click="getData">Terapkan Filter</VBtn>
+        </VCol>
+        <VCol md="1">
+          <VBtn color="warning" @click="getData">
+            <v-icon>bx-refresh</v-icon>
+          </VBtn>
+        </VCol>
+      </VRow>
+    </VCard>
+
+    <!-- Statistik Cards -->
+    <VRow class="mb-6">
+      <VCol cols="12" sm="6" md="3" v-for="(card, index) in statsCards" :key="index">
+        <VCard class="text-center" :style="`background-color: ${card.bgColor}; color: ${card.textColor}`">
+          <VCardText>
+            <VIcon size="36" class="mb-2">{{ card.icon }}</VIcon>
+            <div class="text-h6">{{ card.title }}</div>
+            <div class="text-h4 font-weight-bold">{{ card.count }}</div>
+          </VCardText>
         </VCard>
+      </VCol>
+    </VRow>
 
-        <!-- Statistik Cards -->
-        <VRow class="mb-6">
-          <VCol cols="12" sm="6" md="3" v-for="(card, index) in statsCards" :key="index">
-            <VCard class="text-center" :style="`background-color: ${card.bgColor}; color: ${card.textColor}`">
-              <VCardText>
-                <VIcon size="36" class="mb-2">{{ card.icon }}</VIcon>
-                <div class="text-h6">{{ card.title }}</div>
-                <div class="text-h4 font-weight-bold">{{ card.count }}</div>
-              </VCardText>
-            </VCard>
-          </VCol>
-        </VRow>
-
-        <!-- Table Pendaftar -->
-        <VCard>
-          <VCardTitle class="mt-3">Daftar Pendaftar Admisi</VCardTitle>
-          <VDataTable
-            :headers="headers"
-            :items="data"
-            class="elevation-1"
-            :loading="loading"
+    <!-- Table Pendaftar -->
+    <VCard>
+      <VCardTitle class="mt-3">Daftar List Peserta Test Seleksi</VCardTitle>
+      <VDataTable
+        :headers="headers"
+        :items="data"
+        class="elevation-1"
+        :loading="loading"
+      >
+        <!-- Custom Status Badge -->
+        <template #item.status="{ item }">
+          <VChip
+            :color="getStatusColor(item.status_test)"
+            class="ma-1"
+            dark
           >
-            <!-- Custom Status Badge -->
-            <template #item.status="{ item }">
-              <VChip
-                :color="getStatusColor(item.status_pendaftaran)"
-                class="ma-1"
-                dark
-              >
-                <VIcon left>{{ getStatusIcon(item.status_pendaftaran) }}</VIcon>
-                {{ getStatusLabel(item.status_pendaftaran) }}
-              </VChip>
-            </template>
+            <VIcon left>{{ getStatusIcon(item.status_test) }}</VIcon>
+            {{ getStatusLabel(item.status_test) }}
+          </VChip>
+        </template>
 
-            <template #item.name_register="{ item }" >
-              <div style="min-width: 200px;">
-                {{ item.register.nama_depan + ' ' + item.register.nama_belakang }}
-              </div>
-            </template>
+        <template #item.code_pendaftaran="{ item }" >
+          <div style="min-width: 200px;">
+            {{ item.code_pendaftaran }}
+          </div>
+        </template>
 
-            <template #item.name_siswa="{ item }">
-              <div style="min-width: 200px;">
-              {{ item.siswa.nama_depan + ' ' + item.siswa.nama_belakang }}
-              </div>
-            </template>
+        <template #item.name_register="{ item }" >
+          <div style="min-width: 200px;">
+            {{ item.register.nama_depan + ' ' + item.register.nama_belakang }}
+          </div>
+        </template>
 
-            <template #item.email="{ item }">
-              <div style="min-width: 200px;">
-              {{ item.register.email }}
-              </div>
-            </template>
+        <template #item.name_siswa="{ item }">
+          <div style="min-width: 200px;">
+          {{ item.siswa.nama_depan + ' ' + item.siswa.nama_belakang }}
+          </div>
+        </template>
 
-            <template #item.actions="{ item }">
+        <template #item.email="{ item }">
+          <div style="min-width: 200px;">
+          {{ item.register.email }}
+          </div>
+        </template>
 
-              <div style="min-width: 200px;">
-              <VBtn icon color="primary" :loading="loading" @click="showDetail(item)">
-                <VIcon>bx-show</VIcon>
-              </VBtn>
-              <!-- <VBtn icon color="success" @click="approvalConfirm(item,'Approve')" :loading="loading"  class="ml-2">
-                <VIcon>bx-check</VIcon>
-              </VBtn> -->
-              <VBtn icon color="error" @click="approvalConfirm(item,'Reject')" :loading="loading" class="ml-2">
-                <VIcon>bx-x</VIcon>
-              </VBtn>
-              </div>
-            </template>
-          </VDataTable>
-        </VCard>
-      </VWindowItem>
-
-      <!-- Tab 2: Pendaftaran Ulang -->
-      <VWindowItem :value="2">
-        <PendaftaranUlang />
-      </VWindowItem>
+        <template #item.no_handphone="{ item }">
+          <div style="min-width: 200px;">
+          {{ item.register.no_handphone }}
+          </div>
+        </template>
 
 
-      <!-- Tab 3: Proses Test -->
-      <VWindowItem :value="1">
-        <ProsesTest />
-      </VWindowItem>
-    </VWindow>
 
-    <!-- Detail Dialog -->
+        <template #item.tgl_test="{ item }">
+          <div style="min-width: 200px;">
+          {{ item.tgl_test }}
+          </div>
+        </template>
+
+
+        <template #item.hasil_test="{ item }">
+          <div style="min-width: 200px;">
+          <!-- {{ item.tgl_test }} -->
+          </div>
+        </template>
+
+        <template #item.actions="{ item }">
+
+          <div style="min-width: 200px;">
+          <VBtn icon color="error" :disabled="item.status_test == '02'" @click="approvalConfirm(item,'Reject')" :loading="loading" class="mr-2">
+            <VIcon>bx-x</VIcon>
+          </VBtn>
+          <VBtn icon color="success" :disabled="item.status_test == '01'" @click="approvalConfirm(item,'Approve')" :loading="loading"  class="mr-2">
+            <VIcon>bx-check</VIcon>
+          </VBtn>
+          <VBtn icon color="primary" :loading="loading" @click="showDetail(item)">
+            <VIcon>bx-show</VIcon>
+          </VBtn>
+          </div>
+        </template>
+      </VDataTable>
+    </VCard>
+
+   <!-- Detail Dialog -->
     <VDialog v-model="dialogDetail" max-width="900px" persistent>
       <VCard class="pa-2">
         <VCardTitle class="text-h6">
@@ -211,11 +215,6 @@
             <VRow>
               <VCol cols="12">
                 <p><strong>Sekolah Tujuan:</strong> {{ selectedItem.sekolah.name }} – {{ selectedItem.sekolah_grade.name }}</p>
-                <p><strong>Status Pendaftaran:</strong>
-                  <VChip :color="getStatusColor(selectedItem.status_pendaftaran)" dark dense class="ml-2">
-                    {{ getStatusLabel(selectedItem.status_pendaftaran) }}
-                  </VChip>
-                </p>
                 <p><strong>Tanggal Pendaftaran:</strong> {{ formatDate(selectedItem.tanggal_pendaftaran) }}</p>
                 <p><strong>Status:</strong>
                   {{ selectedItem.status_pendaftaran_siswa }}
@@ -304,7 +303,7 @@
             </VRow>
 
             <VDivider class="my-4" />
-            <v-row v-if="selectedItem.is_need_test == '1' && selectedItem.status_pendaftaran == 'P00'">
+            <v-row v-if="selectedItem.status_pendaftaran == 'P00'">
               <v-col cols="12">
                 <v-text-field
                   v-model="form.tgl_test"
@@ -319,10 +318,10 @@
         <VCardActions>
           <v-row>
               <v-col cols="6" md="4">
-                <v-btn color="success" variant="flat" :disabled="selectedItem.status_pendaftaran == 'P01'" @click="approvalConfirm(selectedItem,'Approve')" block>Setujui</v-btn>
+                <v-btn color="success" variant="flat" @click="approvalConfirm(selectedItem,'Approve')" block>Setujui</v-btn>
               </v-col>
               <v-col cols="6" md="4">
-                <v-btn color="error" variant="flat"  :disabled="selectedItem.status_pendaftaran == 'P02'" @click="approvalConfirm(selectedItem,'Reject')" block>Tolak</v-btn>
+                <v-btn color="error" variant="flat" @click="approvalConfirm(selectedItem,'Reject')" block>Tolak</v-btn>
               </v-col>
               <v-col cols="12" md="4">
                 <v-btn color="primary" variant="flat" @click="dialogDetail = false;getData()" block>Tutup</v-btn>
@@ -331,6 +330,7 @@
         </VCardActions>
       </VCard>
     </VDialog>
+
 
 
     <!-- Snackbar error -->
@@ -357,8 +357,6 @@
 <script setup>
 import { onMounted, ref } from 'vue';
 import ConfirmDialog from '~/components/ConfirmDialog.vue';
-import PendaftaranUlang from '~/components/PendaftaranUlang.vue';
-import ProsesTest from '~/components/ProsesTest.vue';
 const { $api } = useNuxtApp()
 
 // State
@@ -366,7 +364,6 @@ const loading = ref(false)
 const message = ref(null)
 const show = ref(false)
 const filter = ref({ status: null, keyword: '' })
-const activeTab = ref(0)
 
 const dialogDetail = ref(false)
 const selectedItem = ref(null)
@@ -395,16 +392,16 @@ const statsCards = ref([
 
 // Header tabel
 const headers = [
+  { title: 'Aksi', value: 'actions', sortable: false, width: '200px'},
+  { title: 'Kode Pendaftaran', value: 'code_pendaftaran',width: '200px' },
+  { title: 'Status', value: 'status' },
   { title: 'Nama Pendaftar', value: 'name_register',width: '200px' },
   { title: 'Nama Siswa', value: 'name_siswa' },
   { title: 'Email', value: 'email' },
-  { title: 'Status', value: 'status' },
-  { title: 'Aksi', value: 'actions', sortable: false, width: '200px'}
+  { title: 'No Handphone', value: 'no_handphone' },
+  { title: 'Tanggal Test', value: 'tgl_test' },
 ]
 
-const form = reactive({
-  tgl_test : null,
-});
 // Data tabel
 const data = ref([])
 
@@ -422,25 +419,25 @@ function formatDate(dateStr) {
 
 // Label status pendaftaran
 function getStatusLabel(code) {
-  return code === 'P00' ? 'Menunggu Proses'
-    : code === 'P01' ? 'Diterima'
-    : code === 'P02' ? 'Ditolak'
+  return code === '00' ? 'Menunggu Proses'
+    : code === '01' ? 'Lulus'
+    : code === '02' ? 'Tidak Lulus'
     : 'Tidak Diketahui'
 }
 
 // Warna status pendaftaran
 function getStatusColor(code) {
-  return code === 'P00' ? 'warning'
-    : code === 'P01' ? 'success'
-    : code === 'P02' ? 'error'
+  return code === '00' ? 'warning'
+    : code === '01' ? 'success'
+    : code === '02' ? 'error'
     : 'grey'
 }
 
 // Ikon status pendaftaran
 function getStatusIcon(code) {
-  return code === 'P00' ? 'bx-time'
-    : code === 'P01' ? 'bx-check-circle'
-    : code === 'P02' ? 'bx-x-circle'
+  return code === '00' ? 'bx-time'
+    : code === '01' ? 'bx-check-circle'
+    : code === '02' ? 'bx-x-circle'
     : 'bx-question-mark'
 }
 
@@ -448,7 +445,7 @@ function getStatusIcon(code) {
 async function getData() {
   loading.value = true
   try {
-    const response = await $api.post('/register-ppdb/get-regist',{
+    const response = await $api.post('/register-test/get-data',{
       filter : filter.value
     })
     data.value = response.data.data
@@ -459,12 +456,6 @@ async function getData() {
     loading.value = false
   }
 }
-
-// Placeholder filter
-function applyFilter() {
-  // Tambahkan logika filter sesuai kebutuhan
-}
-
 
 function approvalConfirm(data,type) {
     color.value = type == 'Approve' ? 'success' : 'error';
@@ -497,7 +488,7 @@ async function printData(data) {
 
 async function getStat() {
   try {
-    const {data} = await $api.get('/register-ppdb/statistik-pendaftar');
+    const {data} = await $api.get('/register-test/statistik');
     statsCards.value = [
       {
         title: 'Total Pendaftar',
@@ -539,32 +530,28 @@ async function getStat() {
 
 
 async function HandleApproval(data,type) {
-  if(form.tgl_test == null && data.is_need_test == '1' && data.status_pendaftaran == 'P00'){
-    show.value = true
-    message.value = 'Harap isi Tanggal Test Telebih Dahulu'
-  }else{
-    loading.value = true
-    try {
-      const response = await $api.post('/register-ppdb/approval', {
-        code_ppdb : data.code_pendaftaran,
-        type : type,
-        tgl_test : form.tgl_test
-      })
+  loading.value = true
+  try {
+    const response = await $api.post('/register-test/approval', {
+      code_ppdb : data.code_pendaftaran,
+      siswa_id : data.siswa_id,
+      type : type
+    })
 
-      showSuccess.value = true
-      message.value = 'Pendaftaran berhasil diubah.'
-    } catch (error) {
-      show.value = true
-      message.value = error.response?.data?.message || 'Terjadi kesalahan saat mencetak.'
-    } finally {
-      loading.value = false
-      dialogDetail.value = false
-      showConfirm.value = false
-      getData()
-      getStat()
-    }
+    showSuccess.value = true
+    message.value = 'Data berhasil diubah.'
+  } catch (error) {
+    show.value = true
+    message.value = error.response?.data?.message || 'Terjadi kesalahan saat mencetak.'
+  } finally {
+    loading.value = false
+    dialogDetail.value = false
+    showConfirm.value = false
+    getData()
+    getStat()
   }
 }
+
 
 
 // Lifecycle
