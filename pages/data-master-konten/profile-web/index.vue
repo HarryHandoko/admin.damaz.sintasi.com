@@ -302,7 +302,7 @@
           <v-text-field v-model="form.link_youtube" label="Link Youtube" variant="outlined" dense />
         </v-col> -->
 
-        <v-col cols="12" class="text-center">
+        <!-- <v-col cols="12" class="text-center">
           <div>
             <img
               v-if="bannerSambutanPreview"
@@ -344,7 +344,7 @@
                 [{ font: [] }], 
               ]"
             />
-        </v-col>
+        </v-col> -->
 
 
 
