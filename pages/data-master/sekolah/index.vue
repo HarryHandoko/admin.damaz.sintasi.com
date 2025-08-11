@@ -521,6 +521,53 @@
               />
             </v-col>
 
+
+
+            <v-col cols="12" class="text-center">
+              <div>
+                <img
+                  v-if="bannerVisiPreview"
+                  :src="bannerVisiPreview"
+                  alt="Banner Visi"
+                  style="height: 200px;  object-fit: cover; border-radius: 12px; border: 2px solid #eee;"
+                />
+                <div v-else style="height:120px;background:#f7f7f7;border-radius:12px;display:flex;align-items:center;justify-content:center;color:#bbb;">Banner Visi</div>
+              </div>
+              <v-file-input
+                label="Upload Banner Visi"
+                accept="image/*"
+                show-size
+                variant="outlined"
+                dense
+                clearable
+                @change="handleBannerVisiChange"
+                class="mt-2"
+              />
+            </v-col>
+
+
+            <v-col cols="12" class="text-center">
+              <div>
+                <img
+                  v-if="bannerMisiPreview"
+                  :src="bannerMisiPreview"
+                  alt="Banner Misi"
+                  style="height: 200px;  object-fit: cover; border-radius: 12px; border: 2px solid #eee;"
+                />
+                <div v-else style="height:120px;background:#f7f7f7;border-radius:12px;display:flex;align-items:center;justify-content:center;color:#bbb;">Banner Misi</div>
+              </div>
+              <v-file-input
+                label="Upload Banner Misi"
+                accept="image/*"
+                show-size
+                variant="outlined"
+                dense
+                clearable
+                @change="handleBannerMisiChange"
+                class="mt-2"
+              />
+            </v-col>
+
             <v-col cols="12" class="mb-11" v-if="(form.sekolah_id == null || form.sekolah_id == '')">
               <label style="font-weight:500;display:block;margin-bottom:4px;">Konten Detail</label>
               <QuillEditor
@@ -625,6 +672,8 @@ const form = reactive({
   visi : null,
   misi : null,
   moto : null,
+  banner_visi : null,
+  banner_misi : null,
   foto_guru_unit : null
 })
 const valid = ref(true);
@@ -694,6 +743,8 @@ function showModalDialog (item,type) {
     fotoPreviewSekolah.value = '/no-image.jpg'
     fotoPreviewSekolahDetail.value = '/no-image.jpg'
     bannerSambutanPreview.value = '/no-image.jpg'
+    bannerMisiPreview.value = '/no-image.jpg'
+    bannerVisiPreview.value = '/no-image.jpg'
     fotoGuruUnit.value = '/no-image.jpg'
   }else if(type == 'edit'){
     Object.keys(form).forEach(k => form[k] = item[k] ?? '')
@@ -701,6 +752,8 @@ function showModalDialog (item,type) {
     fotoPreviewSekolah.value = item.foto_kontent_sekolah ? item.foto_kontent_sekolah : '/no-image.jpg'
     fotoPreviewSekolahDetail.value = item.foto_kontent ? item.foto_kontent : '/no-image.jpg'
     bannerSambutanPreview.value = item.foto_kepala_unit ? item.foto_kepala_unit : '/no-image.jpg'
+    bannerMisiPreview.value = item.banner_misi ? item.banner_misi : '/no-image.jpg'
+    bannerVisiPreview.value = item.banner_visi ? item.banner_visi : '/no-image.jpg'
     fotoGuruUnit.value = item.foto_guru_unit ? item.foto_guru_unit : '/no-image.jpg'
     form.is_need_nem = item.is_need_nem == '1' ? true : false;
     form.is_need_test = item.is_need_test == '1' ? true : false;
@@ -757,6 +810,8 @@ async function handleCreateData() {
     formData.append('biaya_admin', form.biaya_admin)
     formData.append('biaya_pendaftaran', form.biaya_pendaftaran)
     formData.append('kontent', form.kontent)
+    formData.append('banner_visi', form.banner_visi)
+    formData.append('banner_misi', form.banner_misi)
     formData.append('code_formulir', form.code_formulir)
     formData.append('kontent_detail', form.kontent_detail)
     formData.append('is_need_nem', form.is_need_nem)
@@ -857,6 +912,8 @@ async function handleCreateData() {
     form.visi = null
     form.misi = null
     form.moto = null
+    form.banner_misi = null
+    form.banner_visi = null
     form.kontent = null
     form.kontent_detail = null
     form.slug = null
@@ -1010,6 +1067,42 @@ function handleBannerSambutanChange(e) {
   } else {
     form.foto_kepala_unit = null
     bannerSambutanPreview.value = null
+  }
+}
+
+
+const bannerVisiPreview =  ref('/no-image.jpg');
+
+function handleBannerVisiChange(e) {
+  let file
+  if (Array.isArray(e)) file = e[0]
+  else if (e?.target?.files) file = e.target.files[0]
+  else file = e
+
+  if (file) {
+    form.banner_visi = file
+    bannerVisiPreview.value = URL.createObjectURL(file)
+  } else {
+    form.banner_visi = null
+    bannerVisiPreview.value = null
+  }
+}
+
+
+const bannerMisiPreview =  ref('/no-image.jpg');
+
+function handleBannerMisiChange(e) {
+  let file
+  if (Array.isArray(e)) file = e[0]
+  else if (e?.target?.files) file = e.target.files[0]
+  else file = e
+
+  if (file) {
+    form.banner_misi = file
+    bannerMisiPreview.value = URL.createObjectURL(file)
+  } else {
+    form.banner_misi = null
+    bannerMisiPreview.value = null
   }
 }
 
