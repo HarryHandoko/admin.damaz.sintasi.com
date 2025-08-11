@@ -109,16 +109,17 @@
         </div>
       </template>
       <!-- Delete -->
-      <template #item.aksi="{ item }">
-        <v-btn icon color="error" @click="confirmDeleteData(item,'sekolah')">
+      <template #item.aksi="props" >
+        <div style="width: 400px">
+          <v-btn icon color="error" @click="confirmDeleteData(props.item,'sekolah')">
           <v-icon>bx bx-trash</v-icon>
         </v-btn>
 
-        <v-btn icon color="secondary" class="ml-2" @click="showModalDialog(item,'edit')">
+        <v-btn icon color="secondary" class="ml-2" @click="showModalDialog(props.item,'edit')">
           <v-icon >bx-edit</v-icon>
         </v-btn>
 
-        <v-btn icon color="info" class="ml-2" @click="showModalDialog(item,'adding-grade')">
+        <v-btn icon color="info" class="ml-2" @click="showModalDialog(props.item,'adding-grade')">
           <v-icon >bx-plus</v-icon>
         </v-btn>
 
@@ -129,7 +130,7 @@
               icon
               color="primary"
               class="ml-2"
-              @click="toprestasiUnit(item)"
+              @click="toprestasiUnit(props.item)"
             >
               <v-icon>bx-link-external</v-icon>
             </v-btn>
@@ -143,13 +144,23 @@
               icon
               color="warning"
               class="ml-2"
-              @click="toeskullUnit(item)"
+              @click="toeskullUnit(props.item)"
             >
               <v-icon>bx-link-external</v-icon>
             </v-btn>
           </template>
         </v-tooltip>
 
+
+        <v-btn icon class="ml-2" :disabled="props.item.sort == '1'" @click="updateSortSekolah(props.item,'up')">
+          <v-icon>bx bx-chevron-up</v-icon>
+        </v-btn>
+
+        <v-btn icon color="secondary ml-2"  :disabled="props.item.length == (props.index +1)" @click="updateSortSekolah(props.item,'down')">
+          <v-icon>bx bx-chevron-down</v-icon>
+        </v-btn>
+
+        </div>
       </template>
       <!-- No data -->
       <template #no-data>
@@ -947,6 +958,26 @@ async function updateSort (item,type){
     loading.value = false
   }
 }
+
+
+
+
+async function updateSortSekolah (item,type){
+  loading.value = true
+  try {
+    await $api.post(`/master-data/sekolah/update-sort-sekolah`,{
+      id: item.id,
+      type: type
+    })
+    getData()
+  } catch (error) {
+    show.value = true
+    message.value = error.response?.data?.message || 'Gagal Mengupdate Sekolah.'
+  } finally {
+    loading.value = false
+  }
+}
+
 
 
 const bannerSambutanPreview =  ref('/no-image.jpg');

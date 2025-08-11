@@ -4,28 +4,8 @@
     
     <!-- FOTO ATAS: Banner & Logo -->
     <v-row class="justify-center mb-4">
-      <v-col cols="12" md="6" class="text-center">
-        <div>
-          <img
-            v-if="bannerPreview"
-            :src="bannerPreview"
-            alt="Banner Preview"
-            style="height: 200px;  object-fit: cover; border-radius: 12px; border: 2px solid #eee;"
-          />
-          <div v-else style="height:120px;background:#f7f7f7;border-radius:12px;display:flex;align-items:center;justify-content:center;color:#bbb;">Banner Preview</div>
-        </div>
-        <v-file-input
-          label="Upload Banner"
-          accept="image/*"
-          show-size
-          variant="outlined"
-          dense
-          clearable
-          @change="handleBannerChange"
-          class="mt-2"
-        />
-      </v-col>
-      <v-col cols="12" md="6" class="text-center">
+
+      <v-col cols="12" class="text-center">
         <div>
           <img
             v-if="logoPreview"
@@ -43,6 +23,69 @@
           dense
           clearable
           @change="handleLogoChange"
+          class="mt-2"
+        />
+      </v-col>
+      <v-col cols="12" md="4" class="text-center">
+        <div>
+          <img
+            v-if="bannerPreview"
+            :src="bannerPreview"
+            alt="Banner Preview"
+            style="height: 200px;  object-fit: cover; border-radius: 12px; border: 2px solid #eee;"
+          />
+          <div v-else style="height:120px;width:100%;background:#f7f7f7;border-radius:12px;display:flex;align-items:center;justify-content:center;color:#bbb;">Banner Preview</div>
+        </div>
+        <v-file-input
+          label="Upload Banner"
+          accept="image/*"
+          show-size
+          variant="outlined"
+          dense
+          clearable
+          @change="handleBannerChange"
+          class="mt-2"
+        />
+      </v-col>
+      <v-col cols="12" md="4" class="text-center">
+        <div>
+          <img
+            v-if="bannerPreviewDua"
+            :src="bannerPreviewDua"
+            alt="Banner Preview"
+            style="height: 200px;  object-fit: cover; border-radius: 12px; border: 2px solid #eee;"
+          />
+          <div v-else style="height:120px;width:100%;background:#f7f7f7;border-radius:12px;display:flex;align-items:center;justify-content:center;color:#bbb;">Banner Preview</div>
+        </div>
+        <v-file-input
+          label="Upload Banner"
+          accept="image/*"
+          show-size
+          variant="outlined"
+          dense
+          clearable
+          @change="handleBannerDuaChange"
+          class="mt-2"
+        />
+      </v-col>
+      <v-col cols="12" md="4" class="text-center">
+        <div>
+          <img
+            v-if="bannerPreviewTiga"
+            :src="bannerPreviewTiga"
+            alt="Banner Preview"
+            style="height: 200px;  object-fit: cover; border-radius: 12px; border: 2px solid #eee;"
+          />
+          <div v-else style="height:120px;width:100%;background:#f7f7f7;border-radius:12px;display:flex;align-items:center;justify-content:center;color:#bbb;">Banner Preview</div>
+        </div>
+        <v-file-input
+          label="Upload Banner"
+          accept="image/*"
+          show-size
+          variant="outlined"
+          dense
+          clearable
+          @change="handleBannerTigaChange"
           class="mt-2"
         />
       </v-col>
@@ -365,6 +408,8 @@ const { $api } = useNuxtApp()
 const form = reactive({
   title: '',
   banner: null,
+  bannerdua: null,
+  bannertiga: null,
   tentang_beranda:null,
   banner_about: null,
   banner_visi: null,
@@ -394,6 +439,8 @@ const form = reactive({
 })
 
 const bannerPreview = ref(null)
+const bannerPreviewDua = ref(null)
+const bannerPreviewTiga = ref(null)
 const bannerAboutPreview = ref(null)
 const bannerVisiPreview = ref(null)
 const bannerMisiPreview = ref(null)
@@ -496,6 +543,38 @@ function handleBannerChange(e) {
   }
 }
 
+
+function handleBannerDuaChange(e) {
+  let file
+  if (Array.isArray(e)) file = e[0]
+  else if (e?.target?.files) file = e.target.files[0]
+  else file = e
+
+  if (file) {
+    form.bannerdua = file
+    bannerPreviewDua.value = URL.createObjectURL(file)
+  } else {
+    form.bannerdua = null
+    bannerPreviewDua.value = null
+  }
+}
+
+function handleBannerTigaChange(e) {
+  let file
+  if (Array.isArray(e)) file = e[0]
+  else if (e?.target?.files) file = e.target.files[0]
+  else file = e
+
+  if (file) {
+    form.bannertiga = file
+    bannerPreviewTiga.value = URL.createObjectURL(file)
+  } else {
+    form.bannertiga = null
+    bannerPreviewTiga.value = null
+  }
+}
+
+
 function handleLogoChange(e) {
   let file
   if (Array.isArray(e)) file = e[0]
@@ -536,6 +615,8 @@ async function saveProfile() {
     formData.append('founder', form.founder)
     formData.append('link_youtube', youtubeVideoId.value)
     if (form.banner) formData.append('banner', form.banner)
+    if (form.bannerdua) formData.append('bannerdua', form.bannerdua)
+    if (form.bannertiga) formData.append('bannertiga', form.bannertiga)
     if (form.logo) formData.append('logo', form.logo)
     if (form.banner_about) formData.append('banner_about', form.banner_about)
     if (form.kopsurat) formData.append('kopsurat', form.kopsurat)
@@ -581,6 +662,8 @@ async function getData () {
     form.founder = data.founder || ''
     // Set preview (assume you store only the filename and serve it from /uploads/web_profile/)
     bannerPreview.value = data.banner ?? '/no-image.jpg'
+    bannerPreviewDua.value = data.bannerdua ?? '/no-image.jpg'
+    bannerPreviewTiga.value = data.bannerdua ?? '/no-image.jpg'
     logoPreview.value = data.logo ?? '/no-image.jpg'
     bannerVisiPreview.value = data.banner_visi ?? '/no-image.jpg'
     bannerMisiPreview.value = data.banner_misi ?? '/no-image.jpg'
