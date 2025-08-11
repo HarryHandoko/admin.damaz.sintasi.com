@@ -121,6 +121,35 @@
         <v-btn icon color="info" class="ml-2" @click="showModalDialog(item,'adding-grade')">
           <v-icon >bx-plus</v-icon>
         </v-btn>
+
+        <v-tooltip text="Lihat Prestasi">
+          <template #activator="{ props }">
+            <v-btn
+              v-bind="props"
+              icon
+              color="primary"
+              class="ml-2"
+              @click="toprestasiUnit(item)"
+            >
+              <v-icon>bx-link-external</v-icon>
+            </v-btn>
+          </template>
+        </v-tooltip>
+
+        <v-tooltip text="Lihat Eskul">
+          <template #activator="{ props }">
+            <v-btn
+              v-bind="props"
+              icon
+              color="warning"
+              class="ml-2"
+              @click="toeskullUnit(item)"
+            >
+              <v-icon>bx-link-external</v-icon>
+            </v-btn>
+          </template>
+        </v-tooltip>
+
       </template>
       <!-- No data -->
       <template #no-data>
@@ -510,8 +539,11 @@
 </template>
 
 <script setup>
-import { onMounted, reactive, ref, watch } from 'vue'
-import ConfirmDialog from '~/components/ConfirmDialog.vue'
+import CryptoJS from 'crypto-js';
+import { onMounted, reactive, ref, watch } from 'vue';
+import { useRouter } from 'vue-router';
+import ConfirmDialog from '~/components/ConfirmDialog.vue';
+const { MD5 } = CryptoJS;
 
 const { $api } = useNuxtApp()
 const headers = [
@@ -951,6 +983,25 @@ function handleGuruUnit(e) {
     form.foto_guru_unit = null
     fotoGuruUnit.value = null
   }
+}
+
+const router = useRouter()
+
+function toprestasiUnit(data) {
+  const encryptedId = MD5(String(data.id)).toString()
+  router.push({
+    path: '/data-master/sekolah/prestasiunit',
+    query: { id: encryptedId,name: data.name }
+  })
+}
+
+
+function toeskullUnit(data) {
+  const encryptedId = MD5(String(data.id)).toString()
+  router.push({
+    path: '/data-master/sekolah/eskullunit',
+    query: { id: encryptedId,name: data.name }
+  })
 }
 
 

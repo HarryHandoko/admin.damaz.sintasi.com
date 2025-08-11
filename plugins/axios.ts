@@ -3,8 +3,8 @@ import axios from 'axios'
 export default defineNuxtPlugin((nuxtApp) => {
   // Create axios instance with your baseURL
   const api = axios.create({
-    // baseURL: 'https://rest-damaz.sintasi.com/api', // <-- set your baseURL here
-    baseURL: 'http://localhost:3333/api', // <-- set your baseURL here
+    baseURL: 'https://rest-damaz.sintasi.com/api', // <-- set your baseURL here
+    // baseURL: 'http://localhost:3333/api', // <-- set your baseURL here
     headers: {
       // Common headers (optional)
       'x-api-key': 'YEHTtRk0CK3meHvnWWwhzbbG1UVbflUh'

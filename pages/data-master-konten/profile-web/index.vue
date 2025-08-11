@@ -149,6 +149,13 @@
     </v-row>
 
     <v-row>
+      <v-col cols="12" class="mb-2">
+        <label style="font-weight:500;display:block;margin-bottom:4px;">Tentang Beranda</label>
+        <v-textarea
+          label="Tentang Beranda"
+          v-model="form.tentang_beranda"
+        ></v-textarea>
+      </v-col>
        <v-col cols="12" class="mb-15">
           <label style="font-weight:500;display:block;margin-bottom:4px;">Tentang Kami</label>
           <QuillEditor
@@ -166,7 +173,24 @@
             />
         </v-col>
 
-        <!-- <v-col cols="12" class="mb-15">
+        <v-col cols="12" class="mb-15">
+          <label style="font-weight:500;display:block;margin-bottom:4px;">Moto Kami</label>
+          <QuillEditor
+              v-model:content="form.moto"
+              contentType="html"
+              class="quill-responsive"
+              :toolbar="[
+                ['bold', 'italic', 'underline', 'strike'],
+                [{ header: [1, 2, 3, false] }],
+                [{ list: 'ordered'}, { list: 'bullet' }],
+                [{ align: [] }],
+                ['link', 'image'],
+                ['clean']
+              ]"
+            />
+        </v-col>
+
+        <v-col cols="12" class="mb-15">
           <label style="font-weight:500;display:block;margin-bottom:4px;">Komitmen Kami</label>
           <QuillEditor
               v-model:content="form.komitmen_kami"
@@ -181,7 +205,7 @@
                 ['clean']
               ]"
             />
-        </v-col> -->
+        </v-col>
 
         <v-col cols="12" class="mb-15">
           <label style="font-weight:500;display:block;margin-bottom:4px;">Visi</label>
@@ -341,12 +365,14 @@ const { $api } = useNuxtApp()
 const form = reactive({
   title: '',
   banner: null,
+  tentang_beranda:null,
   banner_about: null,
   banner_visi: null,
   banner_misi: null,
   kopsurat : null,
   banner_sambutan: null,
   komitmen_kami: null,
+  moto: null,
   tentang_kami: null,
   visi: null,
   misi: null,
@@ -495,12 +521,14 @@ async function saveProfile() {
     formData.append('address', form.address)
     formData.append('whatsapp', form.whatsapp)
     formData.append('email', form.email)
+    formData.append('tentang_beranda', form.tentang_beranda)
     formData.append('social_fb', form.social.fb)
     formData.append('tiktok', form.social.tiktok)
     formData.append('social_ig', form.social.ig)
     formData.append('social_youtube', form.social.youtube)
     formData.append('social_wa', form.social.wa)
     formData.append('komitmen_kami', form.komitmen_kami)
+    formData.append('moto', form.moto)
     formData.append('tentang_kami', form.tentang_kami)
     formData.append('visi', form.visi)
     formData.append('misi', form.misi)
@@ -537,6 +565,8 @@ async function getData () {
     form.address = data.address || ''
     form.whatsapp = data.whatsapp || ''
     form.email = data.email || ''
+    form.tentang_beranda = data.tentang_beranda || ''
+    form.moto = data.moto || ''
     form.social.fb = data.social_fb || ''
     form.social.ig = data.social_ig || ''
     form.social.tiktok = data.tiktok || ''
