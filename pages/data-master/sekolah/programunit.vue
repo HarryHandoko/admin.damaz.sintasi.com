@@ -1,7 +1,7 @@
 <template>
   <v-card>
     <v-card-title class="pa-4">
-      <h2>Esktrakurikuler - {{ namaSekolah }}</h2>
+      <h2>Program Unit - {{ namaSekolah }}</h2>
     </v-card-title>
     <!-- Search & Add -->
     <v-row class="mb-2 pa-4">
@@ -21,16 +21,16 @@
           @click="showModalDialog(null)"
         >
           <v-icon left>bx bx-plus</v-icon>
-          Tambah Esktrakurikuler
+          Tambah Program Unit
         </v-btn>
       </v-col>
     </v-row>
 
-    <!-- Dialog tambah/edit Esktrakurikuler -->
+    <!-- Dialog tambah/edit Esktrakulikuler -->
     <v-dialog v-model="showCreateModal" max-width="600" persistent>
       <v-card>
         <v-card-title class="pa-6 text-center">
-          <span class="headline">Form Esktrakurikuler</span>
+          <span class="headline">Form Program Unit</span>
         </v-card-title>
         <v-form v-model="valid" @submit.prevent="handleCreateData" ref="formRef">
           <v-card-text style="margin-top: -30px;">
@@ -54,8 +54,17 @@
               <v-col cols="12" >
                 <v-text-field
                   v-model="form.name"
-                  label="Nama Eskull"
-                  :rules="[v => !!v || 'Nama Eskull Harus diisi']"
+                  label="Nama Program"
+                  :rules="[v => !!v || 'Nama Program Harus diisi']"
+                  required
+                  class="mb-2"
+                />
+              </v-col>
+              <v-col cols="12" >
+                <v-textarea
+                  v-model="form.deskripsi"
+                  label="Nama Deskrispi"
+                  :rules="[v => !!v || 'Nama Deskrispi Harus diisi']"
                   required
                   class="mb-2"
                 />
@@ -216,6 +225,7 @@ const valid = ref(true)
 const form = reactive({
   id: null,
   name: "",
+  deskripsi: "",
   sekolah_id: route.query.id,
   image: null,
 })
@@ -258,7 +268,7 @@ async function saveEdit(item) {
         }
       }
     }
-    const response = await $api.post('/master-content/eskull-unit/update', formData, {
+    const response = await $api.post('/master-content/program-unggulan-unit/update', formData, {
       headers: { 'Content-Type': 'multipart/form-data' }
     })
     message.value = response.data.message
@@ -299,7 +309,7 @@ const onPageChange = (newPage) => {
 async function getData() {
   loading.value = true
   try {
-    const response = await $api.post('/master-content/eskull-unit/get', {
+    const response = await $api.post('/master-content/program-unggulan-unit/get', {
       page: pagination.page,
       perPage: pagination.itemsPerPage,
       search: filter.search,
@@ -330,11 +340,11 @@ async function handleCreateData() {
 
     formData.append('sekolah_id', route.query.id)
     if(form.id == null){
-      await $api.post('/master-content/eskull-unit/post', formData, {
+      await $api.post('/master-content/program-unggulan-unit/post', formData, {
         headers: { 'Content-Type': 'multipart/form-data' }
       })
     }else{
-      await $api.post('/master-content/eskull-unit/update', formData, {
+      await $api.post('/master-content/program-unggulan-unit/update', formData, {
         headers: { 'Content-Type': 'multipart/form-data' }
       })
     }
@@ -368,7 +378,7 @@ function handleFotoChange(e) {
 async function handleDeleteData() {
   loading.value = true
   try {
-    await $api.post(`/master-content/eskull-unit/delete`,{
+    await $api.post(`/master-content/program-unggulan-unit/delete`,{
       id: DataToDelete.value.id,
     })
     getData()
@@ -384,7 +394,7 @@ async function handleDeleteData() {
 
 async function onToggleActive(item) {
   try {
-    await $api.post(`/master-content/eskull-unit/update`, {
+    await $api.post(`/master-content/program-unggulan-unit/update`, {
       ...item
     })
   } catch (error) {

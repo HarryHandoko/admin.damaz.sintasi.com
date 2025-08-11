@@ -124,9 +124,9 @@
         </v-btn>
 
         <v-tooltip text="Lihat Prestasi">
-          <template #activator="{ props }">
+          <template #activator="{ data }">
             <v-btn
-              v-bind="props"
+              v-bind="data"
               icon
               color="primary"
               class="ml-2"
@@ -138,13 +138,29 @@
         </v-tooltip>
 
         <v-tooltip text="Lihat Eskul">
-          <template #activator="{ props }">
+          <template #activator="{ data }">
             <v-btn
-              v-bind="props"
+              v-bind="data"
               icon
               color="warning"
               class="ml-2"
               @click="toeskullUnit(props.item)"
+            >
+              <v-icon>bx-link-external</v-icon>
+            </v-btn>
+          </template>
+        </v-tooltip>
+
+
+
+        <v-tooltip text="Lihat Program">
+          <template #activator="{ data }">
+            <v-btn
+              v-bind="data"
+              icon
+              color="success"
+              class="ml-2"
+              @click="toprogramUnit(props.item)"
             >
               <v-icon>bx-link-external</v-icon>
             </v-btn>
@@ -1031,6 +1047,15 @@ function toeskullUnit(data) {
   const encryptedId = MD5(String(data.id)).toString()
   router.push({
     path: '/data-master/sekolah/eskullunit',
+    query: { id: encryptedId,name: data.name }
+  })
+}
+
+
+function toprogramUnit(data) {
+  const encryptedId = MD5(String(data.id)).toString()
+  router.push({
+    path: '/data-master/sekolah/programunit',
     query: { id: encryptedId,name: data.name }
   })
 }
