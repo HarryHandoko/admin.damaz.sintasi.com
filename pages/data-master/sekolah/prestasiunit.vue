@@ -40,7 +40,7 @@
                   <img
                     :src="fotoPreview"
                     alt="Preview Foto"
-                    style="width: 120px; height: 120px; object-fit: cover; border-radius: 50%; border: 2px solid #eee;"
+                    style="width: 120px; height: 120px; object-fit: cover; border-radius: 5%; border: 2px solid #eee;"
                   />
                 </div>
                 <v-file-input
@@ -49,6 +49,16 @@
                   show-size
                   @change="handleFotoChange"
                   class="mb-2"
+                />
+              </v-col>
+              <v-col cols="12">
+                <v-select
+                  v-model="form.type"
+                  :items="['Siswa','Guru','Sekolah','Kepala Sekolah']"
+                  label="Jenis Prestasi"
+                  :rules="[v => !!v || 'Jenis Prestasi harus dipilih']"
+                  required
+                  return-object="false"
                 />
               </v-col>
               <v-col cols="12" >
@@ -218,6 +228,7 @@ const form = reactive({
   name: "",
   sekolah_id: route.query.id,
   image: null,
+  type: null,
 })
 
 const show = ref(false)
