@@ -70,6 +70,26 @@
                   class="mb-2"
                 />
               </v-col>
+
+              <v-col cols="12" >
+                <v-text-field
+                  v-model="form.tingkat"
+                  label="Tingkat"
+                  :rules="[v => !!v || 'Tingkat Harus diisi']"
+                  required
+                  class="mb-2"
+                />
+              </v-col>
+
+              <v-col cols="12" >
+                <v-text-field
+                  v-model="form.tahun"
+                  label="Tahun"
+                  :rules="[v => !!v || 'Tahun Harus diisi']"
+                  required
+                  class="mb-2"
+                />
+              </v-col>
             </v-row>
           </v-card-text>
           <v-card-actions>
@@ -228,6 +248,8 @@ const form = reactive({
   name: "",
   sekolah_id: route.query.id,
   image: null,
+  tingkat: null,
+  tahun: null,
   type: null,
 })
 
