@@ -51,13 +51,14 @@
                   class="mb-2"
                 />
               </v-col>
-              <v-col cols="12" >
-                <v-text-field
-                  v-model="form.header"
-                  label="Header"
-                  :rules="[v => !!v || 'Header harus diisi']"
+              <v-col cols="12">
+                <v-select
+                  v-model="form.tipe"
+                  :items="['Pengurus Yayasan','Dikrektur Pendidikan']"
+                  label="Tipe"
+                  :rules="[v => !!v || 'Tipe harus dipilih']"
                   required
-                  class="mb-2"
+                  return-object="false"
                 />
               </v-col>
               <v-col cols="12" >
@@ -266,7 +267,7 @@ const valid = ref(true)
 const form = reactive({
   id: null,
   pengurus: "",
-  header: "",
+  tipe: "",
   jabatan: "",
   image: null,
 })

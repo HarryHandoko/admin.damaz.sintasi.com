@@ -199,21 +199,85 @@
           v-model="form.tentang_beranda"
         ></v-textarea>
       </v-col>
+
+
+
+      <v-col cols="12" md="6" class="text-center">
+        <div>
+          <img
+            v-if="bannerTentangSatu"
+            :src="bannerTentangSatu"
+            alt="Banner Misi"
+            style="height: 200px;  object-fit: cover; border-radius: 12px; border: 2px solid #eee;"
+          />
+          <div v-else style="height:120px;background:#f7f7f7;border-radius:12px;display:flex;align-items:center;justify-content:center;color:#bbb;">Banner Preview</div>
+        </div>
+        <v-file-input
+          label="Upload Banner Tentang Bagian Atas"
+          accept="image/*"
+          show-size
+          variant="outlined"
+          dense
+          clearable
+          @change="handleBannerTentangSatu"
+          class="mt-2"
+        />
+      </v-col>
+
+      <v-col cols="12" md="6" class="text-center">
+        <div>
+          <img
+            v-if="bannerTentangDua"
+            :src="bannerTentangDua"
+            alt="Banner Misi"
+            style="height: 200px;  object-fit: cover; border-radius: 12px; border: 2px solid #eee;"
+          />
+          <div v-else style="height:120px;background:#f7f7f7;border-radius:12px;display:flex;align-items:center;justify-content:center;color:#bbb;">Banner Preview</div>
+        </div>
+        <v-file-input
+          label="Upload Banner Tentang Bagian Bawah"
+          accept="image/*"
+          show-size
+          variant="outlined"
+          dense
+          clearable
+          @change="handleBannerTentangDua"
+          class="mt-2"
+        />
+      </v-col>
+
        <v-col cols="12" class="mb-15">
-          <label style="font-weight:500;display:block;margin-bottom:4px;">Tentang Kami</label>
+          <label style="font-weight:500;display:block;margin-bottom:4px;">Tentang Kami Bagian Atas</label>
           <QuillEditor
-              v-model:content="form.tentang_kami"
-              contentType="html"
-              class="quill-responsive"
-              :toolbar="[
-                ['bold', 'italic', 'underline', 'strike'],
-                [{ header: [1, 2, 3, false] }],
-                [{ list: 'ordered'}, { list: 'bullet' }],
-                [{ align: [] }],
-                ['link', 'image'],
-                ['clean']
-              ]"
-            />
+            v-model:content="form.tentang_kami"
+            contentType="html"
+            class="quill-responsive"
+            :toolbar="[
+              ['bold', 'italic', 'underline', 'strike'],
+              [{ header: [1, 2, 3, false] }],
+              [{ list: 'ordered'}, { list: 'bullet' }],
+              [{ align: [] }],
+              ['link', 'image'],
+              ['clean']
+            ]"
+          />
+        </v-col>
+
+        <v-col cols="12" class="mb-15">
+          <label style="font-weight:500;display:block;margin-bottom:4px;">Tentang Kami Bagian Bawah</label>
+          <QuillEditor
+            v-model:content="form.tentang_dua"
+            contentType="html"
+            class="quill-responsive"
+            :toolbar="[
+              ['bold', 'italic', 'underline', 'strike'],
+              [{ header: [1, 2, 3, false] }],
+              [{ list: 'ordered'}, { list: 'bullet' }],
+              [{ align: [] }],
+              ['link', 'image'],
+              ['clean']
+            ]"
+          />
         </v-col>
 
         <v-col cols="12" class="mb-15">
@@ -284,69 +348,6 @@
             />
         </v-col>
 
-        <!-- <v-col cols="12" class="text-center">
-          <div>
-            <div v-if="youtubeVideoId">
-              <iframe
-                :src="`https://www.youtube.com/embed/${youtubeVideoId}`"
-                frameborder="0"
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                allowfullscreen
-                style="width: 100%; max-width: 400px; height: 225px; border-radius: 12px; border: 2px solid #eee;"
-              ></iframe>
-            </div>
-            <div v-else style="height:120px;background:#f7f7f7;border-radius:12px;display:flex;align-items:center;justify-content:center;color:#bbb;">
-              YouTube Preview
-            </div>
-          </div>
-          <v-text-field v-model="form.link_youtube" label="Link Youtube" variant="outlined" dense />
-        </v-col> -->
-
-        <!-- <v-col cols="12" class="text-center">
-          <div>
-            <img
-              v-if="bannerSambutanPreview"
-              :src="bannerSambutanPreview"
-              alt="Banner Sambutan"
-              style="height: 200px;  object-fit: cover; border-radius: 12px; border: 2px solid #eee;"
-            />
-            <div v-else style="height:120px;background:#f7f7f7;border-radius:12px;display:flex;align-items:center;justify-content:center;color:#bbb;">Banner Preview</div>
-          </div>
-          <v-file-input
-            label="Upload Banner Sambutan"
-            accept="image/*"
-            show-size
-            variant="outlined"
-            dense
-            clearable
-            @change="handleBannerSambutanChange"
-            class="mt-2"
-          />
-        </v-col>
-
-        <v-col cols="12" class="mb-3">
-          <v-text-field v-model="form.founder" label="Founder" variant="outlined" dense />
-        </v-col>
-
-        <v-col cols="12" class="mb-15">
-          <label style="font-weight:500;display:block;margin-bottom:4px;">Sambutan</label>
-          <QuillEditor
-              v-model:content="form.sambutan"
-              contentType="html"
-              class="quill-responsive"
-              :toolbar="[
-                ['bold', 'italic', 'underline', 'strike'],
-                [{ header: [1, 2, 3, false] }],
-                [{ list: 'ordered'}, { list: 'bullet' }],
-                [{ align: [] }],
-                ['link', 'image'],
-                ['clean'],
-                [{ font: [] }], 
-              ]"
-            />
-        </v-col> -->
-
-
 
 
         <v-col cols="12" class="text-center">
@@ -408,9 +409,12 @@ const { $api } = useNuxtApp()
 const form = reactive({
   title: '',
   banner: null,
+  banner_tentang_satu: null,
+  banner_tentang_dua: null,
   bannerdua: null,
   bannertiga: null,
   tentang_beranda:null,
+  tentang_dua:null,
   banner_about: null,
   banner_visi: null,
   banner_misi: null,
@@ -439,6 +443,8 @@ const form = reactive({
 })
 
 const bannerPreview = ref(null)
+const bannerTentangSatu = ref(null)
+const bannerTentangDua = ref(null)
 const bannerPreviewDua = ref(null)
 const bannerPreviewTiga = ref(null)
 const bannerAboutPreview = ref(null)
@@ -513,6 +519,23 @@ function handleBannerVisiChange(e) {
   }
 }
 
+
+
+function handleBannerMisiChange(e) {
+  let file
+  if (Array.isArray(e)) file = e[0]
+  else if (e?.target?.files) file = e.target.files[0]
+  else file = e
+
+  if (file) {
+    form.banner_misi = file
+    bannerMisiPreview.value = URL.createObjectURL(file)
+  } else {
+    form.banner_misi = null
+    bannerMisiPreview.value = null
+  }
+}
+
 function handleKopSuratChange(e) {
   let file
   if (Array.isArray(e)) file = e[0]
@@ -540,6 +563,40 @@ function handleBannerChange(e) {
   } else {
     form.banner = null
     bannerPreview.value = null
+  }
+}
+
+
+
+
+function handleBannerTentangSatu(e) {
+  let file
+  if (Array.isArray(e)) file = e[0]
+  else if (e?.target?.files) file = e.target.files[0]
+  else file = e
+
+  if (file) {
+    form.banner_tentang_satu = file
+    bannerTentangSatu.value = URL.createObjectURL(file)
+  } else {
+    form.banner_tentang_satu = null
+    bannerTentangSatu.value = null
+  }
+}
+
+
+function handleBannerTentangDua(e) {
+  let file
+  if (Array.isArray(e)) file = e[0]
+  else if (e?.target?.files) file = e.target.files[0]
+  else file = e
+
+  if (file) {
+    form.banner_tentang_dua = file
+    bannerTentangDua.value = URL.createObjectURL(file)
+  } else {
+    form.banner_tentang_dua = null
+    bannerTentangDua.value = null
   }
 }
 
@@ -612,9 +669,12 @@ async function saveProfile() {
     formData.append('visi', form.visi)
     formData.append('misi', form.misi)
     formData.append('sambutan', form.sambutan)
+    formData.append('tentang_dua', form.tentang_dua)
     formData.append('founder', form.founder)
     formData.append('link_youtube', youtubeVideoId.value)
     if (form.banner) formData.append('banner', form.banner)
+    if (form.banner_tentang_satu) formData.append('banner_tentang_satu', form.banner_tentang_satu)
+    if (form.banner_tentang_dua) formData.append('banner_tentang_dua', form.banner_tentang_dua)
     if (form.bannerdua) formData.append('bannerdua', form.bannerdua)
     if (form.bannertiga) formData.append('bannertiga', form.bannertiga)
     if (form.logo) formData.append('logo', form.logo)
@@ -660,6 +720,7 @@ async function getData () {
     form.link_youtube = data.link_youtube || ''
     form.sambutan = data.sambutan || ''
     form.founder = data.founder || ''
+    form.tentang_dua = data.tentang_dua || ''
     // Set preview (assume you store only the filename and serve it from /uploads/web_profile/)
     bannerPreview.value = data.banner ?? '/no-image.jpg'
     bannerPreviewDua.value = data.bannerdua ?? '/no-image.jpg'
@@ -669,6 +730,8 @@ async function getData () {
     bannerMisiPreview.value = data.banner_misi ?? '/no-image.jpg'
     bannerAboutPreview.value = data.banner_about ?? '/no-image.jpg'
     bannerSambutanPreview.value = data.banner_sambutan ?? '/no-image.jpg'
+    bannerTentangSatu.value = data.banner_tentang_satu ?? '/no-image.jpg'
+    bannerTentangDua.value = data.banner_tentang_dua ?? '/no-image.jpg'
     KopSuratPreview.value = data.kopsurat ?? '/no-image.jpg'
     brosurFile.value = data.brosur ?? null
     form.banner = null // will be replaced if upload new
