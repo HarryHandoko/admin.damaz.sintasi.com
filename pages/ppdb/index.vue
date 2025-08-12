@@ -13,7 +13,7 @@
         <!-- Filter Section -->
         <VCard class="mb-6 pa-4">
           <VRow>
-            <VCol cols="12" md="4">
+            <VCol cols="12" md="3">
               <VSelect
                 v-model="filter.status"
                 :items="statusOptions"
@@ -23,7 +23,7 @@
                 clearable
               />
             </VCol>
-            <VCol cols="12" md="4">
+            <VCol cols="12" md="3">
               <VTextField
                 v-model="filter.keyword"
                 label="Cari Nama / Email"
@@ -32,12 +32,83 @@
                 clearable
               />
             </VCol>
-            <VCol cols="12" md="3">
-              <VBtn color="primary" @click="getData">Terapkan Filter</VBtn>
-            </VCol>
-            <VCol md="1">
-              <VBtn color="warning" @click="getData">
+            
+          <!-- Filter tanggal awal -->
+          <!-- <VCol cols="12" md="3">
+            <VMenu
+              v-model="menuAwal"
+              :close-on-content-click="false"
+              transition="scale-transition"
+              offset-y
+              min-width="auto"
+            >
+              <template #activator="{ props }">
+                <VTextField
+                  v-model="filter.tanggal_awal"
+                  label="Tanggal Awal"
+                  dense
+                  outlined
+                  readonly
+                  v-bind="props"
+                />
+              </template>
+              <VDatePicker
+                v-model="tanggalAwalRaw"
+                @update:modelValue="updateTanggalAwal"
+                clearable
+              />
+            </VMenu>
+          </VCol> -->
+
+          <!-- Filter tanggal akhir -->
+          <!-- <VCol cols="12" md="3">
+            <VMenu
+              v-model="menuAkhir"
+              :close-on-content-click="false"
+              transition="scale-transition"
+              offset-y
+              min-width="auto"
+            >
+              <template #activator="{ props }">
+                <VTextField
+                  v-model="filter.tanggal_akhir"
+                  label="Tanggal Akhir"
+                  dense
+                  outlined
+                  readonly
+                  v-bind="props"
+                />
+              </template>
+              <VDatePicker
+                v-model="tanggalAkhirRaw"
+                @update:modelValue="updateTanggalAkhir"
+                clearable
+              />
+            </VMenu>
+          </VCol> -->
+
+          <VCol cols="12" md="3">
+            <VSelect
+              v-model="filter.tahun_periodik"
+              :items="optionTahunPeriodik"
+              label="Tahun Periodik"
+              dense
+              outlined
+              clearable
+            />
+          </VCol>
+            <VCol cols="12">
+              <VBtn color="primary" :loading="loading" @click="getData();getStat();">Terapkan Filter</VBtn>
+
+              <VBtn color="warning" :loading="loading" class="ml-2" @click="getData(); getStat()">
                 <v-icon>bx-refresh</v-icon>
+              </VBtn>
+
+              <VBtn color="success" :loading="loading" class="ml-2" @click="getFileExcel()">
+                <v-icon>bx bxs-file</v-icon> Print To Excel
+              </VBtn>
+              <VBtn color="secondary" :loading="loading" class="ml-2" @click="getFileBundle()">
+                <v-icon>bx bxs-file</v-icon> Print To Bundle
               </VBtn>
             </VCol>
           </VRow>
@@ -92,6 +163,12 @@
             <template #item.email="{ item }">
               <div style="min-width: 200px;">
               {{ item.register.email }}
+              </div>
+            </template>
+
+            <template #item.tanggal_pendaftaran="{ item }">
+              <div style="min-width: 200px;">
+              {{ formatDate(item.tanggal_pendaftaran) }}
               </div>
             </template>
 
@@ -365,9 +442,17 @@ const { $api } = useNuxtApp()
 const loading = ref(false)
 const message = ref(null)
 const show = ref(false)
-const filter = ref({ status: null, keyword: '' })
+const filter = ref({ 
+  status: null, 
+  keyword: '' ,
+  tanggal_awal: null,
+  tanggal_akhir: null,
+  tahun_periodik: null
+})
 const activeTab = ref(0)
 
+const menuAwal = ref(false)
+const menuAkhir = ref(false)
 const dialogDetail = ref(false)
 const selectedItem = ref(null)
 
@@ -395,11 +480,12 @@ const statsCards = ref([
 
 // Header tabel
 const headers = [
+  { title: 'Status', value: 'status' },
+  { title: 'Aksi', value: 'actions', sortable: false, width: '200px'},
   { title: 'Nama Pendaftar', value: 'name_register',width: '200px' },
   { title: 'Nama Siswa', value: 'name_siswa' },
   { title: 'Email', value: 'email' },
-  { title: 'Status', value: 'status' },
-  { title: 'Aksi', value: 'actions', sortable: false, width: '200px'}
+  { title: 'Tanggal Pendaftaran', value: 'tanggal_pendaftaran' },
 ]
 
 const form = reactive({
@@ -497,7 +583,9 @@ async function printData(data) {
 
 async function getStat() {
   try {
-    const {data} = await $api.get('/register-ppdb/statistik-pendaftar');
+    const {data} = await $api.get('/register-ppdb/statistik-pendaftar',{
+      params: filter.value
+    });
     statsCards.value = [
       {
         title: 'Total Pendaftar',
@@ -567,9 +655,99 @@ async function HandleApproval(data,type) {
 }
 
 
+// Format helper
+function formatDateTanggal(date) {
+  if (!date) return ''
+  const d = new Date(date)
+  const day = String(d.getDate()).padStart(2, '0')
+  const month = String(d.getMonth() + 1).padStart(2, '0')
+  const year = d.getFullYear()
+  return `${day}-${month}-${year}`
+}
+
+
+function updateTanggalAwal(val) {
+  filter.value.tanggal_awal = formatDateTanggal(val)
+  menuAwal.value = false
+}
+
+function updateTanggalAkhir(val) {
+  filter.value.tanggal_akhir = formatDateTanggal(val)
+  menuAkhir.value = false
+}
+
+
+const optionTahunPeriodik = ref([]);
+
+async function getTahunPeriodik() {
+  loading.value = true;
+  try {
+    const {data} = await $api.get('/register-ppdb/ref-tahun-periodik');
+    optionTahunPeriodik.value = data.data
+    filter.value.tahun_periodik = optionTahunPeriodik.value.at(-1)
+
+    if(filter.value.tahun_periodik != null){
+      getData();
+      getStat();
+    }
+  } catch (error) {
+    show.value = true;
+    message.value = 'Server Error.';
+  } finally {
+    loading.value = false;
+  }
+}
+
+
+
+async function getFileExcel() {
+  loading.value = true
+  try {
+    const response = await $api.post('/report/reg-ppdb/download-excel', {
+      filter : filter.value
+    })
+
+    const downloadUrl = response.data.download_url
+    if (downloadUrl) {
+      window.open(downloadUrl, '_blank') // 👈 buka di tab baru
+    } else {
+      show.value = true
+      message.value = 'Gagal mendapatkan link unduhan.'
+    }
+  } catch (error) {
+    show.value = true
+    message.value = error.response?.data?.message || 'Terjadi kesalahan saat mencetak.'
+  } finally {
+    loading.value = false
+  }
+}
+
+
+
+async function getFileBundle() {
+  loading.value = true
+  try {
+    const response = await $api.post('/report/reg-ppdb/download-bundle', {
+      filter : filter.value
+    })
+
+    const downloadUrl = response.data.download_url
+    if (downloadUrl) {
+      window.open(downloadUrl, '_blank') // 👈 buka di tab baru
+    } else {
+      show.value = true
+      message.value = 'Gagal mendapatkan link unduhan.'
+    }
+  } catch (error) {
+    show.value = true
+    message.value = error.response?.data?.message || 'Terjadi kesalahan saat mencetak.'
+  } finally {
+    loading.value = false
+  }
+}
+
 // Lifecycle
 onMounted(() => {
-  getData()
-  getStat()
+  getTahunPeriodik();
 })
 </script>

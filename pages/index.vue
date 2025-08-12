@@ -21,10 +21,21 @@
         </VCardText>
       </VCard>
     </VCol>
+
+    <v-col cols="12">
+      <v-card class="pa-4">
+        <h2>Jumlah Pendaftar per Tahun</h2>
+        <apexchart
+          type="line"
+          height="350"
+          :options="chartOptions"
+          :series="chartSeries"
+        />
+      </v-card>
+    </v-col>
   </VRow>
 </template>
 <script setup>
-import AnalyticsCongratulations from '@/views/dashboard/AnalyticsCongratulations.vue';
 
 const { $api } = useNuxtApp()
 
@@ -37,7 +48,7 @@ const statsCards = ref([
 ])
 
 
-
+const loading = ref(false);
 async function getStat() {
   try {
     const {data} = await $api.get('/register-ppdb/statistik-pendaftar');
@@ -75,8 +86,66 @@ async function getStat() {
   } finally {
   }
 }
+const years = ref([])
+const totalPendaftar = ref([])
+
+const chartSeries = ref([])
+const chartOptions = ref({
+  chart: {
+    height: 350,
+    type: "area",
+    zoom: { enabled: false }
+  },
+  dataLabels: {
+    enabled: true
+  },
+  stroke: {
+    curve: "smooth"
+  },
+  xaxis: {
+    categories: []
+  },
+  markers: {
+    size: 5
+  },
+  colors: ["#1E90FF"],
+  legend: {
+    position: "bottom",
+    horizontalAlign: "right"
+  }
+})
+
+async function getPertahun() {
+  loading.value = true
+  try {
+    const { data } = await $api.post('/dashboard/analitic-total-per-tahun')
+
+    // Map data tahun dan total pendaftar
+    years.value = data.map(item => item.year)
+    totalPendaftar.value = data.map(item => item.total)
+
+    // Update chart data dan options sekaligus
+    chartSeries.value = [
+      { name: "Total Pendaftar", data: totalPendaftar.value }
+    ]
+    chartOptions.value = {
+      ...chartOptions.value,
+      xaxis: {
+        ...chartOptions.value.xaxis,
+        categories: years.value
+      }
+    }
+
+  } catch (error) {
+    show.value = true
+    message.value = 'Server Error.'
+  } finally {
+    loading.value = false
+  }
+}
 
 onMounted(() => {
   getStat()
+  getPertahun()
 })
 </script>

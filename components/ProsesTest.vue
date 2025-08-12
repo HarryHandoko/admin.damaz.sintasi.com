@@ -3,7 +3,7 @@
 
     <VCard class="mb-6 pa-4">
       <VRow>
-        <VCol cols="12" md="4">
+        <VCol cols="12" md="3">
           <VSelect
             v-model="filter.status"
             :items="statusOptions"
@@ -13,7 +13,7 @@
             clearable
           />
         </VCol>
-        <VCol cols="12" md="4">
+        <VCol cols="12" md="3">
           <VTextField
             v-model="filter.keyword"
             label="Cari Nama / Email"
@@ -23,13 +23,29 @@
           />
         </VCol>
         <VCol cols="12" md="3">
-          <VBtn color="primary" @click="getData">Terapkan Filter</VBtn>
-        </VCol>
-        <VCol md="1">
-          <VBtn color="warning" @click="getData">
-            <v-icon>bx-refresh</v-icon>
-          </VBtn>
-        </VCol>
+            <VSelect
+              v-model="filter.tahun_periodik"
+              :items="optionTahunPeriodik"
+              label="Tahun Periodik"
+              dense
+              outlined
+              clearable
+            />
+          </VCol>
+          <VCol cols="12">
+            <VBtn color="primary" :loading="loading" @click="getData();getStat();">Terapkan Filter</VBtn>
+
+            <VBtn color="warning" :loading="loading" class="ml-2" @click="getData(); getStat()">
+              <v-icon>bx-refresh</v-icon>
+            </VBtn>
+
+            <VBtn color="success" :loading="loading" class="ml-2" @click="getFileExcel()">
+              <v-icon>bx bxs-file</v-icon> Print To Excel
+            </VBtn>
+            <VBtn color="secondary" :loading="loading" class="ml-2" @click="getFileBundle()">
+              <v-icon>bx bxs-file</v-icon> Print To Bundle
+            </VBtn>
+          </VCol>
       </VRow>
     </VCard>
 
@@ -363,13 +379,20 @@ const { $api } = useNuxtApp()
 const loading = ref(false)
 const message = ref(null)
 const show = ref(false)
-const filter = ref({ status: null, keyword: '' })
+
+const filter = ref({ 
+  status: null, 
+  keyword: '' ,
+  tanggal_awal: null,
+  tanggal_akhir: null,
+  tahun_periodik: null
+})
 
 const dialogDetail = ref(false)
 const selectedItem = ref(null)
 
 // Opsi status
-const statusOptions = ['Diterima', 'Ditolak', 'Dalam Proses']
+const statusOptions = ['Lulus', 'Tidak Lulus', 'Dalam Proses']
 
 const zoomDialog = ref(false);
 const zoomDialogFoto = ref(false);
@@ -488,7 +511,9 @@ async function printData(data) {
 
 async function getStat() {
   try {
-    const {data} = await $api.get('/register-test/statistik');
+    const {data} = await $api.get('/register-test/statistik',{
+      ...filter.value
+    });
     statsCards.value = [
       {
         title: 'Total Pendaftar',
@@ -554,9 +579,78 @@ async function HandleApproval(data,type) {
 
 
 
+const optionTahunPeriodik = ref([]);
+
+async function getTahunPeriodik() {
+  loading.value = true;
+  try {
+    const {data} = await $api.get('/register-ppdb/ref-tahun-periodik');
+    optionTahunPeriodik.value = data.data
+    filter.value.tahun_periodik = optionTahunPeriodik.value.at(-1)
+
+    if(filter.value.tahun_periodik != null){
+      getData();
+      getStat();
+    }
+  } catch (error) {
+    show.value = true;
+    message.value = 'Server Error.';
+  } finally {
+    loading.value = false;
+  }
+}
+
+
+
+async function getFileExcel() {
+  loading.value = true
+  try {
+    const response = await $api.post('/report/seleksi-ppdb/download-excel', {
+      filter : filter.value
+    })
+
+    const downloadUrl = response.data.download_url
+    if (downloadUrl) {
+      window.open(downloadUrl, '_blank') // 👈 buka di tab baru
+    } else {
+      show.value = true
+      message.value = 'Gagal mendapatkan link unduhan.'
+    }
+  } catch (error) {
+    show.value = true
+    message.value = error.response?.data?.message || 'Terjadi kesalahan saat mencetak.'
+  } finally {
+    loading.value = false
+  }
+}
+
+
+
+async function getFileBundle() {
+  loading.value = true
+  try {
+    const response = await $api.post('/report/seleksi-ppdb/download-bundle', {
+      filter : filter.value
+    })
+
+    const downloadUrl = response.data.download_url
+    if (downloadUrl) {
+      window.open(downloadUrl, '_blank') // 👈 buka di tab baru
+    } else {
+      show.value = true
+      message.value = 'Gagal mendapatkan link unduhan.'
+    }
+  } catch (error) {
+    show.value = true
+    message.value = error.response?.data?.message || 'Terjadi kesalahan saat mencetak.'
+  } finally {
+    loading.value = false
+  }
+}
+
+
 // Lifecycle
 onMounted(() => {
-  getData()
-  getStat()
+  getTahunPeriodik()
 })
 </script>

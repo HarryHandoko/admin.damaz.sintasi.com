@@ -3,7 +3,7 @@
 
     <VCard class="mb-6 pa-4">
       <VRow>
-        <VCol cols="12" md="4">
+        <VCol cols="12" md="3">
           <VSelect
             v-model="filter.status"
             :items="statusOptions"
@@ -13,7 +13,7 @@
             clearable
           />
         </VCol>
-        <VCol cols="12" md="4">
+        <VCol cols="12" md="3">
           <VTextField
             v-model="filter.keyword"
             label="Cari Nama / Email"
@@ -22,14 +22,31 @@
             clearable
           />
         </VCol>
+        
         <VCol cols="12" md="3">
-          <VBtn color="primary" @click="getData">Terapkan Filter</VBtn>
-        </VCol>
-        <VCol md="1">
-          <VBtn color="warning" @click="getData">
-            <v-icon>bx-refresh</v-icon>
-          </VBtn>
-        </VCol>
+            <VSelect
+              v-model="filter.tahun_periodik"
+              :items="optionTahunPeriodik"
+              label="Tahun Periodik"
+              dense
+              outlined
+              clearable
+            />
+          </VCol>
+          <VCol cols="12">
+            <VBtn color="primary" :loading="loading" @click="getData();getStat();">Terapkan Filter</VBtn>
+
+            <VBtn color="warning" :loading="loading" class="ml-2" @click="getData(); getStat()">
+              <v-icon>bx-refresh</v-icon>
+            </VBtn>
+
+            <VBtn color="success" :loading="loading" class="ml-2" @click="getFileExcel()">
+              <v-icon>bx bxs-file</v-icon> Print To Excel
+            </VBtn>
+            <VBtn color="secondary" :loading="loading" class="ml-2" @click="getFileBundle()">
+              <v-icon>bx bxs-file</v-icon> Print To Bundle
+            </VBtn>
+          </VCol>
       </VRow>
     </VCard>
 
@@ -81,19 +98,19 @@
 
         <template #item.name_register="{ item }" >
           <div style="min-width: 200px;">
-            {{ item.register_nama_depan + ' ' + item.register_nama_belakang }}
+            {{ item.register.nama_depan + ' ' + item.register.nama_belakang }}
           </div>
         </template>
 
         <template #item.name_siswa="{ item }">
           <div style="min-width: 200px;">
-          {{ item.nama_depan + ' ' + item.nama_belakang }}
+          {{ item.siswa.nama_depan + ' ' + item.siswa.nama_belakang }}
           </div>
         </template>
 
         <template #item.email="{ item }">
           <div style="min-width: 200px;">
-          {{ item.email }}
+          {{ item.register.email }}
           </div>
         </template>
 
@@ -158,15 +175,15 @@
               <VCol cols="12" md="6">
                 <p><strong>Kode Registrasi Ulang:</strong> {{ selectedItem.code_registrasi_ulang }}</p>
                 <p><strong>Kode Pendaftaran:</strong> {{ selectedItem.code_pendaftaran }}</p>
-                <p><strong>Nama Siswa:</strong> {{ selectedItem.nama_depan }} {{ selectedItem.nama_belakang }}</p>
-                <p><strong>Sekolah:</strong> {{ selectedItem.sekolah }}</p>
-                <p><strong>Jenjang:</strong> {{ selectedItem.grade }}</p>
+                <p><strong>Nama Siswa:</strong> {{ selectedItem.register.nama_depan }} {{ selectedItem.register.nama_belakang }}</p>
+                <p><strong>Sekolah:</strong> {{ selectedItem.sekolah.name }}</p>
+                <p><strong>Jenjang:</strong> {{ selectedItem.sekolah_grade.name }}</p>
                 <p><strong>Status:</strong> {{ selectedItem.status_pendaftaran_siswa }}</p>
-                <p><strong>Email:</strong> {{ selectedItem.email }}</p>
-                <p><strong>No. Handphone:</strong> {{ selectedItem.no_handphone }}</p>
+                <p><strong>Email:</strong> {{ selectedItem.register.email }}</p>
+                <p><strong>No. Handphone:</strong> {{ selectedItem.register.no_handphone }}</p>
               </VCol>
               <VCol cols="12" md="6">
-                <p><strong>Nama Pendaftar:</strong> {{ selectedItem.register_nama_depan }} {{ selectedItem.register_nama_belakang }}</p>
+                <p><strong>Nama Pendaftar:</strong> {{ selectedItem.register.nama_depan }} {{ selectedItem.register.nama_belakang }}</p>
                 <p><strong>Biaya Pendaftaran:</strong> Rp {{ Number(selectedItem.biaya_pendaftaran).toLocaleString() }}</p>
                 <p><strong class="mr-2">Status Pembayaran:</strong> 
                   <VChip :color="selectedItem.bukti_pembayaran != null ? 'success' : 'error'" dark>
@@ -448,9 +465,80 @@ async function HandleApproval(data,type) {
 }
 
 
+
+
+const optionTahunPeriodik = ref([]);
+
+async function getTahunPeriodik() {
+  loading.value = true;
+  try {
+    const {data} = await $api.get('/register-ppdb/ref-tahun-periodik');
+    optionTahunPeriodik.value = data.data
+    filter.value.tahun_periodik = optionTahunPeriodik.value.at(-1)
+
+    if(filter.value.tahun_periodik != null){
+      getData();
+      getStat();
+    }
+  } catch (error) {
+    show.value = true;
+    message.value = 'Server Error.';
+  } finally {
+    loading.value = false;
+  }
+}
+
+
+
+async function getFileExcel() {
+  loading.value = true
+  try {
+    const response = await $api.post('/report/register-ulang/download-excel', {
+      filter : filter.value
+    })
+
+    const downloadUrl = response.data.download_url
+    if (downloadUrl) {
+      window.open(downloadUrl, '_blank') // 👈 buka di tab baru
+    } else {
+      show.value = true
+      message.value = 'Gagal mendapatkan link unduhan.'
+    }
+  } catch (error) {
+    show.value = true
+    message.value = error.response?.data?.message || 'Terjadi kesalahan saat mencetak.'
+  } finally {
+    loading.value = false
+  }
+}
+
+
+
+async function getFileBundle() {
+  loading.value = true
+  try {
+    const response = await $api.post('/report/register-ulang/download-bundle', {
+      filter : filter.value
+    })
+
+    const downloadUrl = response.data.download_url
+    if (downloadUrl) {
+      window.open(downloadUrl, '_blank') // 👈 buka di tab baru
+    } else {
+      show.value = true
+      message.value = 'Gagal mendapatkan link unduhan.'
+    }
+  } catch (error) {
+    show.value = true
+    message.value = error.response?.data?.message || 'Terjadi kesalahan saat mencetak.'
+  } finally {
+    loading.value = false
+  }
+}
+
+
 // Lifecycle
 onMounted(() => {
-  getData()
-  getStat()
+  getTahunPeriodik()
 })
 </script>
