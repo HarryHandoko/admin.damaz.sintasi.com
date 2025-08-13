@@ -450,10 +450,12 @@
 
 
 
+            
+
             <v-col cols="12" class="mb-11" v-if="(form.sekolah_id == null || form.sekolah_id == '')">
-              <label style="font-weight:500;display:block;margin-bottom:4px;">Moto</label>
+              <label style="font-weight:500;display:block;margin-bottom:4px;">Profile Unit</label>
               <QuillEditor
-                  v-model:content="form.moto"
+                  v-model:content="form.kontent_detail"
                   contentType="html"
                   class="quill-responsive"
                   :toolbar="[
@@ -566,23 +568,6 @@
                 @change="handleBannerMisiChange"
                 class="mt-2"
               />
-            </v-col>
-
-            <v-col cols="12" class="mb-11" v-if="(form.sekolah_id == null || form.sekolah_id == '')">
-              <label style="font-weight:500;display:block;margin-bottom:4px;">Konten Detail</label>
-              <QuillEditor
-                  v-model:content="form.kontent_detail"
-                  contentType="html"
-                  class="quill-responsive"
-                  :toolbar="[
-                    ['bold', 'italic', 'underline', 'strike'],
-                    [{ header: [1, 2, 3, false] }],
-                    [{ list: 'ordered'}, { list: 'bullet' }],
-                    [{ align: [] }],
-                    ['link', 'image'],
-                    ['clean']
-                  ]"
-                />
             </v-col>
 
         </v-card-text>

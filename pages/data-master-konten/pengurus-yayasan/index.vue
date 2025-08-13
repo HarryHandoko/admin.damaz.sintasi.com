@@ -270,6 +270,7 @@ const form = reactive({
   tipe: "",
   jabatan: "",
   image: null,
+  sambutan : null
 })
 
 const show = ref(false)
