@@ -63,6 +63,15 @@
               </v-col>
               <v-col cols="12" >
                 <v-text-field
+                  v-model="form.nama_pemilik"
+                  label="Nama"
+                  :rules="[v => !!v || 'Nama Harus diisi']"
+                  required
+                  class="mb-2"
+                />
+              </v-col>
+              <v-col cols="12" >
+                <v-text-field
                   v-model="form.name"
                   label="Prestasi"
                   :rules="[v => !!v || 'Prestasi Harus diisi']"
@@ -245,6 +254,7 @@ const filter = reactive({
 const valid = ref(true)
 const form = reactive({
   id: null,
+  nama_pemilik: "",
   name: "",
   sekolah_id: route.query.id,
   image: null,
