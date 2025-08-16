@@ -1,12 +1,12 @@
 <template>
-  <VRow>
+  <VRow v-if="dataAccount != null">
     <!-- 👉 Congratulations -->
     <VCol cols="12">
       <AnalyticsCongratulations />
     </VCol>
 
     <!-- Statistik Cards -->
-    <VCol cols="12" sm="6" md="3" v-for="(card, index) in statsCards" :key="index">
+    <VCol cols="12" sm="6" md="3" v-for="(card, index) in statsCards" :key="index" >
       <VCard class="text-center" :style="`background-color: ${card.bgColor}; color: ${card.textColor}`">
         <VCardText>
           <VIcon size="36" class="mb-2">{{ card.icon }}</VIcon>
@@ -17,7 +17,7 @@
     </VCol>
 
 
-    <v-col cols="12">
+    <v-col cols="12" v-if="dataAccount.role_name != 'Pendaftar'">
       <v-card class="pa-4 mb-6">
         <h2>Jumlah Pendaftar per Tahun</h2>
         <apexchart
@@ -31,7 +31,7 @@
 
 
 
-    <v-col cols="12" md="6">
+    <v-col cols="12" md="6" v-if="dataAccount.role_name != 'Pendaftar'">
       <v-card class="pa-4 mb-6">
         <h3>Filter Data Per Tahun</h3>
         <v-form @submit.prevent="onFilter">
@@ -54,11 +54,11 @@
       </v-card>
     </v-col>
 
-    <v-col cols="12" md="6"></v-col>
+    <v-col cols="12" md="6" v-if="dataAccount.role_name != 'Pendaftar'"></v-col>
 
 
     <!-- Chart Jumlah Pendaftar per Tahun (existing) -->
-    <v-col cols="12" md="6">
+    <v-col cols="12" md="6" v-if="dataAccount.role_name != 'Pendaftar'">
       <v-card class="pa-4 mb-6">
           <h2>Jumlah Pendaftar per Unit</h2>
           <apexchart
@@ -72,7 +72,7 @@
 
 
     <!-- Chart: Jumlah Pendaftar per Jenis Kelamin -->
-    <v-col cols="12" md="6">
+    <v-col cols="12" md="6" v-if="dataAccount.role_name != 'Pendaftar'">
       <v-card class="pa-4 mb-6">
         <h2>Jumlah Pendaftar per Jenis Kelamin</h2>
         <apexchart
@@ -334,8 +334,20 @@ async function getGenderChartData() {
   }
 }
 
+const dataAccount = ref(null);
+// Fetch Data User
+async function fetchUser() {
+  try {
+    const { data } = await $api.get('/users')
+    dataAccount.value = data
+  } catch (error) {
+    console.error(error)
+  }
+}
+
 
 onMounted(() => {
+  fetchUser()
   getStat()
   getPertahun()
   getPertahunUnit()

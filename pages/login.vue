@@ -83,6 +83,11 @@
                 </VBtn>
               </VCol>
 
+              <VCol cols="12">
+                <div id="googleBtn" data-width="100%" style="width:100%"></div>
+
+              </VCol>
+
               <!-- login instead -->
               <VCol
                 cols="12"
@@ -110,12 +115,13 @@
   </div>
 </template>
 
-<script setup lang="ts">
+<script setup >
 import authV1BottomShape from '@images/svg/auth-v1-bottom-shape.svg?url'
 import authV1TopShape from '@images/svg/auth-v1-top-shape.svg?url'
 import { ref } from 'vue'
 
-const { $api } = useNuxtApp()
+const config = useRuntimeConfig()
+const { $api,$gAuth } = useNuxtApp()
 
 const form = ref({
   email: '',
@@ -127,9 +133,6 @@ const loading = ref(false)
 const message = ref('Login failed. Please check your credentials.')
 
 const isPasswordVisible = ref(false)
-
-definePageMeta({ layout: 'blank' })
-
 
 async function login() {
   loading.value = true
@@ -150,13 +153,41 @@ async function login() {
 }
 
 
+async function handleCredentialResponse(response) {
+  const idToken = response.credential
+  const {data} = await $api.post('/auth/google', {token: idToken})
+
+  localStorage.setItem('token', data.user.token)
+  localStorage.removeItem('redirected')
+  navigateTo('/')
+}
+
+
 onMounted(() => {
   if (localStorage.getItem('token')) {
     navigateTo('/')
   }
+  google.accounts.id.initialize({
+    client_id: config.public.GOOGLE_CLIENT_ID,
+    callback: handleCredentialResponse,
+  })
+
+  google.accounts.id.renderButton(
+    document.getElementById("googleBtn"),
+    { theme: "outline", size: "large" }
+  )
 })
+
+definePageMeta({ layout: 'blank' })
+
 </script>
 
 <style lang="scss">
 @use "@core/scss/template/pages/page-auth";
+
+#googleBtn > div {
+  width: 100% !important;
+  display: flex;
+  justify-content: center;
+}
 </style>
