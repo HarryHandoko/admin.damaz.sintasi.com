@@ -1,238 +1,258 @@
 <template>
-  <v-card>
-    <v-card-title class="pa-4">
-      <h2>Prestasi - {{ namaSekolah }}</h2>
-    </v-card-title>
-    <!-- Search & Add -->
-    <v-row class="mb-2 pa-4">
-      <v-col cols="12" sm="12" md="6">
-        <v-text-field
-          v-model="filter.search"
-          label="Cari"
-          placeholder="Cari Galeri"
-          @keyup.enter="getData"
-          clearable
-        />
-      </v-col>
-      <v-col cols="12" sm="12" md="6">
-        <v-btn
-          color="primary"
-          class="float-end"
-          @click="showModalDialog(null)"
-        >
-          <v-icon left>bx bx-plus</v-icon>
-          Tambah Prestasi
-        </v-btn>
-      </v-col>
-    </v-row>
+  <VCard>
+    <VTabs v-model="tab" background-color="primary" dark>
+      <VTab value="foto-prestasi">Foto Prestasi</VTab>
+      <VTab value="prestasi">Prestasi</VTab>
+    </VTabs>
 
-    <!-- Dialog tambah/edit Prestasi -->
-    <v-dialog v-model="showCreateModal" max-width="600" persistent>
-      <v-card>
-        <v-card-title class="pa-6 text-center">
-          <span class="headline">Form Prestasi</span>
-        </v-card-title>
-        <v-form v-model="valid" @submit.prevent="handleCreateData" ref="formRef">
-          <v-card-text style="margin-top: -30px;">
-            <v-row dense>
-              <v-col cols="12" sm="12">
-                <div v-if="fotoPreview" class="mt-2 text-center">
-                  <img
-                    :src="fotoPreview"
-                    alt="Preview Foto"
-                    style="width: 120px; height: 120px; object-fit: cover; border-radius: 5%; border: 2px solid #eee;"
+    <VCardText>
+      <VWindow v-model="tab">
+        <VWindowItem value="foto-prestasi">
+          <FotoPrestasi />
+        </VWindowItem>
+
+        <VWindowItem value="prestasi">
+            <v-card>
+              <v-card-title class="pa-4">
+                <h2>Prestasi - {{ namaSekolah }}</h2>
+              </v-card-title>
+              <!-- Search & Add -->
+              <v-row class="mb-2 pa-4">
+                <v-col cols="12" sm="12" md="6">
+                  <v-text-field
+                    v-model="filter.search"
+                    label="Cari"
+                    placeholder="Cari Galeri"
+                    @keyup.enter="getData"
+                    clearable
                   />
-                </div>
-                <v-file-input
-                  label="Upload Foto"
-                  accept="image/*"
-                  show-size
-                  @change="handleFotoChange"
-                  class="mb-2"
-                />
-              </v-col>
-              <v-col cols="12">
-                <v-select
-                  v-model="form.type"
-                  :items="['Siswa','Guru','Sekolah','Kepala Sekolah']"
-                  label="Jenis Prestasi"
-                  :rules="[v => !!v || 'Jenis Prestasi harus dipilih']"
-                  required
-                  return-object="false"
-                />
-              </v-col>
-              <v-col cols="12" >
-                <v-text-field
-                  v-model="form.nama_pemilik"
-                  label="Nama"
-                  :rules="[v => !!v || 'Nama Harus diisi']"
-                  required
-                  class="mb-2"
-                />
-              </v-col>
-              <v-col cols="12" >
-                <v-text-field
-                  v-model="form.name"
-                  label="Prestasi"
-                  :rules="[v => !!v || 'Prestasi Harus diisi']"
-                  required
-                  class="mb-2"
-                />
-              </v-col>
+                </v-col>
+                <v-col cols="12" sm="12" md="6">
+                  <v-btn
+                    color="primary"
+                    class="float-end"
+                    @click="showModalDialog(null)"
+                  >
+                    <v-icon left>bx bx-plus</v-icon>
+                    Tambah Prestasi
+                  </v-btn>
+                </v-col>
+              </v-row>
 
-              <v-col cols="12" >
-                <v-text-field
-                  v-model="form.tingkat"
-                  label="Tingkat"
-                  :rules="[v => !!v || 'Tingkat Harus diisi']"
-                  required
-                  class="mb-2"
-                />
-              </v-col>
+              <!-- Dialog tambah/edit Prestasi -->
+              <v-dialog v-model="showCreateModal" max-width="600" persistent>
+                <v-card>
+                  <v-card-title class="pa-6 text-center">
+                    <span class="headline">Form Prestasi</span>
+                  </v-card-title>
+                  <v-form v-model="valid" @submit.prevent="handleCreateData" ref="formRef">
+                    <v-card-text style="margin-top: -30px;">
+                      <v-row dense>
+                        <v-col cols="12" sm="12">
+                          <div v-if="fotoPreview" class="mt-2 text-center">
+                            <img
+                              :src="fotoPreview"
+                              alt="Preview Foto"
+                              style="width: 120px; height: 120px; object-fit: cover; border-radius: 5%; border: 2px solid #eee;"
+                            />
+                          </div>
+                          <v-file-input
+                            label="Upload Foto"
+                            accept="image/*"
+                            show-size
+                            @change="handleFotoChange"
+                            class="mb-2"
+                          />
+                        </v-col>
+                        <v-col cols="12">
+                          <v-select
+                            v-model="form.type"
+                            :items="['Siswa','Guru','Sekolah','Kepala Sekolah']"
+                            label="Jenis Prestasi"
+                            :rules="[v => !!v || 'Jenis Prestasi harus dipilih']"
+                            required
+                            return-object="false"
+                          />
+                        </v-col>
+                        <v-col cols="12" >
+                          <v-text-field
+                            v-model="form.nama_pemilik"
+                            label="Nama"
+                            :rules="[v => !!v || 'Nama Harus diisi']"
+                            required
+                            class="mb-2"
+                          />
+                        </v-col>
+                        <v-col cols="12" >
+                          <v-text-field
+                            v-model="form.name"
+                            label="Prestasi"
+                            :rules="[v => !!v || 'Prestasi Harus diisi']"
+                            required
+                            class="mb-2"
+                          />
+                        </v-col>
 
-              <v-col cols="12" >
-                <v-text-field
-                  v-model="form.tahun"
-                  label="Tahun"
-                  :rules="[v => !!v || 'Tahun Harus diisi']"
-                  required
-                  class="mb-2"
+                        <v-col cols="12" >
+                          <v-text-field
+                            v-model="form.tingkat"
+                            label="Tingkat"
+                            :rules="[v => !!v || 'Tingkat Harus diisi']"
+                            required
+                            class="mb-2"
+                          />
+                        </v-col>
+
+                        <v-col cols="12" >
+                          <v-text-field
+                            v-model="form.tahun"
+                            label="Tahun"
+                            :rules="[v => !!v || 'Tahun Harus diisi']"
+                            required
+                            class="mb-2"
+                          />
+                        </v-col>
+                      </v-row>
+                    </v-card-text>
+                    <v-card-actions>
+                      <v-spacer></v-spacer>
+                      <v-btn color="blue-grey" variant="text" @click="showCreateModal = false">Batal</v-btn>
+                      <v-btn color="primary" variant="flat" :disabled="!valid || loading" type="submit" :loading="loading">
+                        Simpan
+                      </v-btn>
+                    </v-card-actions>
+                  </v-form>
+                </v-card>
+              </v-dialog>
+
+              <!-- Dialog Foto Besar -->
+              <v-dialog v-model="showFotoDialog" max-width="600px">
+                <v-card>
+                  <v-img
+                    :src="selectedFoto"
+                    height="400px"
+                    contain
+                    style="object-fit:contain;"
+                  />
+                </v-card>
+              </v-dialog>
+
+              <!-- Snackbar error -->
+              <v-snackbar v-model="show" color="error" timeout="3000">
+                {{ message }}
+              </v-snackbar>
+
+              <!-- Dialog konfirmasi hapus -->
+              <ConfirmDialog
+                :modelValue="showConfirmDelete"
+                title="Konfirmasi Hapus"
+                :message="`Apakah Anda yakin ingin menghapus Data ${DataToDelete?.title}?`"
+                @confirm="handleDeleteData"
+                @cancel="showConfirmDelete = false"
+              />
+            </v-card>
+
+
+            <v-row v-if="loading" justify="center" align="center" class="my-12">
+              <v-col cols="12" class="text-center">
+                <v-progress-circular
+                  indeterminate
+                  color="primary"
+                  size="64"
+                  width="5"
                 />
+                <div class="mt-2">Memuat data...</div>
               </v-col>
             </v-row>
-          </v-card-text>
-          <v-card-actions>
-            <v-spacer></v-spacer>
-            <v-btn color="blue-grey" variant="text" @click="showCreateModal = false">Batal</v-btn>
-            <v-btn color="primary" variant="flat" :disabled="!valid || loading" type="submit" :loading="loading">
-              Simpan
-            </v-btn>
-          </v-card-actions>
-        </v-form>
-      </v-card>
-    </v-dialog>
-
-    <!-- Dialog Foto Besar -->
-    <v-dialog v-model="showFotoDialog" max-width="600px">
-      <v-card>
-        <v-img
-          :src="selectedFoto"
-          height="400px"
-          contain
-          style="object-fit:contain;"
-        />
-      </v-card>
-    </v-dialog>
-
-    <!-- Snackbar error -->
-    <v-snackbar v-model="show" color="error" timeout="3000">
-      {{ message }}
-    </v-snackbar>
-
-    <!-- Dialog konfirmasi hapus -->
-    <ConfirmDialog
-      :modelValue="showConfirmDelete"
-      title="Konfirmasi Hapus"
-      :message="`Apakah Anda yakin ingin menghapus Data ${DataToDelete?.title}?`"
-      @confirm="handleDeleteData"
-      @cancel="showConfirmDelete = false"
-    />
-  </v-card>
 
 
-  <v-row v-if="loading" justify="center" align="center" class="my-12">
-    <v-col cols="12" class="text-center">
-      <v-progress-circular
-        indeterminate
-        color="primary"
-        size="64"
-        width="5"
-      />
-      <div class="mt-2">Memuat data...</div>
-    </v-col>
-  </v-row>
+            <!-- Card List -->
+            <v-row class="mt-4" v-if="!loading && items.length">
+              <v-col
+                v-for="(item, idx) in items"
+                :key="item.id"
+                cols="12"
+                sm="6"
+                md="4"
+                lg="3"
+              >
+                <v-card class="mb-4" elevation="2">
+                  <v-img
+                    :src="item.image ? item.image : '/no-image.jpg'"
+                    alt="Galeri Image"
+                    height="180px"
+                    cover
+                    style="cursor: pointer;"
+                    @click="openFotoDialog(item.image)"
+                  />
+                  <v-card-title>
+                    <span v-if="editingRow === 'name'+item.id">
+                      <v-text-field
+                        v-model="item.name"
+                        density="compact"
+                        autofocus
+                        hide-details
+                        @keydown.enter="saveEdit(item)"
+                        @keydown.esc="cancelEdit"
+                        @blur="cancelEdit"
+                        style="width: 100%;"
+                      />
+                    </span>
+                    <span v-else @click="startEdit('name'+item.id)" style="cursor:pointer;">
+                      {{ item.name ?? '-' }}
+                    </span>
+                  </v-card-title>
+                  <v-card-actions>
+                    <v-btn icon color="error" @click="confirmDeleteData(item)">
+                      <v-icon>bx bx-trash</v-icon>
+                    </v-btn>
+                    <v-btn icon color="primary" class="ml-1" @click="showModalDialog(item)">
+                      <v-icon>bx bx-edit</v-icon>
+                    </v-btn>
+                    <v-switch
+                      v-model="item.is_active"
+                      inset
+                      color="success"
+                      hide-details
+                      @change="onToggleActive(item)"
+                      class="ml-2"
+                      style="width: 70px;"
+                    />
+                  </v-card-actions>
+                </v-card>
+              </v-col>
+            </v-row>
 
+            <!-- No data -->
+            <div v-else-if="!loading && !items.length" class="pa-4 text-center">
+              Tidak ada data.
+            </div>
 
-  <!-- Card List -->
-  <v-row class="mt-4" v-if="!loading && items.length">
-    <v-col
-      v-for="(item, idx) in items"
-      :key="item.id"
-      cols="12"
-      sm="6"
-      md="4"
-      lg="3"
-    >
-      <v-card class="mb-4" elevation="2">
-        <v-img
-          :src="item.image ? item.image : '/no-image.jpg'"
-          alt="Galeri Image"
-          height="180px"
-          cover
-          style="cursor: pointer;"
-          @click="openFotoDialog(item.image)"
-        />
-        <v-card-title>
-          <span v-if="editingRow === 'name'+item.id">
-            <v-text-field
-              v-model="item.name"
-              density="compact"
-              autofocus
-              hide-details
-              @keydown.enter="saveEdit(item)"
-              @keydown.esc="cancelEdit"
-              @blur="cancelEdit"
-              style="width: 100%;"
-            />
-          </span>
-          <span v-else @click="startEdit('name'+item.id)" style="cursor:pointer;">
-            {{ item.name ?? '-' }}
-          </span>
-        </v-card-title>
-        <v-card-actions>
-          <v-btn icon color="error" @click="confirmDeleteData(item)">
-            <v-icon>bx bx-trash</v-icon>
-          </v-btn>
-          <v-btn icon color="primary" class="ml-1" @click="showModalDialog(item)">
-            <v-icon>bx bx-edit</v-icon>
-          </v-btn>
-          <v-switch
-            v-model="item.is_active"
-            inset
-            color="success"
-            hide-details
-            @change="onToggleActive(item)"
-            class="ml-2"
-            style="width: 70px;"
-          />
-        </v-card-actions>
-      </v-card>
-    </v-col>
-  </v-row>
-
-  <!-- No data -->
-  <div v-else-if="!loading && !items.length" class="pa-4 text-center">
-    Tidak ada data.
-  </div>
-
-  <!-- Pagination -->
-  <v-row justify="center" v-if="pagination.totalItems > pagination.itemsPerPage">
-    <v-pagination
-      v-model="pagination.page"
-      :length="Math.ceil(pagination.totalItems / pagination.itemsPerPage)"
-      @input="onPageChange"
-      class="my-4"
-    />
-  </v-row>
+            <!-- Pagination -->
+            <v-row justify="center" v-if="pagination.totalItems > pagination.itemsPerPage">
+              <v-pagination
+                v-model="pagination.page"
+                :length="Math.ceil(pagination.totalItems / pagination.itemsPerPage)"
+                @input="onPageChange"
+                class="my-4"
+              />
+            </v-row>
+        </VWindowItem>
+      </VWindow>
+    </VCardText>
+  </VCard>
+  
 </template>
 
 <script setup>
 import { onMounted, reactive, ref, watch } from 'vue'
 import ConfirmDialog from '~/components/ConfirmDialog.vue'
+import FotoPrestasi from '~/components/FotoPrestasi.vue'
 
 import { useRoute } from 'vue-router'
 
 const route = useRoute()
+const tab = ref('prestasi')
 
 const { $api } = useNuxtApp()
 
