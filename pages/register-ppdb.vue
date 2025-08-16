@@ -134,21 +134,8 @@
 
               <!-- Login dengan Google -->
               <VCol cols="12">
-                <VBtn
-                  :loading="loading"
-                  block
-                  color="white"
-                  class="login-google-btn"
-                  style="border: 1px solid #e0e0e0;"
-                  @click="loginWithGoogle"
-                >
-                  <img
-                    src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg"
-                    alt="Google"
-                    style="width: 24px; height: 24px; margin-right: 12px;"
-                  />
-                  <span style="color: #444;">Login dengan Google</span>
-                </VBtn>
+                <div id="googleBtn" data-width="100%" style="width:100%"></div>
+
               </VCol>
             </VRow>
           </VForm>
@@ -162,12 +149,12 @@
   </div>
 </template>
 
-<script setup lang="ts">
+<script setup>
 import authV1BottomShape from '@images/svg/auth-v1-bottom-shape.svg?url';
 import authV1TopShape from '@images/svg/auth-v1-top-shape.svg?url';
 import { onMounted, ref } from 'vue';
 
-const { $api } = useNuxtApp()
+const { $api,$gAuth } = useNuxtApp()
 
 const form = ref({
   nama_depan: '',
@@ -199,8 +186,20 @@ async function fetchCaptcha() {
   }
 }
 
+const config = useRuntimeConfig()
 onMounted(() => {
   fetchCaptcha()
+
+  google.accounts.id.initialize({
+    client_id: config.public.GOOGLE_CLIENT_ID,
+    callback: handleCredentialResponse,
+  })
+
+  google.accounts.id.renderButton(
+    document.getElementById("googleBtn"),
+    { theme: "outline", size: "large" }
+  )
+
 })
 
 async function register() {
@@ -225,8 +224,6 @@ async function register() {
       form.value.email = ''
       form.value.no_handphone = ''
       captchaInput.value = ''
-      // Optional: redirect ke login, atau reset form
-      // await nextTick(() => form.value = ...)
     }
 
 
@@ -239,9 +236,13 @@ async function register() {
     loading.value = false
   }
 }
+async function handleCredentialResponse(response) {
+  const idToken = response.credential
+  const {data} = await $api.post('/auth/google', {token: idToken})
 
-const loginWithGoogle = () => {
-  window.location.href = 'http://localhost:3333/auth/google'
+  localStorage.setItem('token', data.user.token)
+  localStorage.removeItem('redirected')
+  navigateTo('/')
 }
 
 definePageMeta({ layout: 'blank' })
@@ -259,4 +260,11 @@ input[type=number]::-webkit-outer-spin-button {
 input[type=number] {
   -moz-appearance: textfield;
 }
+
+#googleBtn > div {
+  width: 100% !important;
+  display: flex;
+  justify-content: center;
+}
+
 </style>

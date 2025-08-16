@@ -4,9 +4,14 @@ import svgLoader from 'vite-svg-loader'
 
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
+  runtimeConfig: {
+    public: {
+      GOOGLE_CLIENT_ID: '459746861160-sufkjqinf1hqc0lqk31i27ndvqoabt93.apps.googleusercontent.com'
+    }
+  },
   app: {
     head: {
-      titleTemplate: '%s - PPDB',
+      titleTemplate: '%s - SPMB',
       title: 'Admin Panel Damaz',
 
       link: [{
@@ -14,6 +19,13 @@ export default defineNuxtConfig({
         type: 'image/x-icon',
         href: '/favicon.ico',
       }],
+      script: [
+        {
+          src: "https://accounts.google.com/gsi/client",
+          async: true,
+          defer: true,
+        },
+      ],
     },
   },
 

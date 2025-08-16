@@ -93,7 +93,7 @@ onMounted(() => {
           <VDivider class="my-2" />
 
           <!-- 👉 Profile -->
-          <VListItem link>
+          <VListItem link @click="$router.push('/profile')">
             <template #prepend>
               <VIcon
                 class="me-2"
