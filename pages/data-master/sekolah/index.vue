@@ -99,7 +99,7 @@
 
 
       <template #item.logo="{item}">
-        <div 
+        <div
             style="cursor: pointer;height:80px;width:80px;" class="pa-2">
           <v-img
             :src="item.logo ? item.logo : '/no-image.jpg'"
@@ -320,7 +320,6 @@
               v-if=" (form.sekolah_id == null || form.sekolah_id == '')"
             />
 
-
             <v-text-field
               v-model="form.biaya_pendaftaran"
               label="Biaya Pendaftaran"
@@ -330,6 +329,38 @@
               :rules="[v => !!v || 'Biaya Pendaftaran harus diisi']"
               v-if=" (form.sekolah_id == null || form.sekolah_id == '')"
             />
+
+            <v-col cols="12">
+              <v-switch
+                v-model="form.is_sdit"
+                inset
+                label="Apakah SDIT?"
+                color="success"
+                hide-details
+                v-if=" (form.sekolah_id == null || form.sekolah_id == '')"
+              />
+            </v-col>
+
+            <v-text-field
+              v-model="form.biaya_admin_sdit"
+              label="Biaya admin SDIT"
+              required
+              type="number"
+              class="mb-4"
+              :rules="[v => !!v || 'Biaya admin harus diisi']"
+              v-if="form.is_sdit && (form.sekolah_id == null || form.sekolah_id == '')"
+            />
+
+            <v-text-field
+              v-model="form.biaya_pendaftaran_sdit"
+              v-if="form.is_sdit && (form.sekolah_id == null || form.sekolah_id == '')"
+              label="SDIT Biaya Pendaftaran"
+              required
+              type="number"
+              class="mb-4"
+              :rules="[v => !!v || 'Biaya Pendaftaran harus diisi']"
+            />
+
 
 
             <v-col cols="12">
@@ -424,7 +455,7 @@
                     [{ align: [] }],
                     ['link', 'image'],
                     ['clean'],
-                    [{ font: [] }], 
+                    [{ font: [] }],
                   ]"
                 />
             </v-col>
@@ -450,7 +481,7 @@
 
 
 
-            
+
 
             <v-col cols="12" class="mb-11" v-if="(form.sekolah_id == null || form.sekolah_id == '')">
               <label style="font-weight:500;display:block;margin-bottom:4px;">Profile Unit</label>
@@ -658,6 +689,9 @@ const form = reactive({
   visi : null,
   misi : null,
   moto : null,
+  is_sdit: false,
+  biaya_admin_sdit: 0,
+  biaya_pendaftaran_sdit: 0,
   banner_visi : null,
   banner_misi : null,
   foto_guru_unit : null
@@ -734,6 +768,7 @@ function showModalDialog (item,type) {
     fotoGuruUnit.value = '/no-image.jpg'
   }else if(type == 'edit'){
     Object.keys(form).forEach(k => form[k] = item[k] ?? '')
+    form.is_sdit = item.is_sdit == '1' ? true : false;
     fotoPreview.value = item.logo ? item.logo : '/no-image.jpg'
     fotoPreviewSekolah.value = item.foto_kontent_sekolah ? item.foto_kontent_sekolah : '/no-image.jpg'
     fotoPreviewSekolahDetail.value = item.foto_kontent ? item.foto_kontent : '/no-image.jpg'
@@ -806,6 +841,9 @@ async function handleCreateData() {
     formData.append('visi', form.visi)
     formData.append('misi', form.misi)
     formData.append('moto', form.moto)
+    formData.append('is_sdit', form.is_sdit)
+    formData.append('biaya_admin_sdit', form.biaya_admin_sdit)
+    formData.append('biaya_pendaftaran_sdit', form.biaya_pendaftaran_sdit)
     formData.append('logo', form.logo) // Pastikan form.logo adalah File
     formData.append('foto_kontent_sekolah', form.foto_kontent_sekolah) // Pastikan form.logo adalah File
     formData.append('sambutan_kepala_unit', form.sambutan_kepala_unit) // Pastikan form.logo adalah File
