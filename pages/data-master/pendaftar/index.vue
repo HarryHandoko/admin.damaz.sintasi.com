@@ -299,7 +299,6 @@
                 <v-text-field
                   v-model="form.tempat_lahir"
                   label="Tempat Lahir"
-                  required
                   class="mb-2"
                 />
               </v-col>
@@ -309,7 +308,6 @@
                   v-model="form.tanggal_lahir"
                   label="Tanggal Lahir"
                   type="date"
-                  required
                   class="mb-2"
                 />
               </v-col>
