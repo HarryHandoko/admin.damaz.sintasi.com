@@ -248,8 +248,6 @@
                   v-model="form.no_handphone"
                   label="No. Handphone"
                   type="number"
-                  :rules="[v => !!v || 'No. HP harus diisi']"
-                  required
                   class="mb-2"
                 />
               </v-col>
@@ -259,9 +257,6 @@
                   v-model="form.nik"
                   label="No. NIK"
                   type="number"
-                  :rules="[
-                    v => !!v || 'NIK harus diisi']"
-                  required
                   class="mb-2"
                 />
               </v-col>
