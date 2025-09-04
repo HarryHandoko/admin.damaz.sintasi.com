@@ -298,19 +298,16 @@
 
 
               <v-col cols="12" md="6">
-                <v-text-field v-model="form.nisn" label="NISN" required type="number"
-                  :rules="[v => !!v || 'From harus diisi']" />
+                <v-text-field v-model="form.nisn" label="NISN" type="number" />
               </v-col>
 
 
               <v-col cols="12" md="6">
-                <v-text-field v-model="form.no_akte_kelahiran" label="No Akte Kelahiran" required type="number"
-                  :rules="[v => !!v || 'From harus diisi']" />
+                <v-text-field v-model="form.no_akte_kelahiran" label="No Akte Kelahiran"  type="number" />
               </v-col>
 
               <v-col cols="12">
-                <v-text-field v-model="form.nik" label="NIK" required type="number"
-                  :rules="[v => !!v || 'From harus diisi']" />
+                <v-text-field v-model="form.nik" label="NIK"  type="number" />
               </v-col>
 
 
@@ -363,23 +360,20 @@
 
 
               <v-col cols="12" md="6">
-                <v-text-field v-model="form.hobby" label="Hobby" required :rules="[v => !!v || 'From harus diisi']" />
+                <v-text-field v-model="form.hobby" label="Hobby" />
               </v-col>
 
 
               <v-col cols="12" md="6">
-                <v-text-field v-model="form.cita_cita" label="Cita - Cita" required
-                  :rules="[v => !!v || 'From harus diisi']" />
+                <v-text-field v-model="form.cita_cita" label="Cita - Cita" />
               </v-col>
 
               <v-col cols="12" md="6">
-                <v-text-field v-model="form.tinggi_badan" label="Tinggi Badan" required type="number"
-                  :rules="[v => !!v || 'From harus diisi']" />
+                <v-text-field v-model="form.tinggi_badan" label="Tinggi Badan" type="number" />
               </v-col>
 
               <v-col cols="12" md="6">
-                <v-text-field v-model="form.berat_badan" label="Berat Badan" required type="number"
-                  :rules="[v => !!v || 'From harus diisi']" />
+                <v-text-field v-model="form.berat_badan" label="Berat Badan" type="number" />
               </v-col>
 
 
@@ -393,9 +387,7 @@
               </v-col>
 
               <v-col cols="12" md="12">
-                <v-select v-model="form.beasiswa_id" :items="beasiswa" item-title="nama" item-value="id" label="Beasiswa"
-                  :rules="[v => !!v || 'Form harus dipilih']" required
-                   />
+                <v-select v-model="form.beasiswa_id" :items="beasiswa" item-title="nama" item-value="id" label="Beasiswa" />
               </v-col>
 
               <v-col cols="12" md="6">
@@ -1273,25 +1265,17 @@ async function handleCreateData() {
         !form.value.nama_depan ||
         !form.value.nama_belakang ||
         !fotoPreviewFotoSiswa.value ||
-        !form.value.nisn ||
         !form.value.jenis_kelamin ||
         !form.value.status_pendaftaran_siswa ||
         !form.value.tempat_lahir ||
         !form.value.tgl_lahir ||
         !form.value.bahasa_sehari_hari ||
-        !form.value.no_akte_kelahiran ||
-        !form.value.nik ||
         !form.value.agama ||
         !form.value.anak_ke ||
-        !form.value.hobby ||
         !form.value.kewarganegaraan ||
         !form.value.goldarah ||
-        !form.value.cita_cita ||
         !form.value.jumlah_saudara ||
-        !form.value.tinggi_badan ||
-        !form.value.berat_badan ||
         (!form.value.dataPPDB?.file_kartu_keluarga && !form.value.file_kartu_keluarga) ||
-        (!form.value.dataPPDB?.file_akte_lahir && !form.value.file_akte_lahir) ||
         (
           form.value.dataSekolah?.is_need_nem === '1' &&
           (
