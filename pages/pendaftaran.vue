@@ -289,12 +289,12 @@
                   class="mb-2" />
               </v-col>
               <v-col cols="12" md="6">
-                <v-text-field v-model="form.nama_depan" label="Nama Depan*" required
+                <v-text-field v-model="form.nama_depan" label="Nama Depan *" required
                   :rules="[v => !!v || 'From harus diisi']" />
               </v-col>
 
               <v-col cols="12" md="6">
-                <v-text-field v-model="form.nama_belakang" label="Nama Belakang*" required
+                <v-text-field v-model="form.nama_belakang" label="Nama Belakang *" required
                   :rules="[v => !!v || 'From harus diisi']" />
               </v-col>
 
@@ -1293,7 +1293,6 @@ async function handleCreateData() {
         !form.value.kewarganegaraan ||
         !form.value.goldarah ||
         !form.value.jumlah_saudara ||
-        (!form.value.dataPPDB?.file_kartu_keluarga && !form.value.file_kartu_keluarga) ||
         (
           form.value.dataSekolah?.is_need_nem === '1' &&
           (
