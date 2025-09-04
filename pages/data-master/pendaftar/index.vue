@@ -248,8 +248,6 @@
                   v-model="form.no_handphone"
                   label="No. Handphone"
                   type="number"
-                  :rules="[v => !!v || 'No. HP harus diisi']"
-                  required
                   class="mb-2"
                 />
               </v-col>
@@ -259,10 +257,6 @@
                   v-model="form.nik"
                   label="No. NIK"
                   type="number"
-                  :rules="[
-                    v => !!v || 'NIK harus diisi'
-                  ]"
-                  required
                   class="mb-2"
                 />
               </v-col>
@@ -305,7 +299,6 @@
                 <v-text-field
                   v-model="form.tempat_lahir"
                   label="Tempat Lahir"
-                  required
                   class="mb-2"
                 />
               </v-col>
@@ -315,7 +308,6 @@
                   v-model="form.tanggal_lahir"
                   label="Tanggal Lahir"
                   type="date"
-                  required
                   class="mb-2"
                 />
               </v-col>
