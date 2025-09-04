@@ -249,6 +249,7 @@
                 <div>ID Registrasi: <b>{{ form.code_ppdb }}</b></div>
                 <div>Biaya Administrasi: <b>{{ formatRupiah(form.biaya_admin) }}</b></div>
                 <div>Diskon: <b>{{ formatRupiah(form.diskon) }}</b></div>
+                <div>Total Bayar: <b>{{ formatRupiah(Number(form.biaya_admin) - Number(form.diskon ?? 0)) }}</b></div>
                 <div>Status Pembayaran:
                   <span
                     :style="form.payment_status == 'Menunggu' ? 'color:blue' : form.payment_status == 'Pembayaran Berhasil' ? 'color:green' : 'color:red'">
@@ -756,6 +757,9 @@
                 </p>
                   <p>
                 Diskon : <b>{{ formatRupiah(form.diskon) }}</b>
+                </p>
+                <p>
+                Total Bayar : <b>{{ formatRupiah(Number(form.biaya_admin) - Number(form.diskon ?? 0)) }}</b>
                 </p>
 
                 <p style="margin-bottom:10px"><strong>Informasi Pembayaran:</strong></p>
