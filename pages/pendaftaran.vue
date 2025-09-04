@@ -265,13 +265,13 @@
                 <b>Pendaftaran Perserta Didik</b>
               </v-col>
               <v-col cols="12" md="6">
-                <v-select v-model="form.sekolah_id" :items="sekolah" item-title="name" item-value="id" label="Sekolah"
+                <v-select v-model="form.sekolah_id" :items="sekolah" item-title="name" item-value="id" label="Sekolah*"
                   :rules="[v => !!v || 'Form harus dipilih']" required
                   @update:model-value="getGrade(); form.grade_id = null" />
               </v-col>
 
               <v-col cols="12" md="6">
-                <v-select v-model="form.grade_id" :items="grade" item-title="name" item-value="id" label="Grade"
+                <v-select v-model="form.grade_id" :items="grade" item-title="name" item-value="id" label="Grade*"
                   :rules="[v => !!v || 'Form harus dipilih']" required />
               </v-col>
             </v-row>
@@ -289,12 +289,12 @@
                   class="mb-2" />
               </v-col>
               <v-col cols="12" md="6">
-                <v-text-field v-model="form.nama_depan" label="Nama Depan" required
+                <v-text-field v-model="form.nama_depan" label="Nama Depan*" required
                   :rules="[v => !!v || 'From harus diisi']" />
               </v-col>
 
               <v-col cols="12" md="6">
-                <v-text-field v-model="form.nama_belakang" label="Nama Belakang" required
+                <v-text-field v-model="form.nama_belakang" label="Nama Belakang*" required
                   :rules="[v => !!v || 'From harus diisi']" />
               </v-col>
 
@@ -314,48 +314,48 @@
 
 
               <v-col cols="12" md="6">
-                <v-select v-model="form.agama" :items="['Islam', 'Kristen', 'Budha', 'Hindu', 'Konghucu']" label="Agama"
+                <v-select v-model="form.agama" :items="['Islam', 'Kristen', 'Budha', 'Hindu', 'Konghucu']" label="Agama*"
                   :rules="[v => !!v || 'Agama harus dipilih']" required return-object="false" />
               </v-col>
 
               <v-col cols="12" md="6">
-                <v-select v-model="form.jenis_kelamin" :items="['Laki-laki', 'Perempuan']" label="Jenis Kelamin"
+                <v-select v-model="form.jenis_kelamin" :items="['Laki-laki', 'Perempuan']" label="Jenis Kelamin*"
                   :rules="[v => !!v || 'Jenis Kelamin harus dipilih']" required return-object="false" />
               </v-col>
 
               <v-col cols="12" md="6">
-                <v-text-field v-model="form.tempat_lahir" label="Tempat Lahir" required
+                <v-text-field v-model="form.tempat_lahir" label="Tempat Lahir*" required
                   :rules="[v => !!v || 'From harus diisi']" />
               </v-col>
 
 
               <v-col cols="12" md="6">
-                <v-text-field v-model="form.tgl_lahir" label="Tanggal Lahir" type="date" required
+                <v-text-field v-model="form.tgl_lahir" label="Tanggal Lahir*" type="date" required
                   :rules="[v => !!v || 'From harus diisi']" />
               </v-col>
 
 
               <v-col cols="12" md="6">
-                <v-text-field v-model="form.anak_ke" label="Anak Ke" required type="number"
-                  :rules="[v => !!v || 'From harus diisi']" />
-              </v-col>
-
-
-
-              <v-col cols="12" md="6">
-                <v-text-field v-model="form.jumlah_saudara" label="Jumlah Saudara" required type="number"
+                <v-text-field v-model="form.anak_ke" label="Anak Ke*" required type="number"
                   :rules="[v => !!v || 'From harus diisi']" />
               </v-col>
 
 
 
               <v-col cols="12" md="6">
-                <v-select v-model="form.goldarah" :items="['O', 'A', 'B', 'AB']" label="Golongan Darah"
+                <v-text-field v-model="form.jumlah_saudara" label="Jumlah Saudara*" required type="number"
+                  :rules="[v => !!v || 'From harus diisi']" />
+              </v-col>
+
+
+
+              <v-col cols="12" md="6">
+                <v-select v-model="form.goldarah" :items="['O', 'A', 'B', 'AB']" label="Golongan Darah*"
                   :rules="[v => !!v || 'Golongan Darah harus dipilih']" required return-object="false" />
               </v-col>
 
               <v-col cols="12" md="6">
-                <v-text-field v-model="form.kewarganegaraan" label="Kewarganegaraan" required
+                <v-text-field v-model="form.kewarganegaraan" label="Kewarganegaraan*" required
                   :rules="[v => !!v || 'From harus diisi']" />
               </v-col>
 
@@ -381,11 +381,11 @@
 
 
               <v-col cols="12">
-                <v-text-field v-model="form.no_handphone" label="No Handphone" required type="number" />
+                <v-text-field v-model="form.no_handphone" label="No Handphone*" required type="number" />
               </v-col>
 
               <v-col cols="12">
-                <v-textarea v-model="form.riwayat_kesehatan" label="Riwayat Kesehatan" required />
+                <v-textarea v-model="form.riwayat_kesehatan" label="Riwayat Kesehatan*" required />
               </v-col>
 
               <v-col cols="12" md="12">
@@ -393,37 +393,37 @@
               </v-col>
 
               <v-col cols="12" md="12">
-                <v-select v-model="form.is_alumni" :items="[{ value: false, text: 'Bukan Alumni' }, { value: true, text: 'Alumni' }]" item-title="text" item-value="value" label="Beasiswa" />
+                <v-select v-model="form.is_alumni" :items="[{ value: false, text: 'Bukan Alumni' }, { value: true, text: 'Alumni' }]" item-title="text" item-value="value" label="Apakah Alumni Darul Maza" />
               </v-col>
 
               <v-col cols="12" md="6">
                 <v-select v-model="form.status_pendaftaran_siswa" :items="['Siswa Baru', 'Siswa Pindahan']"
-                  label="Status Pendaftaran" :rules="[v => !!v || 'Status Pendaftaran harus dipilih']" required
+                  label="Status Pendaftaran*" :rules="[v => !!v || 'Status Pendaftaran harus dipilih']" required
                   return-object="false" />
               </v-col>
 
               <v-col cols="12" md="6">
-                <v-text-field v-model="form.asal_sekolah" label="Asal Sekolah" required :rules="form.status_pendaftaran_siswa === 'Siswa Pindahan'
+                <v-text-field v-model="form.asal_sekolah" label="Asal Sekolah*" required :rules="form.status_pendaftaran_siswa === 'Siswa Pindahan'
                   ? [v => !!v || 'Form harus diisi']
                   : []" />
               </v-col>
 
 
               <v-col cols="12" md="6" v-if="form.status_pendaftaran_siswa == 'Siswa Pindahan'">
-                <v-text-field v-model="form.jenjang_terakhir" label="Jenjang Terakhir" required
+                <v-text-field v-model="form.jenjang_terakhir" label="Jenjang Terakhir*" required
                   :rules="[v => !!v || 'From harus diisi']" />
               </v-col>
 
 
               <v-col cols="12" md="6" v-if="form.status_pendaftaran_siswa == 'Siswa Pindahan' && form.dataPPDB != null">
-                <v-text-field v-model="form.dataPPDB.sekolah_grade.name" label="Jenjang Lanjutan" required readonly />
+                <v-text-field v-model="form.dataPPDB.sekolah_grade.name" label="Jenjang Lanjutan*" required readonly />
               </v-col>
 
 
               <v-col cols="12">
                 <v-select v-model="form.bahasa_sehari_hari"
                   :items="['Bahasa Indonesia', 'Bahasa Arab', 'Bahasa Inggris', 'Bahasa Daerah']"
-                  label="Bahasa Sehari Hari" :rules="[v => !!v || 'Bahasa Sehari Hari harus dipilih']" required
+                  label="Bahasa Sehari Hari*" :rules="[v => !!v || 'Bahasa Sehari Hari harus dipilih']" required
                   return-object="false" />
               </v-col>
 
@@ -434,7 +434,7 @@
 
 
               <v-col cols="12" v-if="form.dataSekolah != null ? form.dataSekolah.is_need_nem == '1' : false">
-                <v-text-field v-model="form.nilai_nem" label="NEM" required type="number"
+                <v-text-field v-model="form.nilai_nem" label="NEM*" required type="number"
                   :rules="[v => !!v || 'From harus diisi']" />
               </v-col>
 
@@ -480,13 +480,13 @@
 
 
               <v-col cols="12" md="6" v-if="(form.award == 'Ada')">
-                <v-text-field v-model="form.award_name" label="Nama Prestasi" required
+                <v-text-field v-model="form.award_name" label="Nama Prestasi*" required
                   :rules="[v => !!v || 'From harus diisi']" />
               </v-col>
 
 
               <v-col cols="12" md="6" v-if="(form.award == 'Ada')">
-                <v-text-field v-model="form.award_date" label="Tanggal didapat" type="date" required
+                <v-text-field v-model="form.award_date" label="Tanggal didapat*" type="date" required
                   :rules="[v => !!v || 'From harus diisi']" />
               </v-col>
 
@@ -498,50 +498,50 @@
                 <b>Jarak Rumah ke Sekolah</b>
               </v-col>
               <v-col cols="12">
-                <v-text-field v-model="form.jarak_rumah_sekolah" label="Jarak Rumah ke Sekolah" required
+                <v-text-field v-model="form.jarak_rumah_sekolah" label="Jarak Rumah ke Sekolah*" required
                   :rules="[v => !!v || 'From harus diisi']" />
               </v-col>
               <v-col cols="12">
                 <b>Alamat</b>
               </v-col>
               <v-col cols="12">
-                <v-textarea v-model="form.alamat_siswa" label="Alamat Lengkap" required
+                <v-textarea v-model="form.alamat_siswa" label="Alamat Lengkap*" required
                   :rules="[v => !!v || 'From harus diisi']" />
               </v-col>
               <v-col cols="6" md="6">
-                <v-text-field v-model="form.rt_siswa" label="RT" required :rules="[v => !!v || 'From harus diisi']" />
+                <v-text-field v-model="form.rt_siswa" label="RT*" required :rules="[v => !!v || 'From harus diisi']" />
               </v-col>
               <v-col cols="6" md="6">
-                <v-text-field v-model="form.rw_siswa" label="RW" required :rules="[v => !!v || 'From harus diisi']" />
+                <v-text-field v-model="form.rw_siswa" label="RW*" required :rules="[v => !!v || 'From harus diisi']" />
               </v-col>
 
               <v-col cols="12">
-                <v-text-field v-model="form.zip_code_siswa" label="Kode Pos" required
+                <v-text-field v-model="form.zip_code_siswa" label="Kode Pos*" required
                   :rules="[v => !!v || 'From harus diisi']" />
               </v-col>
 
 
               <v-col cols="12" md="6">
                 <v-select v-model="form.provinsi_id_siswa" :items="provinceData" item-title="name" item-value="code"
-                  label="Provinsi" :rules="[v => !!v || 'Form harus dipilih']" required
+                  label="Provinsi*" :rules="[v => !!v || 'Form harus dipilih']" required
                   @update:model-value="getKota(form.provinsi_id_siswa)" />
               </v-col>
 
               <v-col cols="12" md="6">
                 <v-select v-model="form.city_id_siswa" :items="cityData" item-title="name" item-value="code"
-                  label="Kota" :rules="[v => !!v || 'Form harus dipilih']" required
+                  label="Kota*" :rules="[v => !!v || 'Form harus dipilih']" required
                   @update:model-value="getKelurahan(form.city_id_siswa)" />
               </v-col>
 
               <v-col cols="12" md="6">
                 <v-select v-model="form.district_id_siswa" :items="disctrictData" item-title="name" item-value="code"
-                  label="Kecamatan" :rules="[v => !!v || 'Form harus dipilih']" required
+                  label="Kecamatan*" :rules="[v => !!v || 'Form harus dipilih']" required
                   @update:model-value="getVillage(form.district_id_siswa)" />
               </v-col>
 
               <v-col cols="12" md="6">
                 <v-select v-model="form.subdistrict_id_siswa" :items="villageData" item-title="name" item-value="code"
-                  label="Desa" :rules="[v => !!v || 'Form harus dipilih']" required />
+                  label="Desa*" :rules="[v => !!v || 'Form harus dipilih']" required />
               </v-col>
             </v-row>
 
@@ -551,12 +551,12 @@
                 <b>Orang Tua Calon Siswa</b>
               </v-col>
               <v-col cols="12" md='6'>
-                <v-text-field v-model="form.nama_ayah" label="Nama Ayah" required
+                <v-text-field v-model="form.nama_ayah" label="Nama Ayah*" required
                   :rules="[v => !!v || 'From harus diisi']" />
               </v-col>
 
               <v-col cols="12" md='6'>
-                <v-text-field v-model="form.nik_ayah" label="NIK Ayah" required
+                <v-text-field v-model="form.nik_ayah" label="NIK Ayah*" required
                   :rules="[v => !!v || 'From harus diisi']" />
               </v-col>
 
@@ -579,13 +579,13 @@
                   'Sarjana (S1)',
                   'Magister (S2)',
                   'Doktor (S3)'
-                ]" label="Pendidikan Terakhir Ayah" :rules="[v => !!v || 'Pendidikan Terakhir Ayah harus dipilih']"
+                ]" label="Pendidikan Terakhir Ayah*" :rules="[v => !!v || 'Pendidikan Terakhir Ayah harus dipilih']"
                   required return-object="false" />
               </v-col>
               <v-col cols="12" md="6">
                 <v-select v-model="form.pekerjaan_ayah"
                   :items="['PNS', 'Pegawai Swasta', 'Pegawai BUMN', 'TNI/POLISI', 'GURU', 'DOSEN', 'Wirausaha', 'Tidak Bekerja', 'Lainnya']"
-                  label="Pekerjaan Ayah" :rules="[v => !!v || 'Pekerjaan Ayah harus dipilih']" required
+                  label="Pekerjaan Ayah*" :rules="[v => !!v || 'Pekerjaan Ayah harus dipilih']" required
                   return-object="false" />
               </v-col>
 
@@ -599,7 +599,7 @@
                   'Rp 5.000.000 – Rp 10.000.000',
                   'Lebih dari Rp 10.000.000',
                   'Tidak memiliki penghasilan'
-                ]" label="Penghasilan Ayah" :rules="[v => !!v || 'Penghasilan Ayah harus dipilih']" required
+                ]" label="Penghasilan Ayah*" :rules="[v => !!v || 'Penghasilan Ayah harus dipilih']" required
                   return-object="false" />
               </v-col>
 
@@ -609,17 +609,17 @@
               </v-col>
 
               <v-col cols="12">
-                <v-textarea v-model="form.alamat_ayah" label="Alamat" required
+                <v-textarea v-model="form.alamat_ayah" label="Alamat*" required
                   :rules="[v => !!v || 'From harus diisi']" />
               </v-col>
               <v-divider class="mb-2 mt-2" />
               <v-col cols="12" md='6'>
-                <v-text-field v-model="form.nama_ibu" label="Nama Ibu" required
+                <v-text-field v-model="form.nama_ibu" label="Nama Ibu*" required
                   :rules="[v => !!v || 'From harus diisi']" />
               </v-col>
 
               <v-col cols="12" md='6'>
-                <v-text-field v-model="form.nik_ibu" label="NIK Ibu" required
+                <v-text-field v-model="form.nik_ibu" label="NIK Ibu*" required
                   :rules="[v => !!v || 'From harus diisi']" />
               </v-col>
               <v-col cols="12" md='6'>
@@ -639,13 +639,13 @@
                   'Sarjana (S1)',
                   'Magister (S2)',
                   'Doktor (S3)'
-                ]" label="Pendidikan Terakhir Ibu" :rules="[v => !!v || 'Pendidikan Terakhir Ibu harus dipilih']"
+                ]" label="Pendidikan Terakhir Ibu*" :rules="[v => !!v || 'Pendidikan Terakhir Ibu harus dipilih']"
                   required return-object="false" />
               </v-col>
               <v-col cols="12" md="6">
                 <v-select v-model="form.pekerjaan_ibu"
                   :items="['PNS', 'Pegawai Swasta', 'Pegawai BUMN', 'TNI/POLISI', 'GURU', 'DOSEN', 'Wirausaha', 'Ibu Rumah Tangga', 'Lainnya']"
-                  label="Pekerjaan Ibu" :rules="[v => !!v || 'Pekerjaan Ibu harus dipilih']" required
+                  label="Pekerjaan Ibu*" :rules="[v => !!v || 'Pekerjaan Ibu harus dipilih']" required
                   return-object="false" />
               </v-col>
 
@@ -658,7 +658,7 @@
                   'Rp 5.000.000 – Rp 10.000.000',
                   'Lebih dari Rp 10.000.000',
                   'Tidak memiliki penghasilan'
-                ]" label="Penghasilan Ibu" :rules="[v => !!v || 'Penghasilan Ibu harus dipilih']" required
+                ]" label="Penghasilan Ibu*" :rules="[v => !!v || 'Penghasilan Ibu harus dipilih']" required
                   return-object="false" />
               </v-col>
 
@@ -668,23 +668,24 @@
               </v-col>
 
               <v-col cols="12">
-                <v-textarea v-model="form.alamat_ibu" label="Alamat" required
+                <v-textarea v-model="form.alamat_ibu" label="Alamat*" required
                   :rules="[v => !!v || 'From harus diisi']" />
               </v-col>
 
               <v-divider class="mb-2 mt-2" />
 
               <v-col cols="12" md='6'>
-                <v-text-field v-model="form.nama_wali" label="Nama Wali" required
+                <v-text-field v-model="form.nama_wali" label="Nama Wali*" required
                   :rules="[v => !!v || 'From harus diisi']" />
               </v-col>
 
               <v-col cols="12" md='6'>
-                <v-text-field v-model="form.nik_wali" label="NIK Wali" required
+                <v-text-field v-model="form.nik_wali" label="NIK Wali*" required
                   :rules="[v => !!v || 'From harus diisi']" />
               </v-col>
               <v-col cols="12" md='6'>
-                <v-text-field v-model="form.no_telepon_wali" label="No Telepon" required />
+                <v-text-field v-model="form.no_telepon_wali" label="No Telepon*" required
+                  :rules="[v => !!v || 'From harus diisi']" />
               </v-col>
 
               <v-col cols="12" md='6'>
@@ -700,13 +701,13 @@
                   'Sarjana (S1)',
                   'Magister (S2)',
                   'Doktor (S3)'
-                ]" label="Pendidikan Terakhir Wali" :rules="[v => !!v || 'Pendidikan Terakhir Wali harus dipilih']"
+                ]" label="Pendidikan Terakhir Wali*" :rules="[v => !!v || 'Pendidikan Terakhir Wali harus dipilih']"
                   required return-object="false" />
               </v-col>
               <v-col cols="12" md="6">
                 <v-select v-model="form.pekerjaan_wali"
                   :items="['PNS', 'Pegawai Swasta', 'Pegawai BUMN', 'TNI/POLISI', 'GURU', 'DOSEN', 'Wirausaha', 'Ibu Rumah Tangga', 'Lainnya']"
-                  label="Pekerjaan Wali" :rules="[v => !!v || 'Pekerjaan Wali harus dipilih']" required
+                  label="Pekerjaan Wali*" :rules="[v => !!v || 'Pekerjaan Wali harus dipilih']" required
                   return-object="false" />
               </v-col>
 
@@ -719,7 +720,7 @@
                   'Rp 5.000.000 – Rp 10.000.000',
                   'Lebih dari Rp 10.000.000',
                   'Tidak memiliki penghasilan'
-                ]" label="Penghasilan Wali" :rules="[v => !!v || 'Penghasilan Wali harus dipilih']" required
+                ]" label="Penghasilan Wali*" :rules="[v => !!v || 'Penghasilan Wali harus dipilih']" required
                   return-object="false" />
               </v-col>
 
@@ -729,7 +730,7 @@
               </v-col>
 
               <v-col cols="12">
-                <v-textarea v-model="form.alamat_wali" label="Alamat" required
+                <v-textarea v-model="form.alamat_wali" label="Alamat*" required
                   :rules="[v => !!v || 'From harus diisi']" />
               </v-col>
             </v-row>
