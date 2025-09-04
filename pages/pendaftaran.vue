@@ -248,6 +248,7 @@
                 </div>
                 <div>ID Registrasi: <b>{{ form.code_ppdb }}</b></div>
                 <div>Biaya Administrasi: <b>{{ formatRupiah(form.biaya_admin) }}</b></div>
+                <div>Diskon: <b>{{ formatRupiah(form.diskon) }}</b></div>
                 <div>Status Pembayaran:
                   <span
                     :style="form.payment_status == 'Menunggu' ? 'color:blue' : form.payment_status == 'Pembayaran Berhasil' ? 'color:green' : 'color:red'">
@@ -388,6 +389,10 @@
 
               <v-col cols="12" md="12">
                 <v-select v-model="form.beasiswa_id" :items="beasiswa" item-title="nama" item-value="id" label="Beasiswa" />
+              </v-col>
+
+              <v-col cols="12" md="12">
+                <v-select v-model="form.is_alumni" :items="[{ value: false, text: 'Bukan Alumni' }, { value: true, text: 'Alumni' }]" item-title="text" item-value="value" label="Beasiswa" />
               </v-col>
 
               <v-col cols="12" md="6">
@@ -746,7 +751,12 @@
                 Nama Ayah : <b>{{ form.nama_ayah }}</b>
               </v-col>
               <v-col cols="12" style="border-top:1px solid #d9d9d9">
+                <p>
                 Biaya Admininstrasi : <b>{{ formatRupiah(form.biaya_admin) }}</b>
+                </p>
+                  <p>
+                Diskon : <b>{{ formatRupiah(form.diskon) }}</b>
+                </p>
 
                 <p style="margin-bottom:10px"><strong>Informasi Pembayaran:</strong></p>
 
@@ -1016,6 +1026,8 @@ const form = ref({
   file_akte_lahir: null,
   file_kartu_keluarga: null,
   beasiswa_id: null,
+  is_alumni: false,
+  diskon: 0,
 
   jarak_rumah_sekolah: null,
   alamat_siswa: null,
@@ -1171,6 +1183,7 @@ function showModal(data) {
     form.value.kebutuhan_spesial = data.siswa.kebutuhan_spesial == '1' ? true : false
     form.value.award = data.siswa_award != null ? 'Ada' : 'Tidak Ada'
     form.value.biaya_admin = data.biaya_admin
+    form.value.diskon = data.diskon
     form.value.biaya_pendaftaran = data.biaya_pendaftaran
     form.value.dataSekolah = data.sekolah
     form.value.dataPPDB = data
@@ -1646,6 +1659,7 @@ async function getDetail() {
     const { data } = await $api.post(`/register-ppdb/get-detail`, {
       register_id: form.value.code_ppdb
     });
+    console.log(data)
     const dataDetail = data.data[0]
     form.value.sekolah_id = dataDetail.sekolah_id
     getGrade()
@@ -1677,6 +1691,7 @@ async function getDetail() {
     form.value.kebutuhan_spesial = dataDetail.siswa.kebutuhan_spesial == '1' ? true : false
     form.value.award = dataDetail.siswa_award != null ? 'Ada' : 'Tidak Ada'
     form.value.biaya_admin = dataDetail.biaya_admin
+    form.value.diskon = dataDetail.diskon
     form.value.biaya_pendaftaran = dataDetail.biaya_pendaftaran
     form.value.dataSekolah = dataDetail.sekolah
     form.value.dataPPDB = dataDetail

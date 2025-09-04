@@ -1,7 +1,7 @@
 <template>
   <v-card>
     <v-card-title class="pa-4">
-      <h2>Beasiswa</h2>
+      <h2>Diskon</h2>
     </v-card-title>
     <v-data-table :headers="headers" :items="items" :items-per-page="pagination.itemsPerPage" :page="pagination.page"
       :server-items-length="pagination.totalItems" :loading="loading" class="elevation-1 small-table" show-expand
@@ -11,12 +11,12 @@
       <template #top>
         <v-row class="mb-2 pa-4">
           <v-col cols="12" sm="12" md="6">
-            <v-text-field v-model="filter.search" label="Cari" placeholder="Cari Beasiswa" />
+            <v-text-field v-model="filter.search" label="Cari" placeholder="Cari Diskon" />
           </v-col>
           <v-col cols="12" sm="12" md="6">
             <v-btn color="primary" class="float-end" @click="showModalDialog(null, null)">
               <v-icon left>bx bx-plus</v-icon>
-              Tambah Beasiswa
+              Tambah Diskon
             </v-btn>
           </v-col>
         </v-row>
@@ -52,8 +52,8 @@
         </v-card-title>
         <v-form v-model="valid" @submit.prevent="handleCreateData">
           <v-card-text style="margin-top: -30px;">
-            <v-text-field v-model="form.nama" label="Nama Beasiswa" required class="mb-4"
-              :rules="[v => !!v || 'Nama harus diisi']" />
+            <v-text-field v-model="form.diskon" label="Diskon" type="number" required class="mb-4"
+              :rules="[v => !!v || 'Diskon harus diisi']" />
           </v-card-text>
           <v-card-actions>
             <v-spacer></v-spacer>
@@ -74,7 +74,7 @@
 
     <!-- Dialog konfirmasi hapus -->
     <ConfirmDialog :modelValue="showConfirmDelete" title="Konfirmasi Hapus"
-      :message="`Apakah Anda yakin ingin menghapus ${DataToDelete?.nama}?`" @confirm="handleDeleteData(TypeToDelete)"
+      :message="`Apakah Anda yakin ingin menghapus ${DataToDelete?.diskon}?`" @confirm="handleDeleteData(TypeToDelete)"
       @cancel="showConfirmDelete = false" />
   </v-card>
 </template>
@@ -88,7 +88,7 @@ const { MD5 } = CryptoJS;
 const { $api } = useNuxtApp()
 const headers = [
   { title: 'No', value: 'index', sortable: false, align: 'start', width: '50px' },
-  { title: 'Nama', value: 'nama', sortable: true },
+  { title: 'Diskon', value: 'diskon', sortable: true },
   { title: '', value: 'aksi', sortable: false, align: 'end' },
 ]
 
@@ -107,7 +107,7 @@ const filter = reactive({
 
 const form = reactive({
   id: '',
-  nama: '',
+  diskon: '',
 })
 const valid = ref(true);
 
@@ -151,7 +151,7 @@ const onPerPageChange = (newPerPage) => {
 async function getData() {
   loading.value = true
   try {
-    const response = await $api.get('/master-data/beasiswa/get', {
+    const response = await $api.get('/master-data/diskon/get', {
     })
     items.value = response.data.data // Pastikan sudah return children!
     pagination.totalItems = response.data.total
@@ -171,17 +171,17 @@ async function handleCreateData() {
   try {
     const formData = new FormData()
     formData.append("id", form.id)
-    formData.append('nama', form.nama)
+    formData.append('diskon', form.diskon)
 
 
     if (!form.id) {
-      await $api.post('/master-data/beasiswa/post', formData, {
+      await $api.post('/master-data/diskon/post', formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },
       })
     } else {
-      await $api.post('/master-data/beasiswa/update', formData, {
+      await $api.post('/master-data/diskon/update', formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },
@@ -191,7 +191,7 @@ async function handleCreateData() {
     showCreateModal.value = false
     getData()
 
-    form.nama = ''
+    form.diskon = ''
   } catch (error) {
     show.value = true
     message.value = error.response?.data?.message || 'Gagal membuat Data'
@@ -204,7 +204,7 @@ async function handleCreateData() {
 async function handleDeleteData() {
   loading.value = true
   try {
-    await $api.post(`/master-data/beasiswa/delete`, {
+    await $api.post(`/master-data/diskon/delete`, {
       id: DataToDelete.value.id,
     })
     getData()
