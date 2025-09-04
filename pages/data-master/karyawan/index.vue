@@ -248,8 +248,7 @@
                   v-model="form.no_handphone"
                   label="No. Handphone"
                   type="number"
-                  :rules="[v => !!v || 'No. HP harus diisi',
-                    v => (v && v.length === 13) || 'Digiti tidak sesuai']"
+                  :rules="[v => !!v || 'No. HP harus diisi']"
                   required
                   class="mb-2"
                 />
@@ -261,9 +260,7 @@
                   label="No. NIK"
                   type="number"
                   :rules="[
-                    v => !!v || 'NIK harus diisi',
-                    v => (v && v.length === 16) || 'NIK harus 16 digit'
-                  ]"
+                    v => !!v || 'NIK harus diisi']"
                   required
                   class="mb-2"
                 />
