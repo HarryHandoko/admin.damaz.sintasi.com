@@ -290,6 +290,17 @@
               :rules="[v => !!v || 'From harus diisi']"
             />
 
+              <v-text-field
+              v-model="form.batas_usia"
+              label="Batas Usia"
+              required
+              class="mb-4"
+              v-if="(form.sekolah_id == null || form.sekolah_id == '')"
+              :rules="[v => !!v || 'From harus diisi']"
+            />
+
+
+
 
             <v-text-field
               v-if="(form.sekolah_id == null || form.sekolah_id == '')"
@@ -675,6 +686,7 @@ const form = reactive({
   name: '',
   logo: null,
   foto_kontent_sekolah: null,
+  batas_usia: null,
   biaya_admin : 0,
   biaya_pendaftaran : 0,
   is_need_nem : 0,
@@ -850,6 +862,7 @@ async function handleCreateData() {
     formData.append('foto_kepala_unit', form.foto_kepala_unit) // Pastikan form.logo adalah File
     formData.append('foto_guru_unit', form.foto_guru_unit) // Pastikan form.logo adalah File
     formData.append('foto_kontent', form.foto_kontent) // Pastikan form.logo adalah File
+    formData.append('batas_usia', form.batas_usia)
 
     if(form.sekolah_id == null && form.id == null){
 
