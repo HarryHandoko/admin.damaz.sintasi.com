@@ -8,6 +8,11 @@
         <VCardItem class="justify-center">
           <img src="/favicon.ico" style="width: 150px; height: 150px;" alt="Logo" />
         </VCardItem>
+        <VCardItem class="justify-center">
+          <h1 class="text-h5 font-weight-bold">
+            Isi Data Wali Murid
+          </h1>
+        </VCardItem>
         <VCardText>
           <VForm @submit.prevent="register">
             <VRow>
@@ -251,10 +256,10 @@ definePageMeta({ layout: 'blank' })
 <style lang="scss">
 @use "@core/scss/template/pages/page-auth";
 /* Chrome, Safari, Edge, Opera */
-input[type=number]::-webkit-inner-spin-button, 
-input[type=number]::-webkit-outer-spin-button { 
+input[type=number]::-webkit-inner-spin-button,
+input[type=number]::-webkit-outer-spin-button {
   -webkit-appearance: none;
-  margin: 0; 
+  margin: 0;
 }
 /* Firefox */
 input[type=number] {
