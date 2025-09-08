@@ -52,8 +52,14 @@
         </v-card-title>
         <v-form v-model="valid" @submit.prevent="handleCreateData">
           <v-card-text style="margin-top: -30px;">
-            <v-text-field v-model="form.diskon" label="Diskon" type="number" required class="mb-4"
-              :rules="[v => !!v || 'Diskon harus diisi']" />
+            <v-text-field v-model="form.nama" label="Nama" required class="mb-4"
+              :rules="[v => !!v || 'Nama harus diisi']" />
+            <v-text-field v-model="form.nominal" label="Nominal" type="number" required class="mb-4"
+              :rules="[v => !!v || 'Nominal harus diisi']" />
+            <v-text-field v-model="form.kode" label="Kode" required class="mb-4"
+              :rules="[v => !!v || 'Kode harus diisi']" />
+            <v-text-field v-model="form.kuota" label="Kuota" type="number" required class="mb-4"
+              :rules="[v => !!v || 'Kuota harus diisi']" />
           </v-card-text>
           <v-card-actions>
             <v-spacer></v-spacer>
@@ -88,7 +94,10 @@ const { MD5 } = CryptoJS;
 const { $api } = useNuxtApp()
 const headers = [
   { title: 'No', value: 'index', sortable: false, align: 'start', width: '50px' },
-  { title: 'Diskon', value: 'diskon', sortable: true },
+  { title: 'Nama', value: 'nama', sortable: true },
+  { title: 'Nominal', value: 'nominal', sortable: true },
+  { title: 'Kode', value: 'kode', sortable: true },
+  { title: 'Kuota', value: 'kuota', sortable: true },
   { title: '', value: 'aksi', sortable: false, align: 'end' },
 ]
 
@@ -107,7 +116,10 @@ const filter = reactive({
 
 const form = reactive({
   id: '',
-  diskon: '',
+  nama: '',
+  nominal: '',
+  kode: '',
+  kuota: '',
 })
 const valid = ref(true);
 
@@ -171,8 +183,10 @@ async function handleCreateData() {
   try {
     const formData = new FormData()
     formData.append("id", form.id)
-    formData.append('diskon', form.diskon)
-
+    formData.append("nama", form.nama)
+    formData.append("nominal", form.nominal)
+    formData.append("kode", form.kode)
+    formData.append("kuota", form.kuota)
 
     if (!form.id) {
       await $api.post('/master-data/diskon/post', formData, {

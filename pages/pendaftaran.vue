@@ -248,8 +248,8 @@
                 </div>
                 <div>ID Registrasi: <b>{{ form.code_ppdb }}</b></div>
                 <div>Biaya Administrasi: <b>{{ formatRupiah(form.biaya_admin) }}</b></div>
-                <div>Diskon: <b>{{ formatRupiah(form.diskon) }}</b></div>
-                <div>Total Bayar: <b>{{ formatRupiah(Number(form.biaya_admin) - Number(form.diskon ?? 0)) }}</b></div>
+                <div>Diskon: <b>{{ formatRupiah(form.nominal_diskon) }}</b></div>
+                <div>Total Bayar: <b>{{ formatRupiah(Number(form.biaya_admin) - Number(form.nominal_diskon ?? 0)) }}</b></div>
                 <div>Status Pembayaran:
                   <span
                     :style="form.payment_status == 'Menunggu' ? 'color:blue' : form.payment_status == 'Pembayaran Berhasil' ? 'color:green' : 'color:red'">
@@ -264,6 +264,22 @@
               <v-col cols="12">
                 <b>Pendaftaran Perserta Didik</b>
               </v-col>
+
+              <v-col cols="12" md="6">
+                <v-text-field v-model="form.nama_depan" label="Nama Depan *" required
+                  :rules="[v => !!v || 'From harus diisi']" />
+              </v-col>
+
+              <v-col cols="12" md="6">
+                <v-text-field v-model="form.nama_belakang" label="Nama Belakang *" required
+                  :rules="[v => !!v || 'From harus diisi']" />
+              </v-col>
+
+              <v-col cols="12">
+                <v-text-field v-model="form.tgl_lahir" label="Tanggal Lahir*" type="date" required
+                  :rules="[v => !!v || 'From harus diisi']" />
+              </v-col>
+
               <v-col cols="12" md="6">
                 <v-select v-model="form.sekolah_id" :items="sekolah" item-title="name" item-value="id" label="Sekolah*"
                   :rules="[v => !!v || 'Form harus dipilih']" required
@@ -273,6 +289,20 @@
               <v-col cols="12" md="6">
                 <v-select v-model="form.grade_id" :items="grade" item-title="name" item-value="id" label="Grade*"
                   :rules="[v => !!v || 'Form harus dipilih']" required />
+              </v-col>
+
+              <v-col cols="12" md="9">
+                <v-text-field v-model="form.voucher_diskon" label="Voucher Diskon" type="text"  />
+              </v-col>
+              <v-col cols="12" md="3" class="d-flex align-center">
+                <v-btn color="primary" @click="applyVoucher" :loading="loadingDiskon" :disabled="loadingDiskon || !form.voucher_diskon">
+                  Terapkan Diskon
+                </v-btn>
+                </v-col>
+              <v-col cols="12" v-if="diskonAppliedMessage" class="mt-2">
+                <v-alert type="success" dense text>
+                  {{ diskonAppliedMessage }}
+                </v-alert>
               </v-col>
             </v-row>
 
@@ -757,10 +787,10 @@
                 Biaya Admininstrasi : <b>{{ formatRupiah(form.biaya_admin) }}</b>
                 </p>
                   <p>
-                Diskon : <b>{{ formatRupiah(form.diskon) }}</b>
+                Diskon : <b>{{ formatRupiah(form.nominal_diskon) }}</b>
                 </p>
                 <p>
-                Total Bayar : <b>{{ formatRupiah(Number(form.biaya_admin) - Number(form.diskon ?? 0)) }}</b>
+                Total Bayar : <b>{{ formatRupiah(Number(form.biaya_admin) - Number(form.nominal_diskon ?? 0)) }}</b>
                 </p>
 
                 <p style="margin-bottom:10px"><strong>Informasi Pembayaran:</strong></p>
@@ -1032,8 +1062,8 @@ const form = ref({
   file_kartu_keluarga: null,
   beasiswa_id: null,
   is_alumni: false,
-  diskon: 0,
-
+  nominal_diskon: 0,
+  voucher_diskon: null,
   jarak_rumah_sekolah: null,
   alamat_siswa: null,
   rt_siswa: null,
@@ -1194,7 +1224,8 @@ function showModal(data) {
     form.value.dataPPDB = data
     fotoPreviewFotoSiswa.value = data.siswa.foto_siswa
     form.value.nilai_nem = data.nem
-
+    form.value.nominal_diskon = data?.nominal_diskon ?? 0
+    form.value.voucher_diskon = data?.voucher_diskon
 
     if (data.siswa_award != null) {
       form.value.award_name = data.siswa_award.award
@@ -1934,6 +1965,28 @@ async function updateSameAddress(type) {
     form.value.alamat_wali = alamat;
   }
 }
+
+const loadingDiskon = ref(false)
+const diskonAppliedMessage = ref(null)
+
+function applyVoucher(){
+  loadingDiskon.value = true
+  $api.post('/register-ppdb/apply-voucher', {
+    code_ppdb: form.value.code_ppdb,
+    voucher_diskon: form.value.voucher_diskon
+  }).then((response) => {
+    showSuccess.value = true
+    message.value = 'Voucher berhasil diterapkan'
+    diskonAppliedMessage.value = 'Voucher berhasil diterapkan'
+    form.value.diskon = response.data.diskon
+  }).catch((error) => {
+    show.value = true
+    message.value = error.response?.data?.message || 'Gagal menerapkan voucher.'
+  }).finally(() => {
+    loadingDiskon.value = false
+  })
+}
+
 onMounted(() => {
   getRole()
   getDataRegister()
