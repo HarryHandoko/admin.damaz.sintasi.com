@@ -821,13 +821,64 @@
 
               <v-col cols="12" md="12">
                 <v-select
-                  v-model="form.beasiswa_id"
-                  :items="beasiswa"
-                  item-title="nama"
-                  item-value="id"
-                  label="Beasiswa"
+                  v-model="form.jenis_beasiswa"
+                  :items="['Tahfidz', 'Akademik', 'Non Akademik']"
+                  label="Jenis Beasiswa"
+                  outlined
+                  dense
                 />
               </v-col>
+
+              <v-col cols="12" md="12" v-if="form.jenis_beasiswa === 'Tahfidz'">
+                <v-select
+                  v-model="form.jumlah_juz"
+                  :items="['15 Juz', '5-10 Juz', '3-5 Juz']"
+                  label="Berapa Juz"
+                  outlined
+                  dense
+                />
+              </v-col>
+
+              <template
+                v-if="
+                  form.jenis_beasiswa === 'Akademik' ||
+                  form.jenis_beasiswa === 'Non Akademik'
+                "
+              >
+                <v-col cols="12" md="12">
+                  <v-text-field
+                    v-model="form.nama_prestasi"
+                    label="Nama Prestasi"
+                    outlined
+                    dense
+                  />
+                </v-col>
+                <v-col cols="12" md="12">
+                  <div
+                    v-if="fotoPreviewFotoSertifikat"
+                    class="mt-2 text-center"
+                  >
+                    <img
+                      :src="fotoPreviewFotoSertifikat"
+                      alt="Preview Foto"
+                      style="
+                        width: 120px;
+                        height: 120px;
+                        object-fit: cover;
+                        border-radius: 5%;
+                        border: 2px solid #eee;
+                      "
+                    />
+                  </div>
+                  <v-file-input
+                    @change="handleFotoChangeFotoSertifikat"
+                    label="Upload Sertifikat"
+                    outlined
+                    dense
+                    accept="image/*"
+                  />
+                </v-col>
+              </template>
 
               <v-col cols="12" md="12">
                 <v-select
@@ -2006,7 +2057,10 @@ const form = ref({
   file_raport: null,
   file_akte_lahir: null,
   file_kartu_keluarga: null,
-  beasiswa_id: null,
+  jenis_beasiswa: "",
+  jumlah_juz: "",
+  nama_prestasi: "",
+  foto_sertifikat: null,
   is_alumni: false,
   nominal_diskon: 0,
   voucher_diskon: null,
@@ -2086,6 +2140,7 @@ const step = ref(1);
 const fotoPreview = ref(null);
 const fotoPreviewBukti = ref(null);
 const fotoPreviewFotoSiswa = ref(null);
+const fotoPreviewFotoSertifikat = ref(null);
 
 const showConfirmDelete = ref(false);
 const titleConfirmDelete = ref(null);
@@ -2168,6 +2223,7 @@ function showModal(data) {
     form.value.dataSekolah = data.sekolah;
     form.value.dataPPDB = data;
     fotoPreviewFotoSiswa.value = data.siswa.foto_siswa;
+    fotoPreviewFotoSertifikat.value = data.siswa.foto_sertifikat;
     form.value.nilai_nem = data.nem;
     form.value.nominal_diskon = data?.nominal_diskon ?? 0;
     form.value.voucher_diskon = data?.voucher_diskon;
@@ -2360,20 +2416,6 @@ async function getRole() {
   }
 }
 
-const beasiswa = ref([]);
-async function getBeasiswa() {
-  loading.value = true;
-  try {
-    const data = await $api.get(`/master-data/beasiswa/get-select`, {});
-    beasiswa.value = data.data.data;
-  } catch (error) {
-    // show.value = true
-    // message.value = error.response?.data?.message || 'Gagal Mendapatkan Data.'
-  } finally {
-    loading.value = false;
-  }
-}
-
 async function getGrade() {
   loading.value = true;
   try {
@@ -2472,6 +2514,21 @@ function handleFotoChangeBuktiRegisUlang(e) {
   } else {
     formDaftarUlang.value.bukti_pembayaran = null;
     foto_bukti_regis_ulang.value = "/no-image.jpg";
+  }
+}
+
+function handleFotoChangeFotoSertifikat(e) {
+  let file;
+  if (Array.isArray(e)) file = e[0];
+  else if (e?.target?.files) file = e.target.files[0];
+  else file = e;
+
+  if (file) {
+    form.value.foto_sertifikat = file;
+    fotoPreviewFotoSertifikat.value = URL.createObjectURL(file);
+  } else {
+    form.value.foto_sertifikat = null;
+    fotoPreviewFotoSertifikat.value = "/no-image.jpg";
   }
 }
 
@@ -2946,6 +3003,5 @@ onMounted(() => {
   getProvince();
   getBankAccount();
   fetchUser();
-  getBeasiswa();
 });
 </script>
