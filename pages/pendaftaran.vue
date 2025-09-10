@@ -373,9 +373,6 @@
                 <div>
                   Bahasa Sehari-hari: <b>{{ form.bahasa_sehari_hari }}</b>
                 </div>
-                <div>
-                  Penghargaan: <b>{{ form.dataPPDB?.siswa_award?.award }}</b>
-                </div>
               </v-col>
 
               <!-- Alamat -->
@@ -1051,52 +1048,60 @@
                 />
               </v-col>
 
-              <v-col
-                cols="12"
-                sm="12"
-                stlye="padding:0"
-                v-if="form.award == 'Ada'"
-              >
-                <div v-if="fotoPreview" class="mt-2 text-center">
-                  <img
-                    :src="fotoPreview"
-                    alt="Preview Foto"
-                    style="
-                      width: auto;
-                      height: 120px;
-                      object-fit: cover;
-                      border-radius: 5%;
-                      border: 2px solid #eee;
-                    "
-                  />
-                </div>
-                <v-file-input
-                  label="Upload Foto"
-                  accept="image/*"
-                  show-size
-                  @change="handleFotoChange"
-                  class="mb-2"
-                />
-              </v-col>
-
-              <v-col cols="12" md="6" v-if="form.award == 'Ada'">
-                <v-text-field
-                  v-model="form.award_name"
-                  label="Nama Prestasi*"
-                  required
-                  :rules="[(v) => !!v || 'From harus diisi']"
-                />
-              </v-col>
-
-              <v-col cols="12" md="6" v-if="form.award == 'Ada'">
-                <v-text-field
-                  v-model="form.award_date"
-                  label="Tanggal didapat*"
-                  type="date"
-                  required
-                  :rules="[(v) => !!v || 'From harus diisi']"
-                />
-              </v-col>
+              <template v-if="form.award == 'Ada'">
+                <template v-for="(awardItem, idx) in form.awards" :key="idx">
+                  <v-col cols="12" sm="12">
+                    <div v-if="awardItem.fotoPreview" class="mt-2 text-center">
+                      <img
+                        :src="awardItem.fotoPreview"
+                        alt="Preview Foto"
+                        style="
+                          width: auto;
+                          height: 120px;
+                          object-fit: cover;
+                          border-radius: 5%;
+                          border: 2px solid #eee;
+                        "
+                      />
+                    </div>
+                    <v-file-input
+                      label="Upload Foto"
+                      accept="image/*"
+                      show-size
+                      @change="(file) => handleFotoChangeAward(file, idx)"
+                      class="mb-2"
+                    />
+                  </v-col>
+                  <v-col cols="12">
+                    <v-text-field
+                      v-model="awardItem.award_name"
+                      label="Nama Prestasi*"
+                      required
+                      :rules="[(v) => !!v || 'Form harus diisi']"
+                  /></v-col>
+                  <v-col cols="12">
+                    <v-text-field
+                      v-model="awardItem.award_date"
+                      label="Tanggal didapat*"
+                      type="date"
+                      required
+                      :rules="[(v) => !!v || 'Form harus diisi']"
+                  /></v-col>
+                  <v-col cols="12">
+                    <v-btn
+                      color="error"
+                      @click="removeAward(idx)"
+                      v-if="form.awards.length > 1 && idx !== 0"
+                      >Hapus</v-btn
+                    >
+                  </v-col>
+                </template>
+                <v-col cols="12">
+                  <v-btn color="primary" @click="addAward"
+                    >Tambah Prestasi</v-btn
+                  >
+                </v-col>
+              </template>
             </v-row>
 
             <v-row v-if="step == 3">
@@ -2048,12 +2053,17 @@ const form = ref({
   kebutuhan_spesial: false,
   bahasa_sehari_hari: null,
   status_pendaftaran_siswa: null,
-  award: "Tidak ada",
-  award_image: null,
-  award_name: null,
-  award_date: null,
-  foto_siswa: null,
   nem: null,
+  award: null,
+  awards: [
+    {
+      fotoPreview: null,
+      award: "",
+      foto: null,
+      award_name: "",
+      award_date: "",
+    },
+  ],
   file_raport: null,
   file_akte_lahir: null,
   file_kartu_keluarga: null,
@@ -2216,7 +2226,29 @@ function showModal(data) {
     form.value.bahasa_sehari_hari = data.siswa.bahasa_sehari_hari;
     form.value.kebutuhan_spesial =
       data.siswa.kebutuhan_spesial == "1" ? true : false;
-    form.value.award = data.siswa_award != null ? "Ada" : "Tidak Ada";
+    form.value.award =
+      Array.isArray(data.siswa_award) && data.siswa_award.length > 0
+        ? "Ada"
+        : "Tidak Ada";
+    form.value.awards =
+      Array.isArray(data.siswa_award) && data.siswa_award.length > 0
+        ? data.siswa_award.map((a) => ({
+            fotoPreview: a.image || null,
+            award: "Ada",
+            foto: null,
+            award_name: a.award,
+            award_date: a.tgl_didapat,
+            id: a.id,
+          }))
+        : [
+            {
+              fotoPreview: null,
+              award: "",
+              foto: null,
+              award_name: "",
+              award_date: "",
+            },
+          ];
     form.value.biaya_admin = data.biaya_admin;
     form.value.diskon = data.diskon;
     form.value.biaya_pendaftaran = data.biaya_pendaftaran;
@@ -2307,11 +2339,23 @@ async function handleCreateData() {
   try {
     const formData = new FormData();
 
-    // Tambahkan semua data dari form.value ke FormData
     for (const key in form.value) {
-      if (form.value.hasOwnProperty(key)) {
+      if (form.value.hasOwnProperty(key) && key !== "awards") {
         formData.append(key, form.value[key]);
       }
+    }
+
+    if (Array.isArray(form.value.awards)) {
+      form.value.awards.forEach((award, i) => {
+        formData.append(`awards[${i}][award_name]`, award.award_name || "");
+        formData.append(`awards[${i}][award_date]`, award.award_date || "");
+        if (award.award_image) {
+          formData.append(`awards[${i}][award_image]`, award.award_image);
+        }
+        if (award.id) {
+          formData.append(`awards[${i}][id]`, award.id);
+        }
+      });
     }
     if (
       step.value == 1 &&
@@ -2991,6 +3035,32 @@ function applyVoucher() {
     .finally(() => {
       loadingDiskon.value = false;
     });
+}
+
+function addAward() {
+  form.value.awards.push({
+    award: "",
+    award_date: "",
+  });
+}
+
+function removeAward(index) {
+  form.value.awards.splice(index, 1);
+}
+
+function handleFotoChangeAward(e, index) {
+  let file;
+  if (Array.isArray(e)) file = e[0];
+  else if (e?.target?.files) file = e.target.files[0];
+  else file = e;
+
+  if (file) {
+    form.value.awards[index].award_image = file;
+    form.value.awards[index].fotoPreview = URL.createObjectURL(file);
+  } else {
+    form.value.awards[index].award_image = null;
+    form.value.awards[index].fotoPreview = "/no-image.jpg";
+  }
 }
 
 onMounted(() => {
