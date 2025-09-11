@@ -63,37 +63,47 @@
         </div>
       </template>
       <!-- biaya_admin edit inline -->
-      <template #item.biaya_admin="{ item }">
-        <div v-if="editingRow === 'biaya_admin'+item.id">
-          <v-text-field
-            v-model="item.biaya_admin"
-            density="compact"
-            autofocus
-            hide-details
-            @keydown.enter="saveEdit(item)"
-            @keydown.esc="cancelEdit"
-            @blur="cancelEdit"
-          />
+      <template #item.biaya_admin="{ item }">      
+        <div v-if="item.is_multi_biaya == '0'">
+          <div v-if="editingRow === 'biaya_admin'+item.id">
+            <v-text-field
+              v-model="item.biaya_admin"
+              density="compact"
+              autofocus
+              hide-details
+              @keydown.enter="saveEdit(item)"
+              @keydown.esc="cancelEdit"
+              @blur="cancelEdit"
+            />
+          </div>
+          <div v-else @click="startEdit('biaya_admin'+item.id)" style="cursor:pointer" >
+          {{ new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' ,minimumFractionDigits: 0, maximumFractionDigits: 0  }).format(item.biaya_admin) }}
+          </div>
         </div>
-        <div v-else @click="startEdit('biaya_admin'+item.id)" style="cursor:pointer">
-         {{ new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' ,minimumFractionDigits: 0, maximumFractionDigits: 0  }).format(item.biaya_admin) }}
+        <div v-else>
+          <b><i>Multi Biaya</i></b>
         </div>
       </template>
       <!-- biaya_pendaftaran edit inline -->
       <template #item.biaya_pendaftaran="{ item }">
-        <div v-if="editingRow === 'biaya_pendaftaran'+item.id">
-          <v-text-field
-            v-model="item.biaya_pendaftaran"
-            density="compact"
-            autofocus
-            hide-details
-            @keydown.enter="saveEdit(item)"
-            @keydown.esc="cancelEdit"
-            @blur="cancelEdit"
-          />
+        <div v-if="item.is_multi_biaya == '0'">
+          <div v-if="editingRow === 'biaya_pendaftaran'+item.id">
+            <v-text-field
+              v-model="item.biaya_pendaftaran"
+              density="compact"
+              autofocus
+              hide-details
+              @keydown.enter="saveEdit(item)"
+              @keydown.esc="cancelEdit"
+              @blur="cancelEdit"
+            />
+          </div>
+          <div v-else @click="startEdit('biaya_pendaftaran'+item.id)" style="cursor:pointer">
+            {{ new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR',minimumFractionDigits: 0, maximumFractionDigits: 0  }).format(item.biaya_pendaftaran) }}
+          </div>
         </div>
-        <div v-else @click="startEdit('biaya_pendaftaran'+item.id)" style="cursor:pointer">
-          {{ new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR',minimumFractionDigits: 0, maximumFractionDigits: 0  }).format(item.biaya_pendaftaran) }}
+        <div v-else>
+          <b><i>Multi Biaya</i></b>
         </div>
       </template>
 
@@ -223,6 +233,54 @@
                     {{ item.nama_sekolah }}
                   </div>
                 </template>
+                <!-- Path edit inline -->
+                <template #item.biaya_formulir="{ item }">
+                  <div v-if="item.is_multi_biaya == '1'">
+                    <div v-if="editingRow === 'biaya_formulir'+item.id">
+                      <v-text-field
+                        v-model="item.biaya_formulir"
+                        density="compact"
+                        autofocus
+                        type="number"
+                        hide-details
+                        @keydown.enter="saveGradeEdit(item)"
+                        @keydown.esc="cancelEdit"
+                        @blur="cancelEdit"
+                      />
+                    </div>
+                    <div v-else @click="startEdit('biaya_formulir'+item.id)" style="cursor:pointer">
+                      {{ new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR',minimumFractionDigits: 0, maximumFractionDigits: 0  }).format(item.biaya_formulir) }}
+                    </div>
+                  </div>
+                  <div v-else>
+                    <b><i>Non Multi Biaya</i></b>
+                  </div>
+                </template>
+                
+                <!-- Path edit inline -->
+                <template #item.biaya_uang_pangkal="{ item }">
+                  <div v-if="item.is_multi_biaya == '1'">
+                    <div v-if="editingRow === 'biaya_uang_pangkal'+item.id">
+                      <v-text-field
+                        v-model="item.biaya_uang_pangkal"
+                        density="compact"
+                        autofocus
+                        hide-details
+                        type="number"
+                        @keydown.enter="saveGradeEdit(item)"
+                        @keydown.esc="cancelEdit"
+                        @blur="cancelEdit"
+                      />
+                    </div>
+                    <div v-else @click="startEdit('biaya_uang_pangkal'+item.id)" style="cursor:pointer">
+                      {{ new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR',minimumFractionDigits: 0, maximumFractionDigits: 0  }).format(item.biaya_uang_pangkal) }}
+                    </div>
+                  </div>
+                  <div v-else>
+                    <b><i>Non Multi Biaya</i></b>
+                  </div>
+                </template>
+
                 <!-- Icon edit inline -->
                 <template #item.icon="{ item }">
                   <v-icon>bx bx-menu</v-icon>
@@ -265,7 +323,8 @@
         </v-card-title>
         <v-form v-model="valid" @submit.prevent="handleCreateData">
         <v-card-text style="margin-top: -30px;">
-            <v-col cols="12" sm="12" stlye="padding:0" v-if="(form.sekolah_id == null || form.sekolah_id == '')">
+            <v-row>
+              <v-col cols="12" sm="12" stlye="padding:0" v-if="(form.sekolah_id == null || form.sekolah_id == '')">
               <div v-if="fotoPreview" class="mt-2 text-center">
                 <img
                   :src="fotoPreview"
@@ -278,99 +337,95 @@
                 accept="image/*"
                 show-size
                 @change="handleFotoChange"
-                class="mb-4"
               />
             </v-col>
 
-            <v-text-field
-              v-model="form.name"
-              :label="(form.sekolah_id == null || form.sekolah_id == '') ? 'Nama Sekolah' : 'Nama Grade'"
-              required
-              class="mb-4"
-              :rules="[v => !!v || 'From harus diisi']"
-            />
-
+            <v-col cols="12">
               <v-text-field
-              v-model="form.batas_usia"
-              label="Batas Usia"
-              required
-              class="mb-4"
-              v-if="(form.sekolah_id == null || form.sekolah_id == '')"
-              :rules="[v => !!v || 'From harus diisi']"
-            />
+                v-model="form.name"
+                :label="(form.sekolah_id == null || form.sekolah_id == '') ? 'Nama Sekolah' : 'Nama Grade'"
+                required
+                :rules="[v => !!v || 'From harus diisi']"
+              />
+            </v-col>
+
+            <v-col cols="6">
+              <v-text-field
+                v-model="form.batas_usia_min"
+                label="Batas Usia Minimum"
+                required
+                type="number"
+                v-if="(form.sekolah_id == null || form.sekolah_id == '')"
+                :rules="[v => !!v || 'From harus diisi']"
+              />
+            </v-col>
+
+            <v-col cols="6">
+              <v-text-field
+                v-model="form.batas_usia_max"
+                label="Batas Usia Maximun"
+                required
+                type="number"
+                v-if="(form.sekolah_id == null || form.sekolah_id == '')"
+                :rules="[v => !!v || 'From harus diisi']"
+              />
+            </v-col>
+
+            <v-col cols="12">
+              <v-text-field
+                v-if="(form.sekolah_id == null || form.sekolah_id == '')"
+                v-model="form.code_formulir"
+                :label="'Kode Formulir'"
+                required
+                :rules="[v => !!v || 'From harus diisi']"
+              />
+            </v-col>
 
 
+            <v-col cols="12">
+              <v-text-field
+                v-if="(form.sekolah_id == null || form.sekolah_id == '')"
+                v-model="form.slug"
+                :label="'Slug'"
+                required
+                :rules="[v => !!v || 'From harus diisi']"
+              />
+            </v-col>
 
-
-            <v-text-field
-              v-if="(form.sekolah_id == null || form.sekolah_id == '')"
-              v-model="form.code_formulir"
-              :label="'Kode Formulir'"
-              required
-              class="mb-4"
-              :rules="[v => !!v || 'From harus diisi']"
-            />
-
-
-            <v-text-field
-              v-if="(form.sekolah_id == null || form.sekolah_id == '')"
-              v-model="form.slug"
-              :label="'Slug'"
-              required
-              class="mb-4"
-              :rules="[v => !!v || 'From harus diisi']"
-            />
-
-            <v-text-field
-              v-model="form.biaya_admin"
-              label="Biaya admin"
-              required
-              type="number"
-              class="mb-4"
-              :rules="[v => !!v || 'Biaya admin harus diisi']"
-              v-if=" (form.sekolah_id == null || form.sekolah_id == '')"
-            />
-
-            <v-text-field
-              v-model="form.biaya_pendaftaran"
-              label="Biaya Pendaftaran"
-              required
-              type="number"
-              class="mb-4"
-              :rules="[v => !!v || 'Biaya Pendaftaran harus diisi']"
-              v-if=" (form.sekolah_id == null || form.sekolah_id == '')"
-            />
 
             <v-col cols="12">
               <v-switch
-                v-model="form.is_sdit"
+                v-model="form.is_multi_biaya"
                 inset
-                label="Apakah SDIT?"
+                label="Apakah Menggunakan Multi Biaya?"
                 color="success"
                 hide-details
                 v-if=" (form.sekolah_id == null || form.sekolah_id == '')"
               />
             </v-col>
+            <v-col cols="6" v-if="form.is_multi_biaya != true">
+              <v-text-field
+                v-model="form.biaya_admin"
+                label="Uang Formulir"
+                required
+                type="number"
+                class="mb-4"
+                :rules="[v => !!v || 'Uang Formulir harus diisi']"
+                v-if=" (form.sekolah_id == null || form.sekolah_id == '')"
+              />
+            </v-col>
 
-            <v-text-field
-              v-model="form.biaya_admin_sdit"
-              label="Biaya admin SDIT"
-              required
-              type="number"
-              class="mb-4"
-              :rules="[v => !!v || 'Biaya admin harus diisi']"
-              v-if="form.is_sdit && (form.sekolah_id == null || form.sekolah_id == '')"
-            />
-
-            <v-text-field
-              v-model="form.biaya_pendaftaran_sdit"
-              v-if="form.is_sdit && (form.sekolah_id == null || form.sekolah_id == '')"
-              label="SDIT Biaya Pendaftaran"
-              required
-              type="number"
-              class="mb-4"
-              :rules="[v => !!v || 'Biaya Pendaftaran harus diisi']"
-            />
+            <v-col cols="6"  v-if="form.is_multi_biaya != true">
+              <v-text-field
+                v-model="form.biaya_pendaftaran"
+                label="Uang Pangkal"
+                required
+                type="number"
+                class="mb-4"
+                :rules="[v => !!v || 'Uang Pangkal harus diisi']"
+                v-if=" (form.sekolah_id == null || form.sekolah_id == '')"
+              />
+            </v-col>
 
 
 
@@ -611,6 +666,7 @@
                 class="mt-2"
               />
             </v-col>
+            </v-row>
 
         </v-card-text>
         <v-card-actions>
@@ -652,13 +708,15 @@ const headers = [
   { title: 'No', value: 'index', sortable: false, align: 'start', width: '50px' },
   { title: '#', value: 'logo', sortable: true },
   { title: 'Nama', value: 'name', sortable: true },
-  { title: 'Biaya Admin', value: 'biaya_admin', sortable: true },
-  { title: 'Biaya Pendaftaran', value: 'biaya_pendaftaran', sortable: true },
+  { title: 'Biaya Formulir', value: 'biaya_admin', sortable: true },
+  { title: 'Uang Pangkal', value: 'biaya_pendaftaran', sortable: true },
   { title: '', value: 'aksi', sortable: false, align: 'end' },
 ]
 const headersSub = [
   { title: 'No', value: 'index', sortable: false, align: 'start', width: '50px' },
   { title: 'Nama Sekolah', value: 'nama_sekolah', sortable: true },
+  { title: 'Biaya Forumulir', value: 'biaya_formulir', sortable: true },
+  { title: 'Biaya Uang Pangkal', value: 'biaya_uang_pangkal', sortable: true },
   { title: 'Grade', value: 'name', sortable: true },
   { title: '', value: 'aksi', sortable: false, align: 'end' },
 ]
@@ -686,7 +744,8 @@ const form = reactive({
   name: '',
   logo: null,
   foto_kontent_sekolah: null,
-  batas_usia: null,
+  batas_usia_min: 0,
+  batas_usia_max: 0,
   biaya_admin : 0,
   biaya_pendaftaran : 0,
   is_need_nem : 0,
@@ -701,9 +760,7 @@ const form = reactive({
   visi : null,
   misi : null,
   moto : null,
-  is_sdit: false,
-  biaya_admin_sdit: 0,
-  biaya_pendaftaran_sdit: 0,
+  is_multi_biaya: false,
   banner_visi : null,
   banner_misi : null,
   foto_guru_unit : null
@@ -790,6 +847,7 @@ function showModalDialog (item,type) {
     fotoGuruUnit.value = item.foto_guru_unit ? item.foto_guru_unit : '/no-image.jpg'
     form.is_need_nem = item.is_need_nem == '1' ? true : false;
     form.is_need_test = item.is_need_test == '1' ? true : false;
+    form.is_multi_biaya = item.is_multi_biaya == '1' ? true : false;
   }else{
     form.sekolah_id = item.id;
   }
@@ -853,16 +911,15 @@ async function handleCreateData() {
     formData.append('visi', form.visi)
     formData.append('misi', form.misi)
     formData.append('moto', form.moto)
-    formData.append('is_sdit', form.is_sdit)
-    formData.append('biaya_admin_sdit', form.biaya_admin_sdit)
-    formData.append('biaya_pendaftaran_sdit', form.biaya_pendaftaran_sdit)
+    formData.append('is_multi_biaya', form.is_multi_biaya)
     formData.append('logo', form.logo) // Pastikan form.logo adalah File
     formData.append('foto_kontent_sekolah', form.foto_kontent_sekolah) // Pastikan form.logo adalah File
     formData.append('sambutan_kepala_unit', form.sambutan_kepala_unit) // Pastikan form.logo adalah File
     formData.append('foto_kepala_unit', form.foto_kepala_unit) // Pastikan form.logo adalah File
     formData.append('foto_guru_unit', form.foto_guru_unit) // Pastikan form.logo adalah File
     formData.append('foto_kontent', form.foto_kontent) // Pastikan form.logo adalah File
-    formData.append('batas_usia', form.batas_usia)
+    formData.append('batas_usia_min', form.batas_usia_min)
+    formData.append('batas_usia_max', form.batas_usia_max)
 
     if(form.sekolah_id == null && form.id == null){
 
@@ -935,11 +992,14 @@ async function handleCreateData() {
     form.name = ''
     form.biaya_admin = 0
     form.biaya_pendaftaran = 0
+    form.batas_usia_min = 0
+    form.batas_usia_max = 0
     form.logo = null
     form.id = null
     form.sekolah_id = null
     form.code_formulir = null
     form.is_need_nem = 0
+    form.is_multi_biaya = 0
     form.is_need_test = 0
     form.foto_kontent = null
     form.foto_kontent_sekolah = null

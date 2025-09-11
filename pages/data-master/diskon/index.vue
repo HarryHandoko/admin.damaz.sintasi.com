@@ -1,7 +1,7 @@
 <template>
   <v-card>
     <v-card-title class="pa-4">
-      <h2>Diskon</h2>
+      <h2> Diskon Voucher</h2>
     </v-card-title>
     <v-data-table :headers="headers" :items="items" :items-per-page="pagination.itemsPerPage" :page="pagination.page"
       :server-items-length="pagination.totalItems" :loading="loading" class="elevation-1 small-table" show-expand
@@ -16,7 +16,7 @@
           <v-col cols="12" sm="12" md="6">
             <v-btn color="primary" class="float-end" @click="showModalDialog(null, null)">
               <v-icon left>bx bx-plus</v-icon>
-              Tambah Diskon
+              Tambah  Diskon Voucher
             </v-btn>
           </v-col>
         </v-row>
@@ -48,7 +48,7 @@
     <v-dialog v-model="showCreateModal" max-width="700" persistent>
       <v-card>
         <v-card-title class="pa-6">
-          <span class="headline">Form Beasiswa</span>
+          <span class="headline">Form Diskon Voucher</span>
         </v-card-title>
         <v-form v-model="valid" @submit.prevent="handleCreateData">
           <v-card-text style="margin-top: -30px;">

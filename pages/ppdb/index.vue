@@ -2,14 +2,18 @@
   <div>
     <!-- Tabs Navigation -->
     <VTabs v-model="activeTab" background-color="primary" dark>
+      <VTab> Permintaan Formulir </VTab>
       <VTab> Pendaftaran Admisi </VTab>
       <VTab> Proses Test </VTab>
       <VTab> Pendaftaran Ulang </VTab>
     </VTabs>
 
     <VWindow v-model="activeTab">
-      <!-- Tab 1: Pendaftar Admisi -->
       <VWindowItem :value="0">
+        <RequestFormulir />
+      </VWindowItem>
+      <!-- Tab 1: Pendaftar Admisi -->
+      <VWindowItem :value="1">
         <!-- Filter Section -->
         <VCard class="mb-6 pa-4">
           <VRow>
@@ -32,60 +36,6 @@
                 clearable
               />
             </VCol>
-            
-          <!-- Filter tanggal awal -->
-          <!-- <VCol cols="12" md="3">
-            <VMenu
-              v-model="menuAwal"
-              :close-on-content-click="false"
-              transition="scale-transition"
-              offset-y
-              min-width="auto"
-            >
-              <template #activator="{ props }">
-                <VTextField
-                  v-model="filter.tanggal_awal"
-                  label="Tanggal Awal"
-                  dense
-                  outlined
-                  readonly
-                  v-bind="props"
-                />
-              </template>
-              <VDatePicker
-                v-model="tanggalAwalRaw"
-                @update:modelValue="updateTanggalAwal"
-                clearable
-              />
-            </VMenu>
-          </VCol> -->
-
-          <!-- Filter tanggal akhir -->
-          <!-- <VCol cols="12" md="3">
-            <VMenu
-              v-model="menuAkhir"
-              :close-on-content-click="false"
-              transition="scale-transition"
-              offset-y
-              min-width="auto"
-            >
-              <template #activator="{ props }">
-                <VTextField
-                  v-model="filter.tanggal_akhir"
-                  label="Tanggal Akhir"
-                  dense
-                  outlined
-                  readonly
-                  v-bind="props"
-                />
-              </template>
-              <VDatePicker
-                v-model="tanggalAkhirRaw"
-                @update:modelValue="updateTanggalAkhir"
-                clearable
-              />
-            </VMenu>
-          </VCol> -->
 
           <VCol cols="12" md="3">
             <VSelect
@@ -191,13 +141,13 @@
       </VWindowItem>
 
       <!-- Tab 2: Pendaftaran Ulang -->
-      <VWindowItem :value="2">
+      <VWindowItem :value="3">
         <PendaftaranUlang />
       </VWindowItem>
 
 
       <!-- Tab 3: Proses Test -->
-      <VWindowItem :value="1">
+      <VWindowItem :value="2">
         <ProsesTest />
       </VWindowItem>
     </VWindow>
@@ -436,6 +386,7 @@ import { onMounted, ref } from 'vue';
 import ConfirmDialog from '~/components/ConfirmDialog.vue';
 import PendaftaranUlang from '~/components/PendaftaranUlang.vue';
 import ProsesTest from '~/components/ProsesTest.vue';
+import RequestFormulir from '~/components/RequestFormulir.vue';
 const { $api } = useNuxtApp()
 
 // State
@@ -544,11 +495,6 @@ async function getData() {
   } finally {
     loading.value = false
   }
-}
-
-// Placeholder filter
-function applyFilter() {
-  // Tambahkan logika filter sesuai kebutuhan
 }
 
 
