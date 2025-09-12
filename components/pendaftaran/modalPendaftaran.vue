@@ -31,7 +31,17 @@
         <div v-if="step == 5 && dataRegistrasi != null  && dataPPDB.is_form_done == 1">
           <FormOrangtua :dataRegist="dataRegistrasi"  @next-step="handleStepChange" @code-pendaftaran="codePendaftaran"></FormOrangtua>
         </div>
+        <div v-if="step == 6 && dataRegistrasi != null  && dataPPDB.is_form_done == 1">
+          <formSummary :dataRegist="dataRegistrasi"  @next-step="handleStepChange" @code-pendaftaran="codePendaftaran"></formSummary>
+        </div>
       </v-card-section>
+      <div v-else class="text-center">
+        <v-progress-circular
+          indeterminate
+          color="primary"
+          size="240"
+        ></v-progress-circular>
+      </div>
     </v-card>
   </v-dialog>
 </template>
@@ -43,6 +53,7 @@ import FormOrangtua from "./child/formOrangtua.vue"
 import formPaymentForm from "./child/formPaymentForm.vue"
 import formPendaftaranUnit from "./child/formPendaftaranUnit.vue"
 import formSiswa from "./child/formSiswa.vue"
+import formSummary from "./child/formSummary.vue"
 
 const props = defineProps({
   show: { type: Boolean, default: false },
@@ -66,14 +77,16 @@ watch(
   () => props.show,
   (val) => {
     internalShow.value = val
+    dataPPDB.value = null;
+    getDataRegister(true); // pass `true` to indicate first load
   }
 )
-watch(
-  () => props.step,
-  (val) => {
-    step.value = val
-  }
-)
+// watch(
+//   () => props.step,
+//   (val) => {
+//     step.value = val
+//   }
+// )
 
 watch(
   () => props.dataRegis,
@@ -108,19 +121,24 @@ function closeModal() {
 const dataPPDB = ref(null);
 async function getDataRegister() {
   try {
-    const data = await $api.post(`/register-ppdb/get-data`,{
-        ids : dataRegistrasi.value
+    const data = await $api.post(`/register-ppdb/get-data`, {
+      ids: dataRegistrasi.value,
     });
     dataPPDB.value = data.data.data[0];
-    if(dataPPDB.value.is_form_done == 1){
+
+    if (!dataPPDB.value) return; 
+
+    if (dataPPDB.value.is_form_done == 1 && dataPPDB.value.siswa_parent != null) {
+      step.value = 6;
+    } else if (dataPPDB.value.is_form_done == 1) {
       step.value = 3;
-    }else{
+    } else {
       step.value = 1;
     }
   } catch (error) {
-  } finally {
   }
 }
 onMounted(() => {
+  dataPPDB.value = null;
 })
 </script>

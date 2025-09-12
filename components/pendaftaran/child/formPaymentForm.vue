@@ -250,6 +250,9 @@ async function handleCreateData() {
       });
       // emit("next-step", 2)
       // emit("submit")
+
+      showSuccess.value = true;
+      message.value = 'Berhasil mengirim bukti pembayaran';
       getDataRegister();
     }
   } catch (error) {

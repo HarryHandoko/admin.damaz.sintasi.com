@@ -331,12 +331,12 @@
             </VRow>
 
             <VDivider class="my-4" />
-            <v-row v-if="selectedItem.is_need_test == '1' && selectedItem.status_pendaftaran == 'P00'">
-              <v-col cols="12">
+            <!--  v-if="selectedItem.is_need_test == '1' && selectedItem.status_pendaftaran == 'P00'" -->
+            <v-row>
+              <v-col cols="12" v-if="selectedItem.is_need_test == '1'">
                 <v-text-field
                   v-model="form.tgl_test"
                   label="Tanggal Test"
-                  required
                   type="date"
                 />
               </v-col>
@@ -345,13 +345,16 @@
         </VCardText>
         <VCardActions>
           <v-row>
-              <v-col cols="6" md="4">
+              <v-col cols="12" v-if="selectedItem.is_need_test == '1'">
+                <v-btn color="info" variant="flat" @click="updateTanggalTest(selectedItem.code_pendaftaran)" block>Ubah Tanggal Test</v-btn>
+              </v-col>
+              <v-col cols="6" md="6">
                 <v-btn color="success" variant="flat" :disabled="selectedItem.status_pendaftaran == 'P01'" @click="approvalConfirm(selectedItem,'Approve')" block>Setujui</v-btn>
               </v-col>
-              <v-col cols="6" md="4">
+              <v-col cols="6" md="6">
                 <v-btn color="error" variant="flat"  :disabled="selectedItem.status_pendaftaran == 'P02'" @click="approvalConfirm(selectedItem,'Reject')" block>Tolak</v-btn>
               </v-col>
-              <v-col cols="12" md="4">
+              <v-col cols="12">
                 <v-btn color="primary" variant="flat" @click="dialogDetail = false;getData()" block>Tutup</v-btn>
               </v-col>
           </v-row>
@@ -498,6 +501,25 @@ async function getData() {
 }
 
 
+
+// Ambil data dari API
+async function updateTanggalTest(code_pendaftaran) {
+  loading.value = true
+  try {
+    const response = await $api.post('/register-ppdb/update-tanggal-test',{
+      code_ppdb : code_pendaftaran,
+      tgl_test : form.tgl_test
+    })
+    showSuccess.value = true
+    message.value = 'Tanggal Seleksi Tes Berhasil diubah'
+  } catch (error) {
+    show.value = true
+    message.value = error.response?.data?.message
+  } finally {
+    loading.value = false
+  }
+}
+
 function approvalConfirm(data,type) {
     color.value = type == 'Approve' ? 'success' : 'error';
     titleConfirm.value = 'Konfirmasi Tindakan';
@@ -573,30 +595,32 @@ async function getStat() {
 
 
 async function HandleApproval(data,type) {
-  if(form.tgl_test == null && data.is_need_test == '1' && data.status_pendaftaran == 'P00'){
-    show.value = true
-    message.value = 'Harap isi Tanggal Test Telebih Dahulu'
-  }else{
-    loading.value = true
-    try {
-      const response = await $api.post('/register-ppdb/approval', {
-        code_ppdb : data.code_pendaftaran,
-        type : type,
-        tgl_test : form.tgl_test
-      })
+  // if(form.tgl_test == null && data.is_need_test == '1' && data.status_pendaftaran == 'P00'){
+  //   show.value = true
+  //   message.value = 'Harap isi Tanggal Test Telebih Dahulu'
+  // }else{
+    
+  // }
 
-      showSuccess.value = true
-      message.value = 'Pendaftaran berhasil diubah.'
-    } catch (error) {
-      show.value = true
-      message.value = error.response?.data?.message || 'Terjadi kesalahan saat mencetak.'
-    } finally {
-      loading.value = false
-      dialogDetail.value = false
-      showConfirm.value = false
-      getData()
-      getStat()
-    }
+  loading.value = true
+  try {
+    const response = await $api.post('/register-ppdb/approval', {
+      code_ppdb : data.code_pendaftaran,
+      type : type,
+      tgl_test : form.tgl_test
+    })
+
+    showSuccess.value = true
+    message.value = 'Pendaftaran berhasil diubah.'
+  } catch (error) {
+    show.value = true
+    message.value = error.response?.data?.message || 'Terjadi kesalahan saat mencetak.'
+  } finally {
+    loading.value = false
+    dialogDetail.value = false
+    showConfirm.value = false
+    getData()
+    getStat()
   }
 }
 

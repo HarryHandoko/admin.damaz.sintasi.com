@@ -425,6 +425,53 @@ async function handleDelete(dataDelete) {
   }
 }
 
+
+
+async function printDataKTS(data) {
+  loading.value = true;
+  try {
+    const response = await $api.post("/register-ppdb/generate-kts-pdf", {
+      register_id: data.id,
+    });
+
+    const downloadUrl = response.data.download_url;
+    if (downloadUrl) {
+      window.open(downloadUrl, "_blank"); // 👈 buka di tab baru
+    } else {
+      show.value = true;
+      message.value = "Gagal mendapatkan link unduhan.";
+    }
+  } catch (error) {
+    show.value = true;
+    message.value =
+      error.response?.data?.message || "Terjadi kesalahan saat mencetak.";
+  } finally {
+    loading.value = false;
+  }
+}
+
+
+
+async function printData(data) {
+  loading.value = true;
+  try {
+    const response = await $api.post("/register-ppdb/generate-pdf", data);
+
+    const downloadUrl = response.data.download_url;
+    if (downloadUrl) {
+      window.open(downloadUrl, "_blank"); // 👈 buka di tab baru
+    } else {
+      show.value = true;
+      message.value = "Gagal mendapatkan link unduhan.";
+    }
+  } catch (error) {
+    show.value = true;
+    message.value =
+      error.response?.data?.message || "Terjadi kesalahan saat mencetak.";
+  } finally {
+    loading.value = false;
+  }
+}
 onMounted(() => {
   getDataRegister();
   fetchUser();

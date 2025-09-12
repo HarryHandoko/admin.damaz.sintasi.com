@@ -156,7 +156,7 @@ const form = ref({
   search: null,
   nama_depan: null,
   nama_belakang: null,
-
+  voucher_diskon: null,
   sekolah_id: null,
   grade_id: null,
 });
@@ -279,6 +279,7 @@ async function getDataRegister() {
     form.value.tgl_lahir = dataPPDB.value.siswa.tgl_lahir;
     form.value.sekolah_id = dataPPDB.value.sekolah_id;
     form.value.code_ppdb = dataPPDB.value.code_pendaftaran;
+    form.value.voucher_diskon = dataPPDB.value.voucher_diskon;
     form.value.id = props.dataRegist;
     getGrade();
     form.value.grade_id = dataPPDB.value.grade_id;

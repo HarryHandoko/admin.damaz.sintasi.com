@@ -54,8 +54,10 @@
           <v-card-text style="margin-top: -30px;">
             <v-text-field v-model="form.nama" label="Nama" required class="mb-4"
               :rules="[v => !!v || 'Nama harus diisi']" />
-            <v-text-field v-model="form.nominal" label="Nominal" type="number" required class="mb-4"
-              :rules="[v => !!v || 'Nominal harus diisi']" />
+            <v-text-field v-model="form.nominal" label="Diskon Uang Formulir" type="number" required class="mb-4"
+              :rules="[v => !!v || 'Diskon Uang Formulir harus diisi']" />
+            <v-text-field v-model="form.diskon_uang_pangkal" label="Dikon Uang Pangkal" type="number" required class="mb-4"
+              :rules="[v => !!v || 'Dikon Uang Pangkal harus diisi']" />
             <v-text-field v-model="form.kode" label="Kode" required class="mb-4"
               :rules="[v => !!v || 'Kode harus diisi']" />
             <v-text-field v-model="form.kuota" label="Kuota" type="number" required class="mb-4"
@@ -95,7 +97,8 @@ const { $api } = useNuxtApp()
 const headers = [
   { title: 'No', value: 'index', sortable: false, align: 'start', width: '50px' },
   { title: 'Nama', value: 'nama', sortable: true },
-  { title: 'Nominal', value: 'nominal', sortable: true },
+  { title: 'Diskon Uang Formulir', value: 'nominal', sortable: true },
+  { title: 'Diskon Uang Pangkal', value: 'diskon_uang_pangkal', sortable: true },
   { title: 'Kode', value: 'kode', sortable: true },
   { title: 'Kuota', value: 'kuota', sortable: true },
   { title: '', value: 'aksi', sortable: false, align: 'end' },
@@ -118,6 +121,7 @@ const form = reactive({
   id: '',
   nama: '',
   nominal: '',
+  diskon_uang_pangkal: '',
   kode: '',
   kuota: '',
 })
@@ -185,6 +189,7 @@ async function handleCreateData() {
     formData.append("id", form.id)
     formData.append("nama", form.nama)
     formData.append("nominal", form.nominal)
+    formData.append("diskon_uang_pangkal", form.diskon_uang_pangkal)
     formData.append("kode", form.kode)
     formData.append("kuota", form.kuota)
 

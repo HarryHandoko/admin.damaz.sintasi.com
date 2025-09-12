@@ -184,7 +184,9 @@
               </VCol>
               <VCol cols="12" md="6">
                 <p><strong>Nama Pendaftar:</strong> {{ selectedItem.register.nama_depan }} {{ selectedItem.register.nama_belakang }}</p>
-                <p><strong>Biaya Pendaftaran:</strong> Rp {{ Number(selectedItem.biaya_pendaftaran).toLocaleString() }}</p>
+                <p><strong>Biaya Uang Pangkal:</strong> Rp {{ Number(selectedItem.biaya_pendaftaran).toLocaleString() }}</p>
+                <p><strong>Diskon Biaya Uang Pangkal:</strong> Rp {{ Number(selectedItem.diskon_uang_pangkal).toLocaleString() }}</p>
+                <p><strong>Total Biaya Uang Pangkal:</strong> Rp {{ Number(selectedItem.biaya_pendaftaran - selectedItem.diskon_uang_pangkal).toLocaleString() }}</p>
                 <p><strong class="mr-2">Status Pembayaran:</strong> 
                   <VChip :color="selectedItem.bukti_pembayaran != null ? 'success' : 'error'" dark>
                     {{ selectedItem.bukti_pembayaran != null ? 'Sudah dibayar' : 'Belum dibayar' }}

@@ -393,6 +393,13 @@
       {{ message }}
     </v-snackbar>
   </div>
+  <div v-else class="text-center">
+    <v-progress-circular
+      indeterminate
+      color="primary"
+      size="240"
+    ></v-progress-circular>
+  </div>
 </template>
 
 <script setup>
@@ -415,7 +422,7 @@ const form = ref({
   id: null,
   code_ppdb: null,
   search: null,
-  penanggung_jawab: "Orang Tua",
+  penanggung_jawab: null,
 
   nama_ayah: null,
   nik_ayah: null,
@@ -466,9 +473,8 @@ async function getDataRegister() {
         ids : props.dataRegist
     });
     dataPPDB.value = data.data.data[0];
-
-
     if (dataPPDB.value.siswa_parent != null) {
+      form.value.penanggung_jawab = dataPPDB.value.siswa_parent.penanggung_jawab;
       form.value.nama_ayah = dataPPDB.value.siswa_parent.nama_ayah;
       form.value.nik_ayah = dataPPDB.value.siswa_parent.nik_ayah;
       form.value.pekerjaan_ayah = dataPPDB.value.siswa_parent.pekerjaan_ayah;
@@ -525,7 +531,7 @@ async function handleCreateData() {
       }
     }
     
-    if (( ( form.value.penanggung_jawab == 'Orang Tua' && form.value.nama_ayah == null ||
+    if (( (form.value.penanggung_jawab == 'Orang Tua' &&  ( form.value.nama_ayah == null ||
         form.value.nik_ayah == null ||
         form.value.pekerjaan_ayah == null ||
         form.value.pendidikan_terakhir_ayah == null ||
@@ -536,7 +542,7 @@ async function handleCreateData() {
         form.value.pekerjaan_ibu == null ||
         form.value.pendidikan_terakhir_ibu == null ||
         form.value.penghasilan_ibu == null ||
-        form.value.alamat_ibu == null) ||
+        form.value.alamat_ibu == null) ) ||
         (form.value.penanggung_jawab != 'Orang Tua' && (form.value.nik_wali == null ||
         form.value.nama_wali == null ||
         form.value.pekerjaan_wali == null ||
@@ -552,7 +558,7 @@ async function handleCreateData() {
           "Content-Type": "multipart/form-data",
         },
       });
-      // emit("next-step", 2)
+      emit("next-step", 6)
       // emit("submit")
       getDataRegister();
     }
@@ -595,6 +601,7 @@ function backStep (steps){
 }
 
 onMounted(() => {
+  form.value.penanggung_jawab ='Orang Tua'
   getDataRegister();
 });
 

@@ -132,7 +132,6 @@
         </v-col>
       </v-row>
     </v-form>
-
     
     <!-- Snackbar error -->
     <v-snackbar v-model="show" color="error" timeout="3000">
@@ -144,6 +143,16 @@
       {{ message }}
     </v-snackbar>
   </div>
+
+
+  <div v-else class="text-center">
+    <v-progress-circular
+      indeterminate
+      color="primary"
+      size="240"
+    ></v-progress-circular>
+  </div>
+
 </template>
 
 <script setup>
