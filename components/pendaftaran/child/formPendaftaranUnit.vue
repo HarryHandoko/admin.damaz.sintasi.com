@@ -7,118 +7,152 @@
 
       <v-col cols="12">
         <v-form v-model="valid" @submit.prevent="handleCreateData">
-        <v-row>
-          <v-col cols="12" md="6">
-            <v-text-field
-              v-model="form.nama_depan"
-              label="Nama Depan *"
-              required
-              :rules="[v => !!v || 'Form harus diisi']"
-            />
-          </v-col>
+          <v-row>
+            <v-col cols="12" md="6">
+              <v-text-field
+                v-model="form.nama_depan"
+                label="Nama Depan *"
+                required
+                :rules="[(v) => !!v || 'Form harus diisi']"
+              />
+            </v-col>
 
-          <v-col cols="12" md="6">
-            <v-text-field
-              v-model="form.nama_belakang"
-              label="Nama Belakang *"
-              required
-              :rules="[v => !!v || 'Form harus diisi']"
-            />
-          </v-col>
+            <v-col cols="12" md="6">
+              <v-text-field
+                v-model="form.nama_belakang"
+                label="Nama Belakang *"
+                required
+                :rules="[(v) => !!v || 'Form harus diisi']"
+              />
+            </v-col>
 
-          <v-col cols="12">
-            <v-text-field
-              v-model="form.tgl_lahir"
-              label="Tanggal Lahir *"
-              type="date"
-              required
-              :rules="[v => !!v || 'Form harus diisi']"
-            />
-          </v-col>
+            <v-col cols="12">
+              <v-text-field
+                v-model="form.tgl_lahir"
+                label="Tanggal Lahir *"
+                type="date"
+                required
+                :rules="[(v) => !!v || 'Form harus diisi']"
+              />
+            </v-col>
 
-          <v-col cols="12" md="6">
-            <v-select
-              v-model="form.sekolah_id"
-              :items="sekolah"
-              item-title="name"
-              item-value="id"
-              label="Sekolah *"
-              required
-              :rules="[v => !!v || 'Form harus dipilih']"
-              @update:model-value="
-                getGrade();
-                form.grade_id = null
-              "
-            />
-          </v-col>
-
-          <v-col cols="12" md="6">
-            <v-select
-              v-model="form.grade_id"
-              :items="grade"
-              item-title="name"
-              item-value="id"
-              label="Grade *"
-              required
-              :rules="[v => !!v || 'Form harus dipilih']"
-            />
-          </v-col>
-
-          <v-col cols="12" md="9">
-            <v-text-field
-              v-model="form.voucher_diskon"
-              label="Voucher Diskon"
-            />
-          </v-col>
-
-          <v-col cols="12" md="3" class="d-flex align-center">
-            <v-btn
-              color="primary"
-              @click="applyVoucher"
-              :loading="loadingDiskon"
-              :disabled="loadingDiskon || !form.voucher_diskon"
-            >
-              Terapkan Diskon
-            </v-btn>
-          </v-col>
-
-          <v-col cols="12" v-if="diskonAppliedMessage" class="mt-2">
-            <v-alert type="success" dense text>
-              {{ diskonAppliedMessage }}
-            </v-alert>
-          </v-col>
-
-          <v-col cols="12" class="text-right">
-            <v-row>
-              <v-col cols="6">
-                <v-btn
-                  color="secondary"
-                  variant="flat"
-                  :disabled="true"
-                  block
-                  class="mr-2"
-                  :loading="loading"
-                >
-                  Kembali
-                </v-btn>
+            <v-col cols="12">
+              <v-select
+                v-model="form.penanggung_jawab"
+                :items="['Orang Tua', 'Wali']"
+                label="Penanggung Jawab*"
+                :rules="[(v) => !!v || 'Pilih salah satu penanggung jawab']"
+                required
+              />
+            </v-col>
+            <template v-if="form.penanggung_jawab === 'Orang Tua'">
+              <v-col cols="12" md="6">
+                <v-text-field
+                  v-model="form.no_hp_ayah"
+                  label="No Telepon Ayah"
+                  required
+                />
               </v-col>
-              <v-col cols="6">
-                <v-btn
-                  color="primary"
-                  variant="flat"
-                  :disabled="loading"
-                  type="submit"
-                  :loading="loading"
-                  block
-                >
-                  Simpan dan lanjut
-                </v-btn>
+
+              <v-col cols="12" md="6">
+                <v-text-field
+                  v-model="form.no_hp_ibu"
+                  label="No Telepon Ibu"
+                  required
+                />
               </v-col>
-            </v-row>
-          </v-col>
-        </v-row>
-      
-      </v-form>
+            </template>
+            <template v-else-if="form.penanggung_jawab === 'Wali'">
+              <v-col cols="12" md="12">
+                <v-text-field
+                  v-model="form.no_hp_wali"
+                  label="No Telepon Wali"
+                  required
+                />
+              </v-col>
+            </template>
+            <v-col cols="12" md="6">
+              <v-select
+                v-model="form.sekolah_id"
+                :items="sekolah"
+                item-title="name"
+                item-value="id"
+                label="Sekolah *"
+                required
+                :rules="[(v) => !!v || 'Form harus dipilih']"
+                @update:model-value="
+                  getGrade();
+                  form.grade_id = null;
+                "
+              />
+            </v-col>
+
+            <v-col cols="12" md="6">
+              <v-select
+                v-model="form.grade_id"
+                :items="grade"
+                item-title="name"
+                item-value="id"
+                label="Grade *"
+                required
+                :rules="[(v) => !!v || 'Form harus dipilih']"
+              />
+            </v-col>
+
+            <v-col cols="12" md="9">
+              <v-text-field
+                v-model="form.voucher_diskon"
+                label="Voucher Diskon"
+              />
+            </v-col>
+
+            <v-col cols="12" md="3" class="d-flex align-center">
+              <v-btn
+                color="primary"
+                @click="applyVoucher"
+                :loading="loadingDiskon"
+                :disabled="loadingDiskon || !form.voucher_diskon"
+              >
+                Terapkan Diskon
+              </v-btn>
+            </v-col>
+
+            <v-col cols="12" v-if="diskonAppliedMessage" class="mt-2">
+              <v-alert type="success" dense text>
+                {{ diskonAppliedMessage }}
+              </v-alert>
+            </v-col>
+
+            <v-col cols="12" class="text-right">
+              <v-row>
+                <v-col cols="6">
+                  <v-btn
+                    color="secondary"
+                    variant="flat"
+                    :disabled="true"
+                    block
+                    class="mr-2"
+                    :loading="loading"
+                  >
+                    Kembali
+                  </v-btn>
+                </v-col>
+                <v-col cols="6">
+                  <v-btn
+                    color="primary"
+                    variant="flat"
+                    :disabled="loading"
+                    type="submit"
+                    :loading="loading"
+                    block
+                  >
+                    Simpan dan lanjut
+                  </v-btn>
+                </v-col>
+              </v-row>
+            </v-col>
+          </v-row>
+        </v-form>
       </v-col>
     </v-row>
 
@@ -146,9 +180,14 @@ const message = ref(null);
 
 const props = defineProps({
   dataRegist: null,
-})
+});
 
-const emit = defineEmits(["update:step", "submit", "next-step","code-pendaftaran"]);
+const emit = defineEmits([
+  "update:step",
+  "submit",
+  "next-step",
+  "code-pendaftaran",
+]);
 
 const form = ref({
   id: null,
@@ -156,6 +195,10 @@ const form = ref({
   search: null,
   nama_depan: null,
   nama_belakang: null,
+  penanggung_jawab: null,
+  no_hp_ayah: null,
+  no_hp_ibu: null,
+  no_hp_wali: null,
   voucher_diskon: null,
   sekolah_id: null,
   grade_id: null,
@@ -164,10 +207,10 @@ const form = ref({
 watch(
   () => props.dataRegist,
   (val) => {
-    if (val) form.value.id = props.dataRegist
+    if (val) form.value.id = props.dataRegist;
   },
   { immediate: true }
-)
+);
 
 const dataPPDB = ref(null);
 const sekolah = ref([]);
@@ -226,7 +269,6 @@ function applyVoucher() {
     });
 }
 
-
 async function handleCreateData() {
   loading.value = true;
   try {
@@ -238,10 +280,10 @@ async function handleCreateData() {
         formData.append(key, form.value[key]);
       }
     }
-    if ((form.value.sekolah_id == null || form.value.grade_id == null)) {
+    if (form.value.sekolah_id == null || form.value.grade_id == null) {
       show.value = true;
       message.value = "Harap isi form dengan lengkap";
-    }else {
+    } else {
       // Tambahkan nilai step secara eksplisit
       formData.append("step", 1);
 
@@ -250,27 +292,26 @@ async function handleCreateData() {
           "Content-Type": "multipart/form-data",
         },
       });
-      emit("next-step", 2)
-      emit("code-pendaftaran", data.data.id)
-      emit("submit")
+      emit("next-step", 2);
+      emit("code-pendaftaran", data.data.id);
+      emit("submit");
     }
   } catch (error) {
-    show.value = true
+    show.value = true;
     message.value =
       error?.response?.data?.message ||
       error?.message ||
-      "Terjadi kesalahan pada server."
+      "Terjadi kesalahan pada server.";
   } finally {
     loading.value = false;
   }
 }
 
-
 async function getDataRegister() {
   loading.value = true;
   try {
-    const data = await $api.post(`/register-ppdb/get-data`,{
-        ids : props.dataRegist
+    const data = await $api.post(`/register-ppdb/get-data`, {
+      ids: props.dataRegist,
     });
     dataPPDB.value = data.data.data[0];
 
@@ -283,7 +324,6 @@ async function getDataRegister() {
     form.value.id = props.dataRegist;
     getGrade();
     form.value.grade_id = dataPPDB.value.grade_id;
-
   } catch (error) {
   } finally {
     loading.value = false;
@@ -294,5 +334,4 @@ onMounted(() => {
   getRole();
   getDataRegister();
 });
-
 </script>
