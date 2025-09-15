@@ -41,8 +41,8 @@
                 v-model="form.penanggung_jawab"
                 :items="['Orang Tua', 'Wali']"
                 label="Penanggung Jawab*"
-                :rules="[(v) => !!v || 'Pilih salah satu penanggung jawab']"
-                required
+                  :rules="[v => !!v || 'Penanggung Jawab harus dipilih']"
+                  required
               />
             </v-col>
             <template v-if="form.penanggung_jawab === 'Orang Tua'">
@@ -51,6 +51,7 @@
                   v-model="form.no_hp_ayah"
                   label="No Telepon Ayah"
                   required
+                  :rules="[(v) => !!v || 'Form harus diisi']"
                 />
               </v-col>
 
@@ -59,6 +60,7 @@
                   v-model="form.no_hp_ibu"
                   label="No Telepon Ibu"
                   required
+                  :rules="[(v) => !!v || 'Form harus diisi']"
                 />
               </v-col>
             </template>
@@ -68,6 +70,7 @@
                   v-model="form.no_hp_wali"
                   label="No Telepon Wali"
                   required
+                  :rules="[(v) => !!v || 'Form harus diisi']"
                 />
               </v-col>
             </template>
@@ -280,7 +283,7 @@ async function handleCreateData() {
         formData.append(key, form.value[key]);
       }
     }
-    if (form.value.sekolah_id == null || form.value.grade_id == null) {
+    if (form.value.sekolah_id == null || form.value.grade_id == null || form.value.penanggung_jawab == null || form.value.nama_depan == null || form.value.nama_belakang == null || form.value.tgl_lahir == null || (form.value.penanggung_jawab === 'Orang Tua' && (form.value.no_hp_ayah == null || form.value.no_hp_ibu == null)) || (form.value.penanggung_jawab === 'Wali' && form.value.no_hp_wali == null)) {
       show.value = true;
       message.value = "Harap isi form dengan lengkap";
     } else {
