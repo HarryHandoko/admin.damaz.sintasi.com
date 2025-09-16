@@ -42,9 +42,6 @@
             <VBtn color="success" :loading="loading" class="ml-2" @click="getFileExcel()">
               <v-icon>bx bxs-file</v-icon> Print To Excel
             </VBtn>
-            <VBtn color="secondary" :loading="loading" class="ml-2" @click="getFileBundle()">
-              <v-icon>bx bxs-file</v-icon> Print To Bundle
-            </VBtn>
           </VCol>
       </VRow>
     </VCard>
