@@ -4,6 +4,7 @@
       <h2>WhatsApp Log</h2>
     </v-card-title>
     <v-data-table
+      v-model="selected"
       :headers="headers"
       :items="items"
       :items-per-page="pagination.itemsPerPage"
@@ -12,6 +13,7 @@
       :loading="loading"
       class="elevation-1 small-table"
       show-expand
+      show-select
       item-value="id"
       @update:page="onPageChange"
       @update:items-per-page="onPerPageChange"
@@ -49,15 +51,27 @@
             />
           </v-col>
           <v-col cols="12" sm="6" md="3">
-            <v-btn
-              color="primary"
-              class="float-end"
-              @click="getData"
-              :loading="loading"
-            >
-              <v-icon left>bx-refresh</v-icon>
-              Refresh
-            </v-btn>
+            <div class="d-flex gap-2">
+              <v-btn
+                color="primary"
+                @click="getData"
+                :loading="loading"
+                size="small"
+              >
+                <v-icon left>bx-refresh</v-icon>
+                Refresh
+              </v-btn>
+              <v-btn
+                color="warning"
+                @click="bulkResend"
+                :disabled="!hasSelectedFailed || loading"
+                :loading="resendLoading"
+                size="small"
+              >
+                <v-icon left>bx-redo</v-icon>
+                Resend Selected
+              </v-btn>
+            </div>
           </v-col>
         </v-row>
       </template>
@@ -129,6 +143,38 @@
         </div>
       </template>
 
+      <!-- Actions -->
+      <template #item.actions="{ item }">
+        <div class="d-flex gap-1">
+          <v-btn
+            v-if="item.status === 'failed'"
+            icon
+            size="small"
+            color="warning"
+            @click="resendSingle(item)"
+            :loading="resendingSingle[item.id]"
+            variant="text"
+          >
+            <v-icon size="18">bx-redo</v-icon>
+            <v-tooltip activator="parent" location="top">
+              Resend Message
+            </v-tooltip>
+          </v-btn>
+          <v-btn
+            icon
+            size="small"
+            color="primary"
+            @click="viewDetails(item)"
+            variant="text"
+          >
+            <v-icon size="18">bx-show</v-icon>
+            <v-tooltip activator="parent" location="top">
+              View Details
+            </v-tooltip>
+          </v-btn>
+        </div>
+      </template>
+
       <!-- Expandable row for details -->
       <template #expanded-row="{ item }">
         <tr>
@@ -146,6 +192,19 @@
                     <p><strong>Started:</strong> {{ formatDateTime(item.started_at) }}</p>
                     <p><strong>Completed:</strong> {{ item.completed_at ? formatDateTime(item.completed_at) : 'Not completed' }}</p>
                     <p v-if="item.processing_time_ms"><strong>Processing Time:</strong> {{ formatTime(item.processing_time_ms) }}</p>
+
+                    <!-- Resend button in details -->
+                    <div v-if="item.status === 'failed'" class="mt-3">
+                      <v-btn
+                        color="warning"
+                        size="small"
+                        @click="resendSingle(item)"
+                        :loading="resendingSingle[item.id]"
+                      >
+                        <v-icon left>bx-redo</v-icon>
+                        Resend This Message
+                      </v-btn>
+                    </div>
                   </v-col>
                   <v-col cols="12" md="6">
                     <div v-if="item.message">
@@ -212,7 +271,7 @@
       <v-col cols="12" sm="6" md="4">
         <v-card color="success" variant="flat">
           <v-card-text class="text-center text-white">
-            <div class="text-h4 font-weight-bold text-white">{{ stats.success || 0 }}</div>
+            <div class="text-h4 font-weight-bold">{{ stats.success || 0 }}</div>
             <div>Success</div>
           </v-card-text>
         </v-card>
@@ -220,7 +279,7 @@
       <v-col cols="12" sm="6" md="4">
         <v-card color="error" variant="flat">
           <v-card-text class="text-center text-white">
-            <div class="text-h4 font-weight-bold text-white">{{ stats.failed || 0 }}</div>
+            <div class="text-h4 font-weight-bold">{{ stats.failed || 0 }}</div>
             <div>Failed</div>
           </v-card-text>
         </v-card>
@@ -228,7 +287,7 @@
       <v-col cols="12" sm="6" md="4">
         <v-card color="warning" variant="flat">
           <v-card-text class="text-center text-white">
-            <div class="text-h4 font-weight-bold text-white">{{ stats.pending || 0 }}</div>
+            <div class="text-h4 font-weight-bold">{{ stats.pending || 0 }}</div>
             <div>Pending</div>
           </v-card-text>
         </v-card>
@@ -236,7 +295,7 @@
       <v-col cols="12" sm="6" md="4">
         <v-card color="info" variant="flat">
           <v-card-text class="text-center text-white">
-            <div class="text-h4 font-weight-bold text-white">{{ stats.retrying || 0 }}</div>
+            <div class="text-h4 font-weight-bold">{{ stats.retrying || 0 }}</div>
             <div>Retrying</div>
           </v-card-text>
         </v-card>
@@ -247,11 +306,21 @@
     <v-snackbar v-model="show" :color="snackbarColor" timeout="3000">
       {{ message }}
     </v-snackbar>
+
+    <!-- Confirm Dialog for Resend -->
+    <ConfirmDialog
+      :modelValue="showResendConfirm"
+      title="Konfirmasi Resend"
+      :message="resendConfirmMessage"
+      @confirm="confirmResend"
+      @cancel="showResendConfirm = false"
+    />
   </v-card>
 </template>
 
 <script setup>
-import { onMounted, reactive, ref, watch } from 'vue';
+import { computed, onMounted, reactive, ref, watch } from 'vue';
+import ConfirmDialog from '~/components/ConfirmDialog.vue';
 
 const { $api } = useNuxtApp()
 
@@ -266,12 +335,16 @@ const headers = [
   { title: 'Completed At', value: 'completed_at', sortable: true, width: '160px' },
   { title: 'Time', value: 'processing_time_ms', sortable: true, width: '100px' },
   { title: 'Message', value: 'message', sortable: false, width: '200px' },
+  { title: 'Actions', value: 'actions', sortable: false, width: '100px' },
 ]
 
 // Reactive data
 const items = ref([])
 const stats = ref({})
 const loading = ref(false)
+const selected = ref([])
+const resendLoading = ref(false)
+const resendingSingle = ref({})
 
 const pagination = reactive({
   itemsPerPage: 10,
@@ -290,6 +363,11 @@ const show = ref(false)
 const message = ref('')
 const snackbarColor = ref('error')
 
+// Resend confirmation
+const showResendConfirm = ref(false)
+const resendConfirmMessage = ref('')
+const resendAction = ref(null)
+
 // Options for filters
 const statusOptions = [
   { title: 'Pending', value: 'pending' },
@@ -305,6 +383,14 @@ const methodOptions = [
   { title: 'Bill to User', value: 'sendBillToUser' },
   { title: 'Bill to Keuangan', value: 'sendBillToKeuangan' },
 ]
+
+// Computed properties
+const hasSelectedFailed = computed(() => {
+  return selected.value.some(id => {
+    const item = items.value.find(item => item.id === id)
+    return item && item.status === 'failed'
+  })
+})
 
 // Helper functions
 function getStatusColor(status) {
@@ -426,6 +512,70 @@ async function getStats() {
   }
 }
 
+// Resend functions
+function resendSingle(item) {
+  resendConfirmMessage.value = `Apakah Anda yakin ingin mengirim ulang pesan ${getMethodText(item.method)} untuk ${item.kode_pendaftaran}?`
+  resendAction.value = () => performSingleResend(item)
+  showResendConfirm.value = true
+}
+
+function bulkResend() {
+  const failedSelected = selected.value.filter(id => {
+    const item = items.value.find(item => item.id === id)
+    return item && item.status === 'failed'
+  })
+
+  resendConfirmMessage.value = `Apakah Anda yakin ingin mengirim ulang ${failedSelected.length} pesan yang gagal?`
+  resendAction.value = () => performBulkResend(failedSelected)
+  showResendConfirm.value = true
+}
+
+async function confirmResend() {
+  showResendConfirm.value = false
+  if (resendAction.value) {
+    await resendAction.value()
+    resendAction.value = null
+  }
+}
+
+async function performSingleResend(item) {
+  resendingSingle.value[item.id] = true
+  try {
+    const response = await $api.post('/whatsapp-log/resend', {
+      id: item.id
+    })
+
+    showMessage(`Pesan berhasil dikirim ulang untuk ${item.kode_pendaftaran}`, 'success')
+    getData() // Refresh data
+  } catch (error) {
+    showMessage(error.response?.data?.message || 'Gagal mengirim ulang pesan', 'error')
+  } finally {
+    resendingSingle.value[item.id] = false
+  }
+}
+
+async function performBulkResend(ids) {
+  resendLoading.value = true
+  try {
+    const response = await $api.post('/whatsapp-log/bulk-resend', {
+      ids: ids
+    })
+
+    showMessage(`${response.data.resend_count} pesan berhasil dikirim ulang`, 'success')
+    selected.value = [] // Clear selection
+    getData() // Refresh data
+  } catch (error) {
+    showMessage(error.response?.data?.message || 'Gagal mengirim ulang pesan', 'error')
+  } finally {
+    resendLoading.value = false
+  }
+}
+
+function viewDetails(item) {
+  // This could open a modal or navigate to detail page
+  console.log('View details for:', item)
+}
+
 function showMessage(msg, color = 'error') {
   message.value = msg
   snackbarColor.value = color
@@ -438,3 +588,23 @@ onMounted(() => {
   getStats()
 })
 </script>
+
+<style scoped>
+.small-table {
+  font-size: 0.875rem;
+}
+
+.text-truncate {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.d-flex.gap-1 > * {
+  margin-right: 4px;
+}
+
+.d-flex.gap-2 > * {
+  margin-right: 8px;
+}
+</style>
