@@ -8,6 +8,18 @@
       <v-col cols="12">
         <v-form v-model="valid" @submit.prevent="handleCreateData">
           <v-row>
+            <v-col cols="12">
+              <v-checkbox
+                v-for="option in sumberInformasiOptions"
+                :key="option.value"
+                :model-value="form.sumber_informasi.includes(option.value)"
+                :label="option.text"
+                @update:model-value="
+                  toggleSumberInformasi(option.value, $event)
+                "
+                density="compact"
+              />
+            </v-col>
             <v-col cols="12" md="6">
               <v-text-field
                 v-model="form.nama_depan"
@@ -41,8 +53,8 @@
                 v-model="form.penanggung_jawab"
                 :items="['Orang Tua', 'Wali']"
                 label="Penanggung Jawab*"
-                  :rules="[v => !!v || 'Penanggung Jawab harus dipilih']"
-                  required
+                :rules="[(v) => !!v || 'Penanggung Jawab harus dipilih']"
+                required
               />
             </v-col>
             <template v-if="form.penanggung_jawab === 'Orang Tua'">
@@ -205,7 +217,28 @@ const form = ref({
   voucher_diskon: null,
   sekolah_id: null,
   grade_id: null,
+  sumber_informasi: [],
 });
+
+const sumberInformasiOptions = [
+  { text: "Teman/Tetangga", value: "teman_tetangga" },
+  { text: "Sosial Media (IG/FB/TikTok)", value: "sosial_media" },
+  { text: "Google/Website", value: "google_website" },
+  { text: "Guru/Karyawan SIT Darul Maza", value: "guru_karyawan" },
+];
+
+function toggleSumberInformasi(value, checked) {
+  if (checked) {
+    if (!form.value.sumber_informasi.includes(value)) {
+      form.value.sumber_informasi.push(value);
+    }
+  } else {
+    const index = form.value.sumber_informasi.indexOf(value);
+    if (index > -1) {
+      form.value.sumber_informasi.splice(index, 1);
+    }
+  }
+}
 
 watch(
   () => props.dataRegist,
@@ -283,7 +316,23 @@ async function handleCreateData() {
         formData.append(key, form.value[key]);
       }
     }
-    if (form.value.sekolah_id == null || form.value.grade_id == null || form.value.penanggung_jawab == null || form.value.nama_depan == null || form.value.nama_belakang == null || form.value.tgl_lahir == null || (form.value.penanggung_jawab === 'Orang Tua' && (form.value.no_hp_ayah == null || form.value.no_hp_ibu == null)) || (form.value.penanggung_jawab === 'Wali' && form.value.no_hp_wali == null)) {
+
+    formData.append(
+      "sumber_informasi",
+      JSON.stringify(form.value.sumber_informasi)
+    );
+
+    if (
+      form.value.sekolah_id == null ||
+      form.value.grade_id == null ||
+      form.value.penanggung_jawab == null ||
+      form.value.nama_depan == null ||
+      form.value.nama_belakang == null ||
+      form.value.tgl_lahir == null ||
+      (form.value.penanggung_jawab === "Orang Tua" &&
+        (form.value.no_hp_ayah == null || form.value.no_hp_ibu == null)) ||
+      (form.value.penanggung_jawab === "Wali" && form.value.no_hp_wali == null)
+    ) {
       show.value = true;
       message.value = "Harap isi form dengan lengkap";
     } else {
@@ -324,6 +373,7 @@ async function getDataRegister() {
     form.value.sekolah_id = dataPPDB.value.sekolah_id;
     form.value.code_ppdb = dataPPDB.value.code_pendaftaran;
     form.value.voucher_diskon = dataPPDB.value.voucher_diskon;
+    form.value.sumber_informasi = dataPPDB.value.sumber_informasi || [];
     form.value.id = props.dataRegist;
     getGrade();
     form.value.grade_id = dataPPDB.value.grade_id;
