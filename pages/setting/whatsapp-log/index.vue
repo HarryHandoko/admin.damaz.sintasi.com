@@ -7,16 +7,12 @@
       v-model="selected"
       :headers="headers"
       :items="items"
-      :items-per-page="pagination.itemsPerPage"
-      :page="pagination.page"
-      :server-items-length="pagination.totalItems"
+      :items-per-page="10"
       :loading="loading"
       class="elevation-1 small-table"
       show-expand
       show-select
       item-value="id"
-      @update:page="onPageChange"
-      @update:items-per-page="onPerPageChange"
       hover
       bordered
       :search="filter.search"
@@ -30,6 +26,7 @@
               label="Cari"
               placeholder="Cari Kode Pendaftaran"
               prepend-inner-icon="bx-search"
+              @update:model-value="onSearchChange"
             />
           </v-col>
           <v-col cols="12" sm="6" md="3">
@@ -78,7 +75,7 @@
 
       <!-- Index Number -->
       <template #item.index="props">
-        {{ (pagination.page - 1) * pagination.itemsPerPage + props.index + 1 }}
+        {{ props.index + 1 }}
       </template>
 
       <!-- Status with color -->
@@ -346,12 +343,6 @@ const selected = ref([])
 const resendLoading = ref(false)
 const resendingSingle = ref({})
 
-const pagination = reactive({
-  itemsPerPage: 10,
-  page: 1,
-  totalItems: 0,
-})
-
 const filter = reactive({
   search: '',
   status: null,
@@ -367,6 +358,9 @@ const snackbarColor = ref('error')
 const showResendConfirm = ref(false)
 const resendConfirmMessage = ref('')
 const resendAction = ref(null)
+
+// Search timeout
+let searchTimeout = ref(null)
 
 // Options for filters
 const statusOptions = [
@@ -461,19 +455,15 @@ function formatJSON(jsonString) {
 }
 
 // Event handlers
-watch([() => pagination.itemsPerPage, () => pagination.page], () => {
-  getData()
+watch(() => filter.search, () => {
+  onSearchChange()
 })
 
-const onPageChange = (newPage) => {
-  pagination.page = newPage
-  getData()
-}
-
-const onPerPageChange = (newPerPage) => {
-  pagination.itemsPerPage = newPerPage
-  pagination.page = 1
-  getData()
+const onSearchChange = () => {
+  clearTimeout(searchTimeout.value)
+  searchTimeout.value = setTimeout(() => {
+    getData()
+  }, 500)
 }
 
 // API functions
@@ -481,8 +471,6 @@ async function getData() {
   loading.value = true
   try {
     const params = {
-      page: pagination.page,
-      limit: pagination.itemsPerPage,
       search: filter.search,
       status: filter.status,
       method: filter.method,
@@ -490,10 +478,7 @@ async function getData() {
 
     const response = await $api.get('/whatsapp-log/get', { params })
 
-    items.value = response.data.data
-    pagination.totalItems = response.data.total
-    pagination.page = response.data.page
-    pagination.itemsPerPage = response.data.perPage
+    items.value = response.data
 
     showMessage('Data berhasil dimuat', 'success')
   } catch (error) {
