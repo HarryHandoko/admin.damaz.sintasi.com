@@ -2,12 +2,15 @@
   <div>
     <v-row>
       <v-col cols="12">
-        <b>Pendafataran Unit</b>
+        <b>Pendaftaran Unit</b>
       </v-col>
 
       <v-col cols="12">
         <v-form v-model="valid" @submit.prevent="handleCreateData">
           <v-row>
+            <v-col cols="12">
+              Mengetahui Darul Maza dari mana :
+            </v-col>
             <v-col cols="12">
               <v-checkbox
                 v-for="option in sumberInformasiOptions"
