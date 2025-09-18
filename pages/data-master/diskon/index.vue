@@ -3,15 +3,24 @@
     <v-card-title class="pa-4">
       <h2> Diskon Voucher</h2>
     </v-card-title>
-    <v-data-table :headers="headers" :items="items" :items-per-page="pagination.itemsPerPage" :page="pagination.page"
-      :server-items-length="pagination.totalItems" :loading="loading" class="elevation-1 small-table" show-expand
-      item-value="id" @update:page="onPageChange" @update:items-per-page="onPerPageChange" hover bordered
-      :search="filter.search">
+    <v-data-table
+      :headers="headers"
+      :items="items"
+      :items-per-page="10"
+      :loading="loading"
+      class="elevation-1 small-table"
+      show-expand
+      item-value="id"
+      hover
+      bordered
+      :search="filter.search"
+    >
       <!-- Top area -->
       <template #top>
         <v-row class="mb-2 pa-4">
           <v-col cols="12" sm="12" md="6">
-            <v-text-field v-model="filter.search" label="Cari" placeholder="Cari Diskon" />
+            <v-text-field v-model="filter.search" label="Cari" placeholder="Cari Diskon"
+              @update:model-value="onSearchChange" />
           </v-col>
           <v-col cols="12" sm="12" md="6">
             <v-btn color="primary" class="float-end" @click="showModalDialog(null, null)">
@@ -108,11 +117,6 @@ const items = ref([])
 const loading = ref(false)
 const showCreateModal = ref(false)
 
-const pagination = reactive({
-  itemsPerPage: 10,
-  page: 1,
-  totalItems: 0,
-})
 const filter = reactive({
   search: '',
 })
@@ -149,40 +153,41 @@ function showModalDialog(item, type) {
   }
 }
 
-watch([() => pagination.itemsPerPage, () => pagination.page], () => {
-  getData()
+// Watch for search changes
+watch(() => filter.search, () => {
+  onSearchChange()
 })
 
-const onPageChange = (newPage) => {
-  pagination.page = newPage
-  getData()
+const onSearchChange = () => {
+  clearTimeout(searchTimeout.value)
+  searchTimeout.value = setTimeout(() => {
+    getData()
+  }, 500)
 }
 
-const onPerPageChange = (newPerPage) => {
-  pagination.itemsPerPage = newPerPage
-  pagination.page = 1
-  getData()
-}
+let searchTimeout = ref(null)
 
 async function getData() {
   loading.value = true
   try {
-    const response = await $api.get('/master-data/diskon/get', {
-    })
-    items.value = response.data.data // Pastikan sudah return children!
-    pagination.totalItems = response.data.total
-    pagination.page = response.data.currentPage
-    pagination.itemsPerPage = response.data.perPage
-    pagination.totalItems = response.data.total
+    const params = {
+      search: filter.search,
+    }
+
+    console.log('Frontend sending params:', params)
+
+    const response = await $api.get('/master-data/diskon/get', { params })
+
+    console.log('Response:', response.data)
+
+    items.value = response.data.data
   } catch (error) {
     show.value = true
     message.value = error.response?.data?.message
   } finally {
     loading.value = false
   }
-}
-
-async function handleCreateData() {
+}async function handleCreateData() {
   loading.value = true
   try {
     const formData = new FormData()
