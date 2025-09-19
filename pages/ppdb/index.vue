@@ -385,6 +385,7 @@
   </div>
 </template>
 <script setup>
+import Pusher from 'pusher-js';
 import { onMounted, ref } from 'vue';
 import ConfirmDialog from '~/components/ConfirmDialog.vue';
 import PendaftaranUlang from '~/components/PendaftaranUlang.vue';
@@ -736,6 +737,18 @@ async function getFileBundle() {
   }
 }
 
+const pusher = new Pusher('2222bbf0d0069f56342b', {
+  cluster: 'ap1'
+})
+// Subscribe ke channel 'ppdb'
+const channel = pusher.subscribe('ppdb')
+channel.bind('reqform', (data) => {
+  const audio = new Audio('/sound/notifikasi.mp3')
+  audio.currentTime = 0
+  audio.play()
+  getData()
+  getStat()
+})
 // Lifecycle
 onMounted(() => {
   getTahunPeriodik();
