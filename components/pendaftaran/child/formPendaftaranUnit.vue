@@ -66,6 +66,7 @@
                   v-model="form.no_hp_ayah"
                   label="No Telepon Ayah"
                   required
+                  type="number"
                   :rules="[(v) => !!v || 'Form harus diisi']"
                 />
               </v-col>
@@ -74,6 +75,7 @@
                 <v-text-field
                   v-model="form.no_hp_ibu"
                   label="No Telepon Ibu"
+                  type="number"
                   required
                   :rules="[(v) => !!v || 'Form harus diisi']"
                 />
@@ -376,6 +378,10 @@ async function getDataRegister() {
     form.value.sekolah_id = dataPPDB.value.sekolah_id;
     form.value.code_ppdb = dataPPDB.value.code_pendaftaran;
     form.value.voucher_diskon = dataPPDB.value.voucher_diskon;
+    form.value.penanggung_jawab = dataPPDB.value.siswa_parent?.penanggung_jawab;
+    form.value.no_hp_ayah = dataPPDB.value.siswa_parent?.no_hp_ayah;
+    form.value.no_hp_ibu = dataPPDB.value.siswa_parent?.no_hp_ibu;
+    form.value.no_hp_wali = dataPPDB.value.siswa_parent?.no_hp_wali;
     form.value.sumber_informasi = dataPPDB.value.sumber_informasi || [];
     form.value.id = props.dataRegist;
     getGrade();
