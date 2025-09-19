@@ -9,7 +9,8 @@
     "lint": "eslint . -c .eslintrc.cjs --fix --ext .ts,.js,.cjs,.vue,.tsx,.jsx",
     "build:icons": "tsx plugins/iconify/build-icons.ts",
     "postinstall": "nuxt prepare && npm run build:icons",
-    "generate": "nuxt generate"
+    "generate": "nuxt generate",
+    "deploy": "node deploy.js"
   },
   "dependencies": {
     "@floating-ui/dom": "1.6.8",
@@ -22,6 +23,7 @@
     "chart.js": "^3.9.1",
     "crypto-js": "^4.2.0",
     "dompurify": "^3.2.6",
+    "node-fetch": "^3.3.2",
     "nuxt": "3.14.1592",
     "pinia": "^2.3.0",
     "prismjs": "^1.29.0",
@@ -55,6 +57,8 @@
     "@typescript-eslint/eslint-plugin": "^7.18.0",
     "@typescript-eslint/parser": "^7.18.0",
     "@vueuse/nuxt": "^12.2.0",
+    "adm-zip": "^0.5.16",
+    "basic-ftp": "^5.0.5",
     "boxicons": "^2.1.4",
     "eslint": "^8.57.1",
     "eslint-config-airbnb-base": "^15.0.0",
