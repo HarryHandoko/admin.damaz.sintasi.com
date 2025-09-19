@@ -45,6 +45,20 @@
             v-model="form.format_pesan_registrasi"
           />
 
+          <!-- === Pendaftaran Formulir Diterima === -->
+          <WhatsappMessageEditor
+            ref="registrasiFormulirDiterimaTextarea"
+            label="Format Pesan Pendaftaran Formulir Diterima"
+            v-model="form.format_pesan_pendaftaran_formulir_diterima"
+          />
+
+          <!-- === Pendaftaran Formulir Ditolak === -->
+          <WhatsappMessageEditor
+            ref="registrasiFormulirDitolakTextarea"
+            label="Format Pesan Pendaftaran Formulir Ditolak"
+            v-model="form.format_pesan_pendaftaran_formulir_ditolak"
+          />
+
           <!-- === Diterima === -->
           <WhatsappMessageEditor
             ref="diterimaTextarea"
@@ -104,10 +118,14 @@ const form = ref({
   format_pesan_diterima: "",
   format_pesan_ditolak: "",
   format_pesan_keuangan: "",
+  format_pesan_pendaftaran_formulir_diterima: "",
+  format_pesan_pendaftaran_formulir_ditolak: "",
 });
 
 const registrasiTextarea = ref(null);
 const diterimaTextarea = ref(null);
+const registrasiFormulirDiterimaTextarea = ref(null);
+const registrasiFormulirDitolakTextarea = ref(null);
 const ditolakTextarea = ref(null);
 const keuanganTextarea = ref(null);
 
