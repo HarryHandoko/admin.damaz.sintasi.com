@@ -111,6 +111,29 @@
             />
           </v-col>
 
+          <v-col cols="12" sm="12" stlye="padding:0">
+            <div v-if="fotoKTPAyah" class="mt-2 text-center">
+              <img
+                :src="fotoKTPAyah"
+                alt="Foto KTP Ayah"
+                style="
+                  width: 120px;
+                  height: 120px;
+                  object-fit: cover;
+                  border-radius: 5%;
+                  border: 2px solid #eee;
+                "
+              />
+            </div>
+            <v-file-input
+              label="Foto KTP Ayah"
+              accept="image/*"
+              show-size
+              @change="handleFotoKTPAyah"
+              class="mb-2"
+            />
+          </v-col>
+
           <v-col cols="12">
             <v-checkbox
               v-model="form.is_same_address_ayah"
@@ -221,6 +244,29 @@
             />
           </v-col>
 
+
+          <v-col cols="12" sm="12" stlye="padding:0">
+            <div v-if="fotoKTPIbu" class="mt-2 text-center">
+              <img
+                :src="fotoKTPIbu"
+                alt="Foto KTP Ibu"
+                style="
+                  width: 120px;
+                  height: 120px;
+                  object-fit: cover;
+                  border-radius: 5%;
+                  border: 2px solid #eee;
+                "
+              />
+            </div>
+            <v-file-input
+              label="Foto KTP Ibu"
+              accept="image/*"
+              show-size
+              @change="handleFotoKTPIbu"
+              class="mb-2"
+            />
+          </v-col>
           <v-col cols="12">
             <v-checkbox
               v-model="form.is_same_address_ibu"
@@ -330,6 +376,31 @@
               :rules="[(v) => !!v || 'Penghasilan Wali harus dipilih']"
               required
               return-object="false"
+            />
+          </v-col>
+
+
+
+          <v-col cols="12" sm="12" stlye="padding:0">
+            <div v-if="fotoKTPWali" class="mt-2 text-center">
+              <img
+                :src="fotoKTPWali"
+                alt="Foto KTP Wali"
+                style="
+                  width: 120px;
+                  height: 120px;
+                  object-fit: cover;
+                  border-radius: 5%;
+                  border: 2px solid #eee;
+                "
+              />
+            </div>
+            <v-file-input
+              label="Foto KTP Wali"
+              accept="image/*"
+              show-size
+              @change="handleFotoKTPWali"
+              class="mb-2"
             />
           </v-col>
 
@@ -456,6 +527,9 @@ const form = ref({
 
 });
 
+const fotoKTPAyah = ref(null);
+const fotoKTPIbu = ref(null);
+const fotoKTPWali = ref(null);
 
 watch(
   () => props.dataRegist,
@@ -486,6 +560,7 @@ async function getDataRegister() {
       form.value.alamat_ayah = dataPPDB.value.siswa_parent.alamat_ayah;
       form.value.is_same_address_ayah =
         dataPPDB.value.siswa_parent.is_same_address_ayah == "true" ? true : false;
+      fotoKTPAyah.value = dataPPDB.value.siswa_parent.ktp_ayah || '/no-image.jpg';
 
       form.value.nama_ibu = dataPPDB.value.siswa_parent.nama_ibu;
       form.value.nik_ibu = dataPPDB.value.siswa_parent.nik_ibu;
@@ -498,6 +573,8 @@ async function getDataRegister() {
       form.value.alamat_ibu = dataPPDB.value.siswa_parent.alamat_ibu;
       form.value.is_same_address_ibu =
         dataPPDB.value.siswa_parent.is_same_address_ibu == "true" ? true : false;
+      
+      fotoKTPIbu.value = dataPPDB.value.siswa_parent.ktp_ibu || '/no-image.jpg';
 
       form.value.nama_wali = dataPPDB.value.siswa_parent.nama_wali;
       form.value.nik_wali = dataPPDB.value.siswa_parent.nik_wali;
@@ -510,6 +587,7 @@ async function getDataRegister() {
       form.value.alamat_wali = dataPPDB.value.siswa_parent.alamat_wali;
       form.value.is_same_address_wali =
         dataPPDB.value.siswa_parent.is_same_address_wali == "true" ? true : false;
+      fotoKTPWali.value = dataPPDB.value.siswa_parent.ktp_wali || '/no-image.jpg';
     }
     
 
@@ -600,8 +678,59 @@ function backStep (steps){
   emit("next-step", steps)
 }
 
+
+function handleFotoKTPAyah(e) {
+  let file;
+  if (Array.isArray(e)) file = e[0];
+  else if (e?.target?.files) file = e.target.files[0];
+  else file = e;
+
+  if (file) {
+    form.value.ktp_ayah = file;
+    fotoKTPAyah.value = URL.createObjectURL(file);
+  } else {
+    form.value.ktp_ayah = null;
+    fotoKTPAyah.value = "/no-image.jpg";
+  }
+}
+
+
+function handleFotoKTPIbu(e) {
+  let file;
+  if (Array.isArray(e)) file = e[0];
+  else if (e?.target?.files) file = e.target.files[0];
+  else file = e;
+
+  if (file) {
+    form.value.ktp_ibu = file;
+    fotoKTPIbu.value = URL.createObjectURL(file);
+  } else {
+    form.value.ktp_ibu = null;
+    fotoKTPIbu.value = "/no-image.jpg";
+  }
+}
+
+
+function handleFotoKTPWali(e) {
+  let file;
+  if (Array.isArray(e)) file = e[0];
+  else if (e?.target?.files) file = e.target.files[0];
+  else file = e;
+
+  if (file) {
+    form.value.ktp_wali = file;
+    fotoKTPWali.value = URL.createObjectURL(file);
+  } else {
+    form.value.ktp_wali = null;
+    fotoKTPWali.value = "/no-image.jpg";
+  }
+}
+
 onMounted(() => {
-  form.value.penanggung_jawab ='Orang Tua'
+  form.value.penanggung_jawab ='Orang Tua';
+  fotoKTPAyah.value = "/no-image.jpg";
+  fotoKTPIbu.value = "/no-image.jpg";
+  fotoKTPWali.value = "/no-image.jpg";
   getDataRegister();
 });
 

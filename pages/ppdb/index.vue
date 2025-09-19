@@ -89,12 +89,12 @@
             <!-- Custom Status Badge -->
             <template #item.status="{ item }">
               <VChip
-                :color="getStatusColor(item.status_pendaftaran)"
+                :color="getStatusColor(item.status_pendaftaran,item.is_done_submit)"
                 class="ma-1"
                 dark
               >
-                <VIcon left>{{ getStatusIcon(item.status_pendaftaran) }}</VIcon>
-                {{ getStatusLabel(item.status_pendaftaran) }}
+                <VIcon left>{{ getStatusIcon(item.status_pendaftaran,item.is_done_submit) }}</VIcon>
+                {{ getStatusLabel(item.status_pendaftaran,item.is_done_submit) }}
               </VChip>
             </template>
 
@@ -204,7 +204,7 @@
                 <v-dialog v-model="zoomDialogFoto" max-width="600">
                   <v-card>
                     <v-img
-                      :src="selectedItem.siswa.foto_siswa"
+                      :src="selectedItem.siswa.foto_siswa ||  '/no-image.jpg'"
                       height="100%"
                       max-height="90vh"
                       contain
@@ -238,11 +238,11 @@
             <VRow>
               <VCol cols="12">
                 <p><strong>Sekolah Tujuan:</strong> {{ selectedItem.sekolah.name }} – {{ selectedItem.sekolah_grade.name }}</p>
-                <p><strong>Status Pendaftaran:</strong>
+                <!-- <p><strong>Status Pendaftaran:</strong>
                   <VChip :color="getStatusColor(selectedItem.status_pendaftaran)" dark dense class="ml-2">
                     {{ getStatusLabel(selectedItem.status_pendaftaran) }}
                   </VChip>
-                </p>
+                </p> -->
                 <p><strong>Tanggal Pendaftaran:</strong> {{ formatDate(selectedItem.tanggal_pendaftaran) }}</p>
                 <p><strong>Status:</strong>
                   {{ selectedItem.status_pendaftaran_siswa }}
@@ -253,8 +253,8 @@
             <VDivider class="my-4" />
 
             <VRow>
-              <VCol cols="12">
-                <p><strong>Alamat:</strong> {{ selectedItem.siswa_address.alamat }}, RT {{ selectedItem.siswa_address.rt }} / RW {{ selectedItem.siswa_address.rw }} ({{ selectedItem.siswa_address.zip_code }})</p>
+              <VCol cols="12"  v-if="selectedItem.siswa_address">
+                <p><strong>Alamat:</strong> {{  selectedItem.siswa_address.alamat }}, RT {{ selectedItem.siswa_address.rt }} / RW {{ selectedItem.siswa_address.rw }} ({{ selectedItem.siswa_address.zip_code }})</p>
                 <p>
                   DESA {{ selectedItem.siswa_address.desa }}<br>
                   KEC/KEL. {{ selectedItem.siswa_address.district }}<br>
@@ -461,19 +461,39 @@ function formatDate(dateStr) {
 }
 
 // Label status pendaftaran
-function getStatusLabel(code) {
-  return code === 'P00' ? 'Menunggu Proses'
-    : code === 'P01' ? 'Diterima'
-    : code === 'P02' ? 'Ditolak'
-    : 'Tidak Diketahui'
+function getStatusLabel(code,is_done_submit) {
+  let status = 'Menunggu Konfirmasi';
+  if(code == 'P00'){
+    if(is_done_submit == 0){
+      status = 'Proses Pengisian Data';
+    }else{
+      status = 'Menunggu Proses';
+    }
+  }else if(code == 'P01'){
+    status = 'Diterima';
+  }else if(code == 'P02'){
+    status = 'Ditolak';
+  }
+
+  return status;
 }
 
 // Warna status pendaftaran
-function getStatusColor(code) {
-  return code === 'P00' ? 'warning'
-    : code === 'P01' ? 'success'
-    : code === 'P02' ? 'error'
-    : 'grey'
+function getStatusColor(code,is_done_submit) {
+  let color = 'warning';
+  if(code == 'P00'){
+    if(is_done_submit == 0){
+      color = 'primary';
+    }else{
+      color = 'warning';
+    }
+  }else if(code == 'P01'){
+    color = 'success';
+  }else if(code == 'P02'){
+    color = 'error';
+  }
+
+  return color;
 }
 
 // Ikon status pendaftaran

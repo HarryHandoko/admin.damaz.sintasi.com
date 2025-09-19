@@ -633,8 +633,8 @@ async function getDataRegister() {
     form.value.nama_prestasi = dataPPDB.value.siswa.nama_prestasi;
     form.value.status_pendaftaran_siswa = dataPPDB.value.status_pendaftaran_siswa;
 
-    fotoPreviewFotoSiswa.value = dataPPDB.value.siswa.foto_siswa;
-    fotoPreviewFotoSertifikat.value = dataPPDB.value.siswa.foto_sertifikat;
+    fotoPreviewFotoSiswa.value = dataPPDB.value.siswa.foto_siswa || '/no-image.jpg';
+    fotoPreviewFotoSertifikat.value = dataPPDB.value.siswa.foto_sertifikat || '/no-image.jpg';
 
     if (dataPPDB.value.siswa_award != null) {
       form.value.award_name = dataPPDB.value.siswa_award.award;

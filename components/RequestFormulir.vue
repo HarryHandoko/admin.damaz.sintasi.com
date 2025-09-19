@@ -371,9 +371,12 @@ async function printData(data) {
 
 async function getStat() {
   try {
-    const {data} = await $api.get('/register-test/statistik',{
-      ...filter.value
-    });
+    const { data } = await $api.get('/register-ppdb/statistik-req-form', {
+      params: {
+        ...filter.value
+      }
+    })
+
     statsCards.value = [
       {
         title: 'Total Pendaftar',

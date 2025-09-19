@@ -128,12 +128,16 @@ async function getDataRegister() {
 
     if (!dataPPDB.value) return; 
 
-    if (dataPPDB.value.is_form_done == 1 && dataPPDB.value.siswa_parent != null) {
+    if (dataPPDB.value.is_form_done == 1 && dataPPDB.value.is_done_submit == 1 && dataPPDB.value.siswa_parent != null) {
       step.value = 6;
-    } else if (dataPPDB.value.is_form_done == 1) {
+    } else if (dataPPDB.value.is_form_done == 1 && dataPPDB.value.is_done_submit == 0) {
       step.value = 3;
     } else {
-      step.value = 1;
+      if(dataPPDB.value.is_submit == 0){
+        step.value = 1;
+      }else{
+        step.value = 2;
+      }
     }
   } catch (error) {
   }

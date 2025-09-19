@@ -3,6 +3,16 @@
     <v-form v-model="valid" @submit.prevent="submitPayRegistrasiUlang">
       <v-row>
         <v-col cols="12">
+          <div class="d-flex justify-space-between align-center" v-if="dataPPDB.is_done_submit == '1'">
+            <v-btn
+              color="primary"
+              variant="outlined"
+              class="mb-2"
+              block
+            >
+              Berkas Sudah Dikirim
+            </v-btn>
+          </div>
           <div class="d-flex justify-space-between align-center">
             <b>Informasi Sekolah</b>
           </div>
@@ -29,7 +39,7 @@
             <b>Data Calon Siswa</b>
             <span
               @click="backStep(3)"
-              v-if="dataPPDB.status_pendaftaran == 'P00'"
+              v-if="dataPPDB.status_pendaftaran == 'P00' && dataPPDB.is_done_submit == 0"
               style="cursor: pointer; color: blue"
               >Show Detail</span
             >
@@ -105,7 +115,7 @@
             <b>Alamat</b>
             <span
               @click="backStep(4)"
-              v-if="dataPPDB.status_pendaftaran == 'P00'"
+              v-if="dataPPDB.status_pendaftaran == 'P00' && dataPPDB.is_done_submit == 0"
               style="cursor: pointer; color: blue"
               >Show Detail</span
             >
@@ -151,7 +161,7 @@
             <b>Data Orang Tua / Wali</b>
             <span
               @click="backStep(5)"
-              v-if="dataPPDB.status_pendaftaran == 'P00'"
+              v-if="dataPPDB.status_pendaftaran == 'P00' && dataPPDB.is_done_submit == 0"
               style="cursor: pointer; color: blue"
               >Show Detail</span
             >
@@ -222,6 +232,18 @@
               Alamat: <b>{{ dataPPDB.siswa_parent.alamat_wali }}</b>
             </div>
           </div>
+        </v-col>
+        <v-col cols="12" v-if="dataPPDB.is_done_submit == 0">
+          <v-btn
+            color="primary"
+            variant="flat"
+            :disabled="loading"
+            :loading="loading"
+            block
+            @click="showConfirmDelete = true"
+          >
+            Kirim Berkas
+          </v-btn>
         </v-col>
         <v-col cols="12" v-if="dataPPDB.is_daftar_ulang == '1'">
           <v-col cols="12" style="border-top: 1px solid #d9d9d9" 
@@ -386,12 +408,23 @@
   <v-snackbar v-model="showSuccess" color="success" timeout="3000">
     {{ message }}
   </v-snackbar>
+
+
+  <ConfirmDialog
+    :modelValue="showConfirmDelete"
+    :title="'Apakah anda yakin ingin mengirim berkas ?'"
+    :message="'Mengirim berkas artinya anda sudah yakin data sudah terisi dengan lengkap'"
+    :color="'primary'"
+    @confirm="KirimBerkas"
+    @cancel="showConfirmDelete = false"
+  />
 </template>
 
 <script setup>
 
 import { ref } from "vue";
-
+import ConfirmDialog from "~/components/ConfirmDialog.vue";
+const showConfirmDelete = ref(false);
 const { $api } = useNuxtApp();
 const loadingDiskon = ref(false);
 const loading = ref(false);
@@ -568,6 +601,24 @@ async function submitPayRegistrasiUlang() {
   }
 }
 
+async function KirimBerkas() {
+  loading.value = true;
+  try {
+    const { data } = await $api.post("/register-ppdb/kirim-berkas",{
+      id : dataPPDB.value.id
+    });
+    showSuccess.value = true;
+    message.value = "Berhasil kirim berkas";
+      getDataRegister();
+
+      showConfirmDelete.value= false;
+  } catch (error) {
+    show.value = true;
+    message.value = "Kirim Berkas Gagal";
+  } finally {
+    loading.value = false;
+  }
+}
 
 onMounted(() => {
   foto_bukti_regis_ulang.value = "/no-image.jpg";

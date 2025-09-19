@@ -5,7 +5,7 @@
         <b>Pendaftaran Unit</b>
       </v-col>
 
-      <v-col cols="12">
+      <v-col cols="12" v-if="dataPPDB">
         <v-form v-model="valid" @submit.prevent="handleCreateData">
           <v-row>
             <v-col cols="12">
@@ -26,7 +26,7 @@
             <v-col cols="12" md="6">
               <v-text-field
                 v-model="form.nama_depan"
-                label="Nama Depan *"
+                label="Nama Depan Calon Murid*"
                 required
                 :rules="[(v) => !!v || 'Form harus diisi']"
               />
@@ -35,7 +35,7 @@
             <v-col cols="12" md="6">
               <v-text-field
                 v-model="form.nama_belakang"
-                label="Nama Belakang *"
+                label="Nama Belakang Calon Murid*"
                 required
                 :rules="[(v) => !!v || 'Form harus diisi']"
               />
@@ -44,7 +44,7 @@
             <v-col cols="12">
               <v-text-field
                 v-model="form.tgl_lahir"
-                label="Tanggal Lahir *"
+                label="Tanggal Lahir Calon Murid*"
                 type="date"
                 required
                 :rules="[(v) => !!v || 'Form harus diisi']"
@@ -87,6 +87,7 @@
                   v-model="form.no_hp_wali"
                   label="No Telepon Wali"
                   required
+                  type="number"
                   :rules="[(v) => !!v || 'Form harus diisi']"
                 />
               </v-col>
@@ -119,14 +120,14 @@
               />
             </v-col>
 
-            <v-col cols="12" md="9">
+            <v-col cols="12" md="9" v-if="dataPPDB.voucher_diskon == null">
               <v-text-field
                 v-model="form.voucher_diskon"
                 label="Voucher Diskon"
               />
             </v-col>
 
-            <v-col cols="12" md="3" class="d-flex align-center">
+            <v-col cols="12" md="3" class="d-flex align-center" v-if="dataPPDB.voucher_diskon == null">
               <v-btn
                 color="primary"
                 @click="applyVoucher"
@@ -140,6 +141,13 @@
             <v-col cols="12" v-if="diskonAppliedMessage" class="mt-2">
               <v-alert type="success" dense text>
                 {{ diskonAppliedMessage }}
+              </v-alert>
+            </v-col>
+
+
+            <v-col cols="12" class="mt-2" v-if="dataPPDB.voucher_diskon != null">
+              <v-alert type="success" dense text>
+               <b>{{ dataPPDB.voucher_diskon }}</b> Voucher Berhasil digunakan 
               </v-alert>
             </v-col>
 
@@ -382,7 +390,7 @@ async function getDataRegister() {
     form.value.no_hp_ayah = dataPPDB.value.siswa_parent?.no_hp_ayah;
     form.value.no_hp_ibu = dataPPDB.value.siswa_parent?.no_hp_ibu;
     form.value.no_hp_wali = dataPPDB.value.siswa_parent?.no_hp_wali;
-    form.value.sumber_informasi = dataPPDB.value.sumber_informasi || [];
+    form.value.sumber_informasi = dataPPDB.value.sumber_informasi != null ? JSON.parse(dataPPDB.value.sumber_informasi[1]) : [];
     form.value.id = props.dataRegist;
     getGrade();
     form.value.grade_id = dataPPDB.value.grade_id;

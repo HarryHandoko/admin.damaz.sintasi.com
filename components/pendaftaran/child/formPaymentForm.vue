@@ -28,6 +28,9 @@
 
         <v-col cols="12" style="border-top: 1px solid #d9d9d9">
           <p>
+            Kode Voucher : <b>{{ dataPPDB.voucher_diskon != null ? dataPPDB.voucher_diskon  : 'Tidak Ada Voucher' }}</b>
+          </p>
+          <p>
             Biaya Administrasi : <b>{{ formatRupiah(dataPPDB.biaya_admin) }}</b>
           </p>
           <p>
@@ -115,7 +118,7 @@
               <v-btn
                 color="secondary"
                 variant="flat"
-                :disabled="false"
+                :disabled="dataPPDB.is_submit ==1"
                 block
                 class="mr-2"
                 :loading="loading"

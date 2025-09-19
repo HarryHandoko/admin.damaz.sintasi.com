@@ -209,22 +209,7 @@
             "
             style="margin: 0px"
           >
-            {{
-              item.status_pendaftaran == "P00"
-                ? "Menunggu"
-                : item.status_pendaftaran == "P01"
-                ? item.is_need_test == "1"
-                  ? item.status_test == "00"
-                    ? "Disetujui Seleksi Test akan dilaksanakan pada " +
-                      item.tgl_test
-                    : item.status_test == "01"
-                    ? "Lulus Tes Seleksi"
-                    : "Tidak Lulus Tes Seleksi"
-                  : "Disetujui"
-                : item.status_pendaftaran == "P02"
-                ? "Ditolak"
-                : "None"
-            }}
+            {{ statusText(item) }}
           </v-col>
 
           <v-col
@@ -471,6 +456,43 @@ async function printData(data) {
   } finally {
     loading.value = false;
   }
+}
+
+
+
+function statusText(ItemProps){
+  let status = 'Menunggu';
+  if(ItemProps.is_done_submit == '0'){
+      if(ItemProps.is_form_done == '0'){
+        status = 'Menunggu Konfirmasi Pembayaran Formulir'
+      }else if(ItemProps.is_form_done == '1'){
+        status = 'Pembayaran Formulir Sudah disetujui, silahkan lanjut isi formulir'
+      }else {
+        status = 'Pembayaran ditolak'
+      }
+  }else{
+    if(ItemProps.is_need_test == '0'){
+      if(ItemProps.status_pendaftaran == 'P00'){
+        status = 'Menunggu Konfirmasi Administrasi Berkas'
+      }else if(ItemProps.status_pendaftaran == 'P01'){
+        status = 'Pendaftaran Berhasil disetujui, silahkan lanjut daftar ulang'
+      }else {
+        status = 'Pendaftaran Ditolak'
+      }
+    }else{
+      if(ItemProps.status_pendaftaran == 'P00'){
+        status = 'Menunggu Konfirmasi Administrasi Berkas'
+      }else if(ItemProps.status_pendaftaran == 'P01' && ItemProps.status_test == '00'){
+        status = 'Disetujui Seleksi Test akan ' + (ItemProps.tgl_test != null ? ' dilaksanakan pada ' + ItemProps.tgl_test : ' diinformasikan lebih lanjut ')
+      }else if(ItemProps.status_pendaftaran == 'P01' && ItemProps.status_test == '01'){
+        status = 'Telah dinyatakan Lulus Seleksi Tes'
+      }else {
+        status = 'Pendaftaran Ditolak'
+      }
+    }
+  }
+  return status;
+  
 }
 onMounted(() => {
   getDataRegister();

@@ -240,7 +240,7 @@
 
             <VDivider class="my-4" />
 
-            <VRow>
+            <VRow v-if="selectedItem.siswa_address">
               <VCol cols="12">
                 <p><strong>Alamat:</strong> {{ selectedItem.siswa_address.alamat }}, RT {{ selectedItem.siswa_address.rt }} / RW {{ selectedItem.siswa_address.rw }} ({{ selectedItem.siswa_address.zip_code }})</p>
                 <p>
@@ -334,13 +334,13 @@
         <VCardActions>
           <v-row>
               <v-col cols="6" md="4">
-                <v-btn color="success" variant="flat" @click="approvalConfirm(selectedItem,'Approve')" block>Setujui</v-btn>
+                <v-btn color="success" :loading="loading" variant="flat" @click="approvalConfirm(selectedItem,'Approve')" block>Setujui</v-btn>
               </v-col>
               <v-col cols="6" md="4">
-                <v-btn color="error" variant="flat" @click="approvalConfirm(selectedItem,'Reject')" block>Tolak</v-btn>
+                <v-btn color="error":loading="loading" variant="flat" @click="approvalConfirm(selectedItem,'Reject')" block>Tolak</v-btn>
               </v-col>
               <v-col cols="12" md="4">
-                <v-btn color="primary" variant="flat" @click="dialogDetail = false;getData()" block>Tutup</v-btn>
+                <v-btn color="primary":loading="loading" variant="flat" @click="dialogDetail = false;getData()" block>Tutup</v-btn>
               </v-col>
           </v-row>
         </VCardActions>
@@ -511,9 +511,11 @@ async function printData(data) {
 
 async function getStat() {
   try {
-    const {data} = await $api.get('/register-test/statistik',{
-      ...filter.value
-    });
+     const {data} = await $api.get('/register-test/statistik',{
+      params : {
+        filter : filter.value
+      }
+    })
     statsCards.value = [
       {
         title: 'Total Pendaftar',
