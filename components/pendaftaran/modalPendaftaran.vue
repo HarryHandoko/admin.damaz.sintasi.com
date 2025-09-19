@@ -4,7 +4,7 @@
       <v-card-title class="pa-6">
         <v-row>
           <v-col cols="11">
-            <span class="headline">Pendaftaran Peserta Didik Baru</span>
+            <span class="headline">SPMB (Sistem Penerimaan Murid Baru)</span>
           </v-col>
           <v-col cols="1" class="pa-2 text-center">
             <v-icon
