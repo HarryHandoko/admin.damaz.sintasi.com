@@ -16,7 +16,7 @@ const EXTRACTOR_URL = `https://test.darulmaza.sch.id/${REMOTE_EXTRACTOR}`
 // ====================================
 async function buildNuxt() {
   console.log("🏗️ Building Nuxt...")
-  execSync("npx nuxi build", { stdio: "inherit" })
+  execSync("npx nuxi generate", { stdio: "inherit" })
   console.log("✅ Build selesai")
 }
 
