@@ -417,6 +417,8 @@ function getMethodIcon(method) {
     case 'sendPendaftaranFormulirDisetujui': return 'bx-file-check'
     case 'sendPendaftaranFormulirDitolak': return 'bx-file-x'
     case 'sendRegUlangDisetujui': return 'bx-rename'
+    case 'sendPraTestDiterima': return 'bx-check-shield'
+    case 'sendPraTestDitolak': return 'bx-shield-x'
     default: return 'bx-message'
   }
 }
@@ -424,13 +426,15 @@ function getMethodIcon(method) {
 function getMethodText(method) {
   switch (method) {
     case 'sendRegisterMessage': return 'Register'
-    case 'sendApprovalMessage': return 'Approval'
-    case 'sendRejectedMessage': return 'Rejection'
+    case 'sendApprovalMessage': return 'Approval Admisi'
+    case 'sendRejectedMessage': return 'Rejection Admisi'
     case 'sendBillToUser': return 'Bill User'
     case 'sendBillToKeuangan': return 'Bill Keuangan'
     case 'sendPendaftaranFormulirDisetujui': return 'Form Approved'
     case 'sendPendaftaranFormulirDitolak': return 'Form Rejected'
     case 'sendRegUlangDisetujui': return 'Daftar Ulang Approved'
+    case 'sendPraTestDiterima': return 'Pra Test Accepted'
+    case 'sendPraTestDitolak': return 'Pra Test Rejected'
     default: return method
   }
 }

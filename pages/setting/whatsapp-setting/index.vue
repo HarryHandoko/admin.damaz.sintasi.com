@@ -62,21 +62,35 @@
           <!-- === Diterima === -->
           <WhatsappMessageEditor
             ref="diterimaTextarea"
-            label="Format Pesan Diterima"
-            v-model="form.format_pesan_diterima"
+            label="Format Pesan Admisi Diterima"
+            v-model="form.format_pesan_admisi_diterima"
           />
 
           <!-- === Ditolak === -->
           <WhatsappMessageEditor
             ref="ditolakTextarea"
-            label="Format Pesan Ditolak"
-            v-model="form.format_pesan_ditolak"
+            label="Format Pesan Admisi Ditolak"
+            v-model="form.format_pesan_admisi_ditolak"
+          />
+
+          <!-- === Pra Test Diterima === -->
+          <WhatsappMessageEditor
+            ref="praTestDiterimaTextarea"
+            label="Format Pesan Pra Test Diterima"
+            v-model="form.format_pesan_pra_test_diterima"
+          />
+
+          <!-- === Pra Test Ditolak === -->
+          <WhatsappMessageEditor
+            ref="praTestDitolakTextarea"
+            label="Format Pesan Pra Test Ditolak"
+            v-model="form.format_pesan_pra_test_ditolak"
           />
 
           <!-- === Pesan Keuangan === -->
           <WhatsappMessageEditor
             ref="keuanganTextarea"
-            label="Format Pesan Keuangan"
+            label="Format Pesan Uang Pangkal Diterima"
             v-model="form.format_pesan_keuangan"
           />
         </v-row>
@@ -115,17 +129,21 @@ const form = ref({
   no_handphone: "",
   no_handphone_keuangan: "",
   format_pesan_registrasi: "",
-  format_pesan_diterima: "",
-  format_pesan_ditolak: "",
+  format_pesan_admisi_diterima: "",
+  format_pesan_admisi_ditolak: "",
   format_pesan_keuangan: "",
   format_pesan_pendaftaran_formulir_diterima: "",
   format_pesan_pendaftaran_formulir_ditolak: "",
+  format_pesan_pra_test_diterima: "",
+  format_pesan_pra_test_ditolak: "",
 });
 
 const registrasiTextarea = ref(null);
 const diterimaTextarea = ref(null);
 const registrasiFormulirDiterimaTextarea = ref(null);
 const registrasiFormulirDitolakTextarea = ref(null);
+const praTestDiterimaTextarea = ref(null);
+const praTestDitolakTextarea = ref(null);
 const ditolakTextarea = ref(null);
 const keuanganTextarea = ref(null);
 
