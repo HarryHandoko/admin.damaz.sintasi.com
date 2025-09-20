@@ -371,7 +371,8 @@
   </div>
 </template>
 <script setup>
-import Pusher from 'pusher-js';
+// import Pusher from 'pusher-js';
+const { $pusher } = useNuxtApp();
 import { onMounted, ref } from 'vue';
 import ConfirmDialog from '~/components/ConfirmDialog.vue';
 const { $api } = useNuxtApp()
@@ -651,12 +652,8 @@ async function getFileBundle() {
   }
 }
 
-
-const pusher = new Pusher('2222bbf0d0069f56342b', {
-  cluster: 'ap1'
-})
 // Subscribe ke channel 'ppdb'
-const channel = pusher.subscribe('ppdb')
+const channel = $pusher.subscribe('ppdb')
 channel.bind('reqform', (data) => {
   const audio = new Audio('/sound/notifikasi.mp3')
   audio.currentTime = 0

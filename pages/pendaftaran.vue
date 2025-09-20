@@ -282,7 +282,7 @@
 
 <script setup>
 import ModalPendaftaran from "@/components/pendaftaran/modalPendaftaran.vue";
-import Pusher from 'pusher-js';
+const { $pusher } = useNuxtApp();
 import { ref } from "vue";
 import ConfirmDialog from "~/components/ConfirmDialog.vue";
 import confirmEmail from "~/components/confirmEmail.vue";
@@ -496,12 +496,8 @@ function statusText(ItemProps){
   
 }
 
-
-const pusher = new Pusher('2222bbf0d0069f56342b', {
-  cluster: 'ap1'
-})
 // Subscribe ke channel 'ppdb'
-const channel = pusher.subscribe('ppdb')
+const channel = $pusher.subscribe('ppdb')
 channel.bind('acc_account', (data) => {
   if(data.registed_by == dataUsers.value.id){
     getDataRegister();

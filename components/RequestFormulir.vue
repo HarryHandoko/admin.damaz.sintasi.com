@@ -100,7 +100,7 @@
 
         <template #item.no_handphone="{ item }">
           <div style="min-width: 200px;">
-          {{ item.siswa_parent != null ? item.siswa_parent.penanggung_jawab != 'Orang Tua' ? item.siswa_parent.no_hp_wali : 'No WA Ayah : '+ item.siswa_parent.no_hp_ayah + 'No WA Ibu : '+ item.siswa_parent.no_hp_ibu : '-'}}
+          {{ item.siswa_parent != null ? item.siswa_parent.penanggung_jawab != 'Orang Tua' ? item.siswa_parent.no_hp_wali : 'No WA Ayah : '+ item.siswa_parent.no_hp_ayah + ' | No WA Ibu : '+ item.siswa_parent.no_hp_ibu : '-'}}
           </div>
         </template>
 
@@ -233,7 +233,8 @@
   </div>
 </template>
 <script setup>
-import Pusher from 'pusher-js';
+// import Pusher from 'pusher-js';
+const { $pusher } = useNuxtApp();
 import { onMounted, ref } from 'vue';
 import ConfirmDialog from '~/components/ConfirmDialog.vue';
 const { $api } = useNuxtApp()
@@ -524,11 +525,8 @@ const formatRupiah = (value) => {
 
 
 
-const pusher = new Pusher('2222bbf0d0069f56342b', {
-  cluster: 'ap1'
-})
 // Subscribe ke channel 'ppdb'
-const channel = pusher.subscribe('ppdb')
+const channel = $pusher.subscribe('ppdb')
 channel.bind('reqform', (data) => {
   const audio = new Audio('/sound/notifikasi.mp3')
   audio.currentTime = 0
