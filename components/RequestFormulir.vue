@@ -100,7 +100,7 @@
 
         <template #item.no_handphone="{ item }">
           <div style="min-width: 200px;">
-          {{ item.register.no_handphone }}
+          {{ item.siswa_parent != null ? item.siswa_parent.penanggung_jawab != 'Orang Tua' ? item.siswa_parent.no_hp_wali : 'No WA Ayah : '+ item.siswa_parent.no_hp_ayah + 'No WA Ibu : '+ item.siswa_parent.no_hp_ibu : '-'}}
           </div>
         </template>
 
