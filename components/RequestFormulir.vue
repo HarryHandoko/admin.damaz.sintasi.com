@@ -99,8 +99,13 @@
         </template>
 
         <template #item.no_handphone="{ item }">
-          <div style="min-width: 200px;">
-          {{ item.siswa_parent != null ? item.siswa_parent.penanggung_jawab != 'Orang Tua' ? item.siswa_parent.no_hp_wali : 'No WA Ayah : '+ item.siswa_parent.no_hp_ayah + ' | No WA Ibu : '+ item.siswa_parent.no_hp_ibu : '-'}}
+          <div style="min-width: 200px;" v-html="
+            item.siswa_parent
+              ? item.siswa_parent.penanggung_jawab !== 'Orang Tua'
+                ? item.siswa_parent.no_hp_wali
+                : 'No WA Ayah: ' + item.siswa_parent.no_hp_ayah + '<br>No WA Ibu: ' + item.siswa_parent.no_hp_ibu
+              : '-'
+          ">
           </div>
         </template>
 
