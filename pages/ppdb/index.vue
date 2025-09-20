@@ -385,13 +385,12 @@
   </div>
 </template>
 <script setup>
-const { $pusher } = useNuxtApp();
 import { onMounted, ref } from 'vue';
 import ConfirmDialog from '~/components/ConfirmDialog.vue';
 import PendaftaranUlang from '~/components/PendaftaranUlang.vue';
 import ProsesTest from '~/components/ProsesTest.vue';
 import RequestFormulir from '~/components/RequestFormulir.vue';
-const { $api } = useNuxtApp()
+const { $api, $pusher } = useNuxtApp()
 
 // State
 const loading = ref(false)
@@ -737,16 +736,18 @@ async function getFileBundle() {
   }
 }
 // Subscribe ke channel 'ppdb'
-const channel = $pusher.subscribe('ppdb')
-channel.bind('reqform', (data) => {
-  const audio = new Audio('/sound/notifikasi.mp3')
-  audio.currentTime = 0
-  audio.play()
-  getData()
-  getStat()
-})
 // Lifecycle
 onMounted(() => {
+  if ($pusher) {
+    const channel = $pusher.subscribe('ppdb')
+    channel.bind('reqform', (data) => {
+      const audio = new Audio('/sound/notifikasi.mp3')
+      audio.currentTime = 0
+      audio.play()
+      getData()
+      getStat()
+    })
+  }
   getTahunPeriodik();
 })
 </script>

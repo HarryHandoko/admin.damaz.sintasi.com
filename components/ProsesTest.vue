@@ -651,18 +651,18 @@ async function getFileBundle() {
     loading.value = false
   }
 }
-
-// Subscribe ke channel 'ppdb'
-const channel = $pusher.subscribe('ppdb')
-channel.bind('reqform', (data) => {
-  const audio = new Audio('/sound/notifikasi.mp3')
-  audio.currentTime = 0
-  audio.play()
-  getData()
-  getStat()
-})
 // Lifecycle
 onMounted(() => {
+  if ($pusher) {
+    const channel = $pusher.subscribe('ppdb')
+    channel.bind('reqform', (data) => {
+      const audio = new Audio('/sound/notifikasi.mp3')
+      audio.currentTime = 0
+      audio.play()
+      getData()
+      getStat()
+    })
+  }
   getTahunPeriodik()
 })
 </script>

@@ -282,10 +282,10 @@
 
 <script setup>
 import ModalPendaftaran from "@/components/pendaftaran/modalPendaftaran.vue";
-const { $pusher } = useNuxtApp();
 import { ref } from "vue";
 import ConfirmDialog from "~/components/ConfirmDialog.vue";
 import confirmEmail from "~/components/confirmEmail.vue";
+const { $pusher } = useNuxtApp();
 
 const { $api } = useNuxtApp();
 const loading = ref(false);
@@ -495,20 +495,22 @@ function statusText(ItemProps){
   return status;
   
 }
-
-// Subscribe ke channel 'ppdb'
-const channel = $pusher.subscribe('ppdb')
-channel.bind('acc_account', (data) => {
-  if(data.registed_by == dataUsers.value.id){
-    getDataRegister();
-    const audio = new Audio('/sound/notif.mp3')
-    audio.currentTime = 0
-    audio.play()
-  }
-})
 onMounted(() => {
   getDataRegister();
   fetchUser();
+
+
+  if ($pusher) {
+    const channel = $pusher.subscribe('ppdb')
+    channel.bind('acc_account', (data) => {
+      if(data.registed_by == dataUsers.value.id){
+        getDataRegister();
+        const audio = new Audio('/sound/notif.mp3')
+        audio.currentTime = 0
+        audio.play()
+      }
+    })
+  }
 });
 
 
