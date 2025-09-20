@@ -98,6 +98,12 @@
           </div>
         </template>
 
+        <template #item.kode_voucher="{ item }">
+          <div style="min-width: 200px;">
+          {{ item.voucher_diskon }}
+          </div>
+        </template>
+
         <template #item.no_handphone="{ item }">
           <div style="min-width: 200px;" v-html="
             item.siswa_parent
@@ -290,6 +296,7 @@ const headers = [
   { title: 'Nama Siswa', value: 'name_siswa' },
   { title: 'Email', value: 'email' },
   { title: 'No Handphone', value: 'no_handphone' },
+  { title: 'Voucher', value: 'kode_voucher' },
 ]
 
 // Data tabel
