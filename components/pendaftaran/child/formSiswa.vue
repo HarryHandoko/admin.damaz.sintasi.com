@@ -53,7 +53,6 @@
           <v-text-field
             v-model="form.no_akte_kelahiran"
             label="No Akte Kelahiran"
-            type="number"
           />
         </v-col>
 
