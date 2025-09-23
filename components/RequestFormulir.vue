@@ -1,48 +1,34 @@
 <template>
   <div>
-
     <VCard class="mb-6 pa-4">
       <VRow>
         <VCol cols="12" md="3">
-          <VSelect
-            v-model="filter.status"
-            :items="statusOptions"
-            label="Filter Status"
-            dense
-            outlined
-            clearable
-          />
+          <VSelect v-model="filter.status" :items="statusOptions" label="Filter Status" dense outlined clearable />
         </VCol>
         <VCol cols="12" md="3">
-          <VTextField
-            v-model="filter.keyword"
-            label="Cari Nama / Email"
-            dense
-            outlined
-            clearable
-          />
+          <VTextField v-model="filter.keyword" label="Cari Nama / Email" dense outlined clearable />
         </VCol>
         <VCol cols="12" md="3">
-            <VSelect
-              v-model="filter.tahun_periodik"
-              :items="optionTahunPeriodik"
-              label="Tahun Periodik"
-              dense
-              outlined
-              clearable
-            />
-          </VCol>
-          <VCol cols="12">
-            <VBtn color="primary" :loading="loading" @click="getData();getStat();">Terapkan Filter</VBtn>
+          <VSelect v-model="filter.tahun_periodik" :items="optionTahunPeriodik" label="Tahun Periodik" dense outlined
+            clearable />
+        </VCol>
+        <VCol cols="12">
+          <VBtn color="primary" :loading="loading" @click="
+            getData();
+          getStat();
+          ">Terapkan Filter</VBtn>
 
-            <VBtn color="warning" :loading="loading" class="ml-2" @click="getData(); getStat()">
-              <v-icon>bx-refresh</v-icon>
-            </VBtn>
+          <VBtn color="warning" :loading="loading" class="ml-2" @click="
+            getData();
+          getStat();
+          ">
+            <v-icon>bx-refresh</v-icon>
+          </VBtn>
 
-            <VBtn color="success" :loading="loading" class="ml-2" @click="getFileExcel()">
-              <v-icon>bx bxs-file</v-icon> Print To Excel
-            </VBtn>
-          </VCol>
+          <VBtn color="success" :loading="loading" class="ml-2" @click="getFileExcel()">
+            <v-icon>bx bxs-file</v-icon> Print To Excel
+          </VBtn>
+        </VCol>
       </VRow>
     </VCard>
 
@@ -62,86 +48,80 @@
     <!-- Table Pendaftar -->
     <VCard>
       <VCardTitle class="mt-3">Permintaan Formulir Pendaftaran</VCardTitle>
-      <VDataTable
-        :headers="headers"
-        :items="data"
-        class="elevation-1"
-        :loading="loading"
-      >
+      <VDataTable :headers="headers" :items="data" class="elevation-1" :loading="loading">
         <!-- Custom Status Badge -->
         <template #item.status="{ item }">
-          <VChip
-            :color="getStatusColor(item.is_form_done)"
-            class="ma-1"
-            dark
-          >
+          <VChip :color="getStatusColor(item.is_form_done)" class="ma-1" dark>
             <VIcon left>{{ getStatusIcon(item.is_form_done) }}</VIcon>
             {{ getStatusLabel(item.is_form_done) }}
           </VChip>
         </template>
 
-        <template #item.code_pendaftaran="{ item }" >
-          <div style="min-width: 200px;">
+        <template #item.code_pendaftaran="{ item }">
+          <div style="min-width: 200px">
             {{ item.code_pendaftaran }}
           </div>
         </template>
 
         <template #item.name_siswa="{ item }">
-          <div style="min-width: 200px;">
-          {{ item.siswa.nama_depan + ' ' + item.siswa.nama_belakang }}
+          <div style="min-width: 200px">
+            {{ item.siswa.nama_depan + " " + item.siswa.nama_belakang }}
           </div>
         </template>
 
         <template #item.email="{ item }">
-          <div style="min-width: 200px;">
-          {{ item.register.email }}
+          <div style="min-width: 200px">
+            {{ item.register.email }}
           </div>
         </template>
 
         <template #item.kode_voucher="{ item }">
-          <div style="min-width: 200px;">
-          {{ item.voucher_diskon }}
+          <div style="min-width: 200px">
+            {{ item.voucher_diskon }}
           </div>
         </template>
 
         <template #item.no_handphone="{ item }">
-          <div style="min-width: 200px;" v-html="
-            item.siswa_parent
-              ? item.siswa_parent.penanggung_jawab !== 'Orang Tua'
-                ? item.siswa_parent.no_hp_wali
-                : 'No WA Ayah: ' + item.siswa_parent.no_hp_ayah + '<br>No WA Ibu: ' + item.siswa_parent.no_hp_ibu
-              : '-'
-          ">
-          </div>
+          <div style="min-width: 200px" v-html="item.siswa_parent
+            ? item.siswa_parent.penanggung_jawab !== 'Orang Tua'
+              ? item.siswa_parent.no_hp_wali
+              : 'No WA Ayah: ' +
+              item.siswa_parent.no_hp_ayah +
+              '<br>No WA Ibu: ' +
+              item.siswa_parent.no_hp_ibu
+            : '-'
+            "></div>
         </template>
 
         <template #item.actions="{ item }">
-
-          <div style="min-width: 200px;">
-          <VBtn icon color="error" :disabled="item.status_test == '2'" @click="approvalConfirm(item,'2')" :loading="loading" class="mr-2">
-            <VIcon>bx-x</VIcon>
-          </VBtn>
-          <VBtn icon color="success" :disabled="item.status_test == '1'" @click="approvalConfirm(item,'1')" :loading="loading"  class="mr-2">
-            <VIcon>bx-check</VIcon>
-          </VBtn>
-          <VBtn icon color="primary" :loading="loading" @click="showDetail(item)">
-            <VIcon>bx-show</VIcon>
-          </VBtn>
+          <div style="min-width: 200px">
+            <VBtn icon color="error" :disabled="item.status_test == '2'" @click="approvalConfirm(item, '2')"
+              :loading="loading" class="mr-2">
+              <VIcon>bx-x</VIcon>
+            </VBtn>
+            <VBtn icon color="success" :disabled="item.status_test == '1'" @click="approvalConfirm(item, '1')"
+              :loading="loading" class="mr-2">
+              <VIcon>bx-check</VIcon>
+            </VBtn>
+            <VBtn icon color="primary" :loading="loading" @click="showDetail(item)">
+              <VIcon>bx-show</VIcon>
+            </VBtn>
           </div>
         </template>
       </VDataTable>
     </VCard>
 
-   <!-- Detail Dialog -->
+    <!-- Detail Dialog -->
     <VDialog v-model="dialogDetail" max-width="900px" persistent>
       <VCard class="pa-2">
         <VCardTitle class="text-h6">
           <VRow>
-            <VCol cols="10">
-              Detail Pendaftar 
-            </VCol>
+            <VCol cols="10"> Detail Pendaftar </VCol>
             <VCol cols="2" class="text-right">
-              <v-icon style="cursor: pointer" @click="dialogDetail = false;getData()">bx bx-x</v-icon>
+              <v-icon style="cursor: pointer" @click="
+                dialogDetail = false;
+              getData();
+              ">bx bx-x</v-icon>
             </VCol>
           </VRow>
         </VCardTitle>
@@ -150,21 +130,49 @@
           <VContainer>
             <VRow>
               <VCol cols="12" md="8">
-                <p><strong>No Formulir:</strong> {{ selectedItem.code_pendaftaran }}</p>
-                <p><strong>Nama Siswa:</strong> {{ selectedItem.siswa.nama_depan }} {{ selectedItem.siswa.nama_belakang }}</p>
-                <p><strong>Tanggal Lahir:</strong> {{ formatDate(selectedItem.siswa.tgl_lahir) }}</p>
+                <p>
+                  <strong>No Formulir:</strong>
+                  {{ selectedItem.code_pendaftaran }}
+                </p>
+                <p>
+                  <strong>Nama Siswa:</strong>
+                  {{ selectedItem.siswa.nama_depan }}
+                  {{ selectedItem.siswa.nama_belakang }}
+                </p>
+                <p>
+                  <strong>Tanggal Lahir:</strong>
+                  {{ formatDate(selectedItem.siswa.tgl_lahir) }}
+                </p>
               </VCol>
             </VRow>
-
 
             <VDivider class="my-4" />
 
             <VRow>
               <VCol cols="12">
-                <p><strong>Sekolah Tujuan: </strong> {{ selectedItem.sekolah.name }} – {{ selectedItem.sekolah_grade.name }}</p>
-                <p><strong>Tanggal Pendaftaran: </strong> {{ formatDate(selectedItem.tanggal_pendaftaran) }}</p>
-                <p><strong>Status: </strong>
-                  <b :style="`color: ${selectedItem.is_form_done == '0' ? 'orange' : selectedItem.is_form_done == '1' ?  'green' : 'red'}`">{{ selectedItem.is_form_done == '0' ? 'Menunggu Konfirmasi' : selectedItem.is_form_done == '1' ?  'Disetujui' : 'Ditolak' }}</b>
+                <p>
+                  <strong>Sekolah Tujuan: </strong>
+                  {{ selectedItem.sekolah.name }} –
+                  {{ selectedItem.sekolah_grade.name }}
+                </p>
+                <p>
+                  <strong>Tanggal Pendaftaran: </strong>
+                  {{ formatDate(selectedItem.tanggal_pendaftaran) }}
+                </p>
+                <p>
+                  <strong>Status: </strong>
+                  <b :style="`color: ${selectedItem.is_form_done == '0'
+                    ? 'orange'
+                    : selectedItem.is_form_done == '1'
+                      ? 'green'
+                      : 'red'
+                    }`">{{
+                      selectedItem.is_form_done == "0"
+                        ? "Menunggu Konfirmasi"
+                        : selectedItem.is_form_done == "1"
+                          ? "Disetujui"
+                          : "Ditolak"
+                    }}</b>
                 </p>
               </VCol>
             </VRow>
@@ -175,29 +183,76 @@
               <VCol cols="12" md="6">
                 <p><strong>Pembayaran:</strong></p>
 
-                <p><strong>Biaya Formulir : </strong> {{ formatRupiah(selectedItem.biaya_admin) }}</p>
-                <p><strong>Diskon : </strong> {{ formatRupiah(selectedItem.nominal_diskon) }}</p>
-                <p><strong>Total Biaya Formulir : </strong> {{ formatRupiah(selectedItem.biaya_admin - selectedItem.nominal_diskon) }}</p>
-                <p>Tanggal Transaksi : {{ formatDate(selectedItem.payment.tanggal_transaksi) }}</p>
+                <p>
+                  <strong>Biaya Formulir : </strong>
+                  {{ formatRupiah(selectedItem.biaya_admin) }}
+                </p>
+                <div class="d-flex justify-between align-start">
+                  <p class="mt-1">
+                    <strong>Voucher Diskon : </strong>{{ selectedItem.voucher_diskon }}
+                  </p>
+                  <v-btn icon size="small" variant="text" @click.prevent="openEditVoucherDialog(selectedItem)">
+                    <v-icon>bx-edit</v-icon>
+                  </v-btn>
+                </div>
+                <v-dialog v-model="editVoucherDialog" max-width="700">
+                  <v-card>
+                    <v-card-title class="py-4">
+                      <span class="headline">Edit Voucher</span>
+                    </v-card-title>
+                    <v-card-section class="pa-4">
+                      <v-row>
+                        <v-col cols="12" md="9">
+                          <v-text-field v-model="editedVoucherDiskonText" label="Voucher Diskon" />
+                        </v-col>
+
+                        <v-col cols="12" md="3" class="d-flex align-center" v-if="editedVoucherDiskonText">
+                          <v-btn color="primary" :loading="loadingDiskon"
+                            :disabled="loadingDiskon || !editedVoucherDiskonText"
+                            @click.prevent="applyVoucher(selectedItem)">
+                            Terapkan Diskon
+                          </v-btn>
+                        </v-col>
+                        <v-col cols="12" v-if="diskonAppliedMessage" class="mt-2">
+                          <v-alert type="success" dense text>
+                            {{ diskonAppliedMessage }}
+                          </v-alert>
+                        </v-col>
+                      </v-row>
+
+                      <div class="mt-5 d-flex">
+                        <v-btn color="error" @click.prevent="closeEditVoucherDialog">
+                          Tutup
+                        </v-btn>
+                      </div>
+                    </v-card-section>
+                  </v-card>
+                </v-dialog>
+                <p>
+                  <strong>Diskon : </strong>
+                  {{ formatRupiah(selectedItem.nominal_diskon) }}
+                </p>
+                <p>
+                  <strong>Total Biaya Formulir : </strong>
+                  {{
+                    formatRupiah(
+                      selectedItem.biaya_admin - selectedItem.nominal_diskon
+                    )
+                  }}
+                </p>
+                <p>
+                  Tanggal Transaksi :
+                  {{ formatDate(selectedItem.payment.tanggal_transaksi) }}
+                </p>
 
                 <!-- Thumbnail -->
-                <VImg
-                  :src="selectedItem.payment.bukti_transfer"
-                  height="120"
-                  contain
-                  style="cursor: zoom-in"
-                  @click="zoomDialog = true"
-                />
+                <VImg :src="selectedItem.payment.bukti_transfer" height="120" contain style="cursor: zoom-in"
+                  @click="zoomDialog = true" />
 
                 <!-- Dialog Zoom -->
                 <v-dialog v-model="zoomDialog" max-width="600">
                   <v-card>
-                    <v-img
-                      :src="selectedItem.payment.bukti_transfer"
-                      height="100%"
-                      max-height="90vh"
-                      contain
-                    />
+                    <v-img :src="selectedItem.payment.bukti_transfer" height="100%" max-height="90vh" contain />
                   </v-card>
                 </v-dialog>
               </VCol>
@@ -206,68 +261,63 @@
         </VCardText>
         <VCardActions>
           <v-row>
-              <v-col cols="6" md="4">
-                <v-btn color="success" variant="flat" @click="approvalConfirm(selectedItem,'1')" block>Setujui</v-btn>
-              </v-col>
-              <v-col cols="6" md="4">
-                <v-btn color="error" variant="flat" @click="approvalConfirm(selectedItem,'2')" block>Tolak</v-btn>
-              </v-col>
-              <v-col cols="12" md="4">
-                <v-btn color="primary" variant="flat" @click="dialogDetail = false;getData()" block>Tutup</v-btn>
-              </v-col>
+            <v-col cols="6" md="4">
+              <v-btn color="success" variant="flat" @click="approvalConfirm(selectedItem, '1')" block>Setujui</v-btn>
+            </v-col>
+            <v-col cols="6" md="4">
+              <v-btn color="error" variant="flat" @click="approvalConfirm(selectedItem, '2')" block>Tolak</v-btn>
+            </v-col>
+            <v-col cols="12" md="4">
+              <v-btn color="primary" variant="flat" @click="
+                dialogDetail = false;
+              getData();
+              " block>Tutup</v-btn>
+            </v-col>
           </v-row>
         </VCardActions>
       </VCard>
     </VDialog>
-
-
 
     <!-- Snackbar error -->
     <v-snackbar v-model="show" color="error" timeout="3000">
       {{ message }}
     </v-snackbar>
 
-
     <!-- Snackbar Sucess -->
     <v-snackbar v-model="showSuccess" color="success" timeout="3000">
       {{ message }}
     </v-snackbar>
     <!-- Dialog konfirmasi hapus -->
-    <ConfirmDialog
-      :modelValue="showConfirm"
-      :title="titleConfirm"
-      :message="messageConfirm"
-      :color="color"
-      @confirm="HandleApproval(dataConfirm, typeConfirm)"
-      @cancel="showConfirm = false"
-    />
+    <ConfirmDialog :modelValue="showConfirm" :title="titleConfirm" :message="messageConfirm" :color="color"
+      @confirm="HandleApproval(dataConfirm, typeConfirm)" @cancel="showConfirm = false" />
   </div>
 </template>
 <script setup>
 // import Pusher from 'pusher-js';
 const { $pusher } = useNuxtApp();
-import { onMounted, ref } from 'vue';
-import ConfirmDialog from '~/components/ConfirmDialog.vue';
-const { $api } = useNuxtApp()
+import { onMounted, ref } from "vue";
+import ConfirmDialog from "~/components/ConfirmDialog.vue";
+const { $api } = useNuxtApp();
 
 // State
-const loading = ref(false)
-const message = ref(null)
-const show = ref(false)
+const loading = ref(false);
+const message = ref(null);
+const show = ref(false);
 
-const filter = ref({ 
-  status: null, 
-  keyword: '' ,
+
+const filter = ref({
+  status: null,
+  keyword: "",
   tanggal_awal: null,
   tanggal_akhir: null,
-  tahun_periodik: null
-})
+  tahun_periodik: null,
+});
 
-const dialogDetail = ref(false)
-const selectedItem = ref(null)
+const dialogDetail = ref(false);
+const selectedItem = ref(null);
 
 // Opsi status
-const statusOptions = ['Lulus', 'Tidak Lulus', 'Dalam Proses']
+const statusOptions = ["Lulus", "Tidak Lulus", "Dalam Proses"];
 
 const zoomDialog = ref(false);
 const zoomDialogFoto = ref(false);
@@ -277,254 +327,281 @@ const titleConfirm = ref(null);
 const messageConfirm = ref(null);
 const dataConfirm = ref(null);
 const typeConfirm = ref(null);
-const color = ref('error');
+const color = ref("error");
 const showSuccess = ref(false);
 
 // Kartu statistik
 const statsCards = ref([
-  { title: 'Total Pendaftar', count: 0, bgColor: '#E3F2FD', textColor: '#1E88E5', icon: 'bx-user' },
-  { title: 'Diterima', count: 0, bgColor: '#E8F5E9', textColor: '#43A047', icon: 'bx-check-circle' },
-  { title: 'Ditolak', count: 0, bgColor: '#FFEBEE', textColor: '#E53935', icon: 'bx-x-circle' },
-  { title: 'Dalam Proses', count: 0, bgColor: '#FFF8E1', textColor: '#FB8C00', icon: 'bx-time' }
-])
+  {
+    title: "Total Pendaftar",
+    count: 0,
+    bgColor: "#E3F2FD",
+    textColor: "#1E88E5",
+    icon: "bx-user",
+  },
+  {
+    title: "Diterima",
+    count: 0,
+    bgColor: "#E8F5E9",
+    textColor: "#43A047",
+    icon: "bx-check-circle",
+  },
+  {
+    title: "Ditolak",
+    count: 0,
+    bgColor: "#FFEBEE",
+    textColor: "#E53935",
+    icon: "bx-x-circle",
+  },
+  {
+    title: "Dalam Proses",
+    count: 0,
+    bgColor: "#FFF8E1",
+    textColor: "#FB8C00",
+    icon: "bx-time",
+  },
+]);
 
 // Header tabel
 const headers = [
-  { title: 'Aksi', value: 'actions', sortable: false, width: '200px'},
-  { title: 'Kode Pendaftaran', value: 'code_pendaftaran',width: '200px' },
-  { title: 'Status', value: 'status' },
-  { title: 'Nama Siswa', value: 'name_siswa' },
-  { title: 'Email', value: 'email' },
-  { title: 'No Handphone', value: 'no_handphone' },
-  { title: 'Voucher', value: 'kode_voucher' },
-]
+  { title: "Aksi", value: "actions", sortable: false, width: "200px" },
+  { title: "Kode Pendaftaran", value: "code_pendaftaran", width: "200px" },
+  { title: "Status", value: "status" },
+  { title: "Nama Siswa", value: "name_siswa" },
+  { title: "Email", value: "email" },
+  { title: "No Handphone", value: "no_handphone" },
+  { title: "Voucher", value: "kode_voucher" },
+];
 
 // Data tabel
-const data = ref([])
+const data = ref([]);
 
 // Fungsi menampilkan detail
 function showDetail(item) {
-  selectedItem.value = item
-  dialogDetail.value = true
+  selectedItem.value = item;
+  dialogDetail.value = true;
 }
 
 // Format tanggal
 function formatDate(dateStr) {
-  const options = { year: 'numeric', month: 'long', day: 'numeric' }
-  return new Date(dateStr).toLocaleDateString('id-ID', options)
+  const options = { year: "numeric", month: "long", day: "numeric" };
+  return new Date(dateStr).toLocaleDateString("id-ID", options);
 }
 
 // Label status pendaftaran
 function getStatusLabel(code) {
-  return code === '0' ? 'Menunggu Proses'
-    : code === '1' ? 'Disetujui'
-    : code === '2' ? 'Tidak disetujui'
-    : 'Tidak Diketahui'
+  return code === "0"
+    ? "Menunggu Proses"
+    : code === "1"
+      ? "Disetujui"
+      : code === "2"
+        ? "Tidak disetujui"
+        : "Tidak Diketahui";
 }
 
 // Warna status pendaftaran
 function getStatusColor(code) {
-  return code === '0' ? 'warning'
-    : code === '1' ? 'success'
-    : code === '2' ? 'error'
-    : 'grey'
+  return code === "0"
+    ? "warning"
+    : code === "1"
+      ? "success"
+      : code === "2"
+        ? "error"
+        : "grey";
 }
 
 // Ikon status pendaftaran
 function getStatusIcon(code) {
-  return code === '0' ? 'bx-time'
-    : code === '1' ? 'bx-check-circle'
-    : code === '2' ? 'bx-x-circle'
-    : 'bx-question-mark'
+  return code === "0"
+    ? "bx-time"
+    : code === "1"
+      ? "bx-check-circle"
+      : code === "2"
+        ? "bx-x-circle"
+        : "bx-question-mark";
 }
 
 // Ambil data dari API
 async function getData() {
-  loading.value = true
+  loading.value = true;
   try {
-    const response = await $api.post('/form-req/getdata',{
-      filter : filter.value
-    })
-    data.value = response.data.data
+    const response = await $api.post("/form-req/getdata", {
+      filter: filter.value,
+    });
+    data.value = response.data.data;
   } catch (error) {
-    show.value = true
-    message.value = error.response?.data?.message
+    show.value = true;
+    message.value = error.response?.data?.message;
   } finally {
-    loading.value = false
+    loading.value = false;
   }
 }
 
-function approvalConfirm(data,type) {
-    color.value = type == '1' ? 'success' : 'error';
-    titleConfirm.value = 'Konfirmasi Tindakan';
-    messageConfirm.value = `Yakin ingin Apakah anda ingin ${type}?`;
-    dataConfirm.value = data;
-    typeConfirm.value = type;
-    showConfirm.value = true;
+function approvalConfirm(data, type) {
+  color.value = type == "1" ? "success" : "error";
+  titleConfirm.value = "Konfirmasi Tindakan";
+  messageConfirm.value = `Yakin ingin Apakah anda ingin ${type}?`;
+  dataConfirm.value = data;
+  typeConfirm.value = type;
+  showConfirm.value = true;
 }
 
 async function printData(data) {
-  loading.value = true
+  loading.value = true;
   try {
-    const response = await $api.post('/register-ppdb/generate-pdf', data)
+    const response = await $api.post("/register-ppdb/generate-pdf", data);
 
-    const downloadUrl = response.data.download_url
+    const downloadUrl = response.data.download_url;
     if (downloadUrl) {
-      window.open(downloadUrl, '_blank') // 👈 buka di tab baru
+      window.open(downloadUrl, "_blank"); // 👈 buka di tab baru
     } else {
-      show.value = true
-      message.value = 'Gagal mendapatkan link unduhan.'
+      show.value = true;
+      message.value = "Gagal mendapatkan link unduhan.";
     }
   } catch (error) {
-    show.value = true
-    message.value = error.response?.data?.message || 'Terjadi kesalahan saat mencetak.'
+    show.value = true;
+    message.value =
+      error.response?.data?.message || "Terjadi kesalahan saat mencetak.";
   } finally {
-    loading.value = false
+    loading.value = false;
   }
 }
 
 async function getStat() {
   try {
-    const { data } = await $api.get('/register-ppdb/statistik-req-form', {
+    const { data } = await $api.get("/register-ppdb/statistik-req-form", {
       params: {
-        ...filter.value
-      }
-    })
+        ...filter.value,
+      },
+    });
 
     statsCards.value = [
       {
-        title: 'Total Pendaftar',
+        title: "Total Pendaftar",
         count: data.data.total,
-        bgColor: '#E3F2FD',
-        textColor: '#1E88E5',
-        icon: 'bx-user',
+        bgColor: "#E3F2FD",
+        textColor: "#1E88E5",
+        icon: "bx-user",
       },
       {
-        title: 'Diterima',
+        title: "Diterima",
         count: data.data.diterima,
-        bgColor: '#E8F5E9',
-        textColor: '#43A047',
-        icon: 'bx-check-circle',
+        bgColor: "#E8F5E9",
+        textColor: "#43A047",
+        icon: "bx-check-circle",
       },
       {
-        title: 'Ditolak',
+        title: "Ditolak",
         count: data.data.ditolak,
-        bgColor: '#FFEBEE',
-        textColor: '#E53935',
-        icon: 'bx-x-circle',
+        bgColor: "#FFEBEE",
+        textColor: "#E53935",
+        icon: "bx-x-circle",
       },
       {
-        title: 'Dalam Proses',
+        title: "Dalam Proses",
         count: data.data.diproses,
-        bgColor: '#FFF8E1',
-        textColor: '#FB8C00',
-        icon: 'bx-time',
+        bgColor: "#FFF8E1",
+        textColor: "#FB8C00",
+        icon: "bx-time",
       },
-    ]
+    ];
   } catch (error) {
-    show.value = true
-    message.value = error.response?.data?.message || 'Terjadi kesalahan.'
+    show.value = true;
+    message.value = error.response?.data?.message || "Terjadi kesalahan.";
   } finally {
-    loading.value = false
+    loading.value = false;
   }
 }
 
-
-
-async function HandleApproval(data,type) {
-  loading.value = true
+async function HandleApproval(data, type) {
+  loading.value = true;
   try {
-    const response = await $api.post('/form-req/approval', {
-      id : data.id,
-      status : type
-    })
+    const response = await $api.post("/form-req/approval", {
+      id: data.id,
+      status: type,
+    });
 
-    showSuccess.value = true
-    message.value = 'Data berhasil diubah.'
+    showSuccess.value = true;
+    message.value = "Data berhasil diubah.";
   } catch (error) {
-    show.value = true
-    message.value = error.response?.data?.message || 'Terjadi kesalahan saat mencetak.'
+    show.value = true;
+    message.value =
+      error.response?.data?.message || "Terjadi kesalahan saat mencetak.";
   } finally {
-    loading.value = false
-    dialogDetail.value = false
-    showConfirm.value = false
-    getData()
-    getStat()
+    loading.value = false;
+    dialogDetail.value = false;
+    showConfirm.value = false;
+    getData();
+    getStat();
   }
 }
-
-
 
 const optionTahunPeriodik = ref([]);
 
 async function getTahunPeriodik() {
   loading.value = true;
   try {
-    const {data} = await $api.get('/register-ppdb/ref-tahun-periodik');
-    optionTahunPeriodik.value = data.data
-    filter.value.tahun_periodik = optionTahunPeriodik.value.at(-1)
+    const { data } = await $api.get("/register-ppdb/ref-tahun-periodik");
+    optionTahunPeriodik.value = data.data;
+    filter.value.tahun_periodik = optionTahunPeriodik.value.at(-1);
 
-    if(filter.value.tahun_periodik != null){
+    if (filter.value.tahun_periodik != null) {
       getData();
       getStat();
     }
   } catch (error) {
     show.value = true;
-    message.value = 'Server Error.';
+    message.value = "Server Error.";
   } finally {
     loading.value = false;
   }
 }
 
-
-
 async function getFileExcel() {
-  loading.value = true
+  loading.value = true;
   try {
-    const response = await $api.post('/report/seleksi-ppdb/download-excel', {
-      filter : filter.value
-    })
+    const response = await $api.post("/report/seleksi-ppdb/download-excel", {
+      filter: filter.value,
+    });
 
-    const downloadUrl = response.data.download_url
+    const downloadUrl = response.data.download_url;
     if (downloadUrl) {
-      window.open(downloadUrl, '_blank') // 👈 buka di tab baru
+      window.open(downloadUrl, "_blank"); // 👈 buka di tab baru
     } else {
-      show.value = true
-      message.value = 'Gagal mendapatkan link unduhan.'
+      show.value = true;
+      message.value = "Gagal mendapatkan link unduhan.";
     }
   } catch (error) {
-    show.value = true
-    message.value = error.response?.data?.message || 'Terjadi kesalahan saat mencetak.'
+    show.value = true;
+    message.value =
+      error.response?.data?.message || "Terjadi kesalahan saat mencetak.";
   } finally {
-    loading.value = false
+    loading.value = false;
   }
 }
-
-
 
 async function getFileBundle() {
-  loading.value = true
+  loading.value = true;
   try {
-    const response = await $api.post('/report/seleksi-ppdb/download-bundle', {
-      filter : filter.value
-    })
+    const response = await $api.post("/report/seleksi-ppdb/download-bundle", {
+      filter: filter.value,
+    });
 
-    const downloadUrl = response.data.download_url
+    const downloadUrl = response.data.download_url;
     if (downloadUrl) {
-      window.open(downloadUrl, '_blank') // 👈 buka di tab baru
+      window.open(downloadUrl, "_blank"); // 👈 buka di tab baru
     } else {
-      show.value = true
-      message.value = 'Gagal mendapatkan link unduhan.'
+      show.value = true;
+      message.value = "Gagal mendapatkan link unduhan.";
     }
   } catch (error) {
-    show.value = true
-    message.value = error.response?.data?.message || 'Terjadi kesalahan saat mencetak.'
+    show.value = true;
+    message.value =
+      error.response?.data?.message || "Terjadi kesalahan saat mencetak.";
   } finally {
-    loading.value = false
+    loading.value = false;
   }
 }
-
-
 
 const formatRupiah = (value) => {
   if (!value) return "Rp 0";
@@ -535,21 +612,61 @@ const formatRupiah = (value) => {
   }).format(value);
 };
 
+const loadingDiskon = ref(false)
+const diskonAppliedMessage = ref(null)
+const editedVoucherDiskonText = ref(null)
+const editVoucherDialog = ref(false)
 
+
+function openEditVoucherDialog(item) {
+  editVoucherDialog.value = true;
+  editedVoucherDiskonText.value = item.voucher_diskon ?? '';
+  diskonAppliedMessage.value = null;
+}
+
+function closeEditVoucherDialog() {
+  editVoucherDialog.value = false;
+  editedVoucherDiskonText.value = '';
+  diskonAppliedMessage.value = null;
+}
+
+function applyVoucher(item) {
+  console.log(item)
+  loadingDiskon.value = true;
+  $api
+    .post("/register-ppdb/apply-voucher", {
+      code_ppdb: item.code_pendaftaran,
+      voucher_diskon: editedVoucherDiskonText.value,
+    })
+    .then((response) => {
+      showSuccess.value = true;
+      message.value = "Voucher berhasil diterapkan";
+      diskonAppliedMessage.value = "Voucher berhasil diterapkan";
+      item.voucher_diskon = editedVoucherDiskonText.value;
+    })
+    .catch((error) => {
+      diskonAppliedMessage.value = null;
+      show.value = true;
+      message.value =
+        error.response?.data?.message || "Gagal menerapkan voucher.";
+    })
+    .finally(() => {
+      loadingDiskon.value = false;
+    });
+}
 
 // Lifecycle
 onMounted(() => {
-
   if ($pusher) {
-    const channel = $pusher.subscribe('ppdb')
-    channel.bind('reqform', (data) => {
-      const audio = new Audio('/sound/notifikasi.mp3')
-      audio.currentTime = 0
-      audio.play()
-      getData()
-      getStat()
-    })
+    const channel = $pusher.subscribe("ppdb");
+    channel.bind("reqform", (data) => {
+      const audio = new Audio("/sound/notifikasi.mp3");
+      audio.currentTime = 0;
+      audio.play();
+      getData();
+      getStat();
+    });
   }
-  getTahunPeriodik()
-})
+  getTahunPeriodik();
+});
 </script>
