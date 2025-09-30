@@ -2,30 +2,92 @@
   <div>
     <VCard class="mb-6 pa-4">
       <VRow>
-        <VCol cols="12" md="3">
-          <VSelect v-model="filter.status" :items="statusOptions" label="Filter Status" dense outlined clearable />
+        <VCol cols="12" md="4">
+          <VSelect
+            v-model="filter.status"
+            :items="statusOptions"
+            label="Filter Status"
+            dense
+            outlined
+            clearable
+          />
         </VCol>
-        <VCol cols="12" md="3">
-          <VTextField v-model="filter.keyword" label="Cari Nama / Email" dense outlined clearable />
+        <VCol cols="12" md="4">
+          <VSelect
+            v-model="filter.sekolah_id"
+            :items="sekolahOptions"
+            label="Filter Sekolah"
+            dense
+            item-title="name"
+            item-value="id"
+            outlined
+            clearable
+            @update:model-value="
+              getGrade();
+              filter.grade_id = null;
+            "
+          />
         </VCol>
-        <VCol cols="12" md="3">
-          <VSelect v-model="filter.tahun_periodik" :items="optionTahunPeriodik" label="Tahun Periodik" dense outlined
-            clearable />
+        <VCol cols="12" md="4">
+          <VSelect
+            v-model="filter.grade_id"
+            :items="gradeOptions"
+            label="Filter Grade"
+            dense
+            item-title="name"
+            item-value="id"
+            outlined
+            clearable
+          />
+        </VCol>
+        <VCol cols="12" md="4">
+          <VTextField
+            v-model="filter.keyword"
+            label="Cari Nama / Email"
+            dense
+            outlined
+            clearable
+          />
+        </VCol>
+        <VCol cols="12" md="4">
+          <VSelect
+            v-model="filter.tahun_periodik"
+            :items="optionTahunPeriodik"
+            label="Tahun Periodik"
+            dense
+            outlined
+            clearable
+          />
         </VCol>
         <VCol cols="12">
-          <VBtn color="primary" :loading="loading" @click="
-            getData();
-          getStat();
-          ">Terapkan Filter</VBtn>
+          <VBtn
+            color="primary"
+            :loading="loading"
+            @click="
+              getData();
+              getStat();
+            "
+            >Terapkan Filter</VBtn
+          >
 
-          <VBtn color="warning" :loading="loading" class="ml-2" @click="
-            getData();
-          getStat();
-          ">
+          <VBtn
+            color="warning"
+            :loading="loading"
+            class="ml-2"
+            @click="
+              getData();
+              getStat();
+            "
+          >
             <v-icon>bx-refresh</v-icon>
           </VBtn>
 
-          <VBtn color="success" :loading="loading" class="ml-2" @click="getFileExcel()">
+          <VBtn
+            color="success"
+            :loading="loading"
+            class="ml-2"
+            @click="getFileExcel()"
+          >
             <v-icon>bx bxs-file</v-icon> Print To Excel
           </VBtn>
         </VCol>
@@ -34,8 +96,17 @@
 
     <!-- Statistik Cards -->
     <VRow class="mb-6">
-      <VCol cols="12" sm="6" md="3" v-for="(card, index) in statsCards" :key="index">
-        <VCard class="text-center" :style="`background-color: ${card.bgColor}; color: ${card.textColor}`">
+      <VCol
+        cols="12"
+        sm="6"
+        md="3"
+        v-for="(card, index) in statsCards"
+        :key="index"
+      >
+        <VCard
+          class="text-center"
+          :style="`background-color: ${card.bgColor}; color: ${card.textColor}`"
+        >
           <VCardText>
             <VIcon size="36" class="mb-2">{{ card.icon }}</VIcon>
             <div class="text-h6">{{ card.title }}</div>
@@ -48,7 +119,12 @@
     <!-- Table Pendaftar -->
     <VCard>
       <VCardTitle class="mt-3">Permintaan Formulir Pendaftaran</VCardTitle>
-      <VDataTable :headers="headers" :items="data" class="elevation-1" :loading="loading">
+      <VDataTable
+        :headers="headers"
+        :items="data"
+        class="elevation-1"
+        :loading="loading"
+      >
         <!-- Custom Status Badge -->
         <template #item.status="{ item }">
           <VChip :color="getStatusColor(item.is_form_done)" class="ma-1" dark>
@@ -82,28 +158,49 @@
         </template>
 
         <template #item.no_handphone="{ item }">
-          <div style="min-width: 200px" v-html="item.siswa_parent
-            ? item.siswa_parent.penanggung_jawab !== 'Orang Tua'
-              ? item.siswa_parent.no_hp_wali
-              : 'No WA Ayah: ' +
-              item.siswa_parent.no_hp_ayah +
-              '<br>No WA Ibu: ' +
-              item.siswa_parent.no_hp_ibu
-            : '-'
-            "></div>
+          <div
+            style="min-width: 200px"
+            v-html="
+              item.siswa_parent
+                ? item.siswa_parent.penanggung_jawab !== 'Orang Tua'
+                  ? item.siswa_parent.no_hp_wali
+                  : 'No WA Ayah: ' +
+                    item.siswa_parent.no_hp_ayah +
+                    '<br>No WA Ibu: ' +
+                    item.siswa_parent.no_hp_ibu
+                : '-'
+            "
+          ></div>
         </template>
 
         <template #item.actions="{ item }">
           <div style="min-width: 200px">
-            <VBtn icon color="error" :disabled="item.status_test == '2'" @click="approvalConfirm(item, '2')"
-              :loading="loading" class="mr-2">
+            <VBtn
+              icon
+              color="error"
+              :disabled="item.status_test == '2'"
+              @click="approvalConfirm(item, '2')"
+              :loading="loading"
+              class="mr-2"
+            >
               <VIcon>bx-x</VIcon>
             </VBtn>
-            <VBtn icon color="success" :disabled="item.status_test == '1'" @click="approvalConfirm(item, '1')"
-              :loading="loading" class="mr-2">
+            <VBtn
+              icon
+              color="success"
+              :disabled="item.status_test == '1'"
+              @click="approvalConfirm(item, '1')"
+              :loading="loading"
+              class="mr-2"
+            >
               <VIcon>bx-check</VIcon>
             </VBtn>
-            <VBtn icon color="primary" :loading="loading" @click="showDetail(item)">
+            <VBtn
+              icon
+              color="primary"
+              :loading="loading"
+              @click="showDetail(item)"
+            >
               <VIcon>bx-show</VIcon>
             </VBtn>
           </div>
@@ -118,10 +215,14 @@
           <VRow>
             <VCol cols="10"> Detail Pendaftar </VCol>
             <VCol cols="2" class="text-right">
-              <v-icon style="cursor: pointer" @click="
-                dialogDetail = false;
-              getData();
-              ">bx bx-x</v-icon>
+              <v-icon
+                style="cursor: pointer"
+                @click="
+                  dialogDetail = false;
+                  getData();
+                "
+                >bx bx-x</v-icon
+              >
             </VCol>
           </VRow>
         </VCardTitle>
@@ -161,18 +262,22 @@
                 </p>
                 <p>
                   <strong>Status: </strong>
-                  <b :style="`color: ${selectedItem.is_form_done == '0'
-                    ? 'orange'
-                    : selectedItem.is_form_done == '1'
-                      ? 'green'
-                      : 'red'
-                    }`">{{
+                  <b
+                    :style="`color: ${
+                      selectedItem.is_form_done == '0'
+                        ? 'orange'
+                        : selectedItem.is_form_done == '1'
+                          ? 'green'
+                          : 'red'
+                    }`"
+                    >{{
                       selectedItem.is_form_done == "0"
                         ? "Menunggu Konfirmasi"
                         : selectedItem.is_form_done == "1"
                           ? "Disetujui"
                           : "Ditolak"
-                    }}</b>
+                    }}</b
+                  >
                 </p>
               </VCol>
             </VRow>
@@ -189,9 +294,15 @@
                 </p>
                 <div class="d-flex justify-between align-start">
                   <p class="mt-1">
-                    <strong>Voucher Diskon : </strong>{{ selectedItem.voucher_diskon }}
+                    <strong>Voucher Diskon : </strong
+                    >{{ selectedItem.voucher_diskon }}
                   </p>
-                  <v-btn icon size="small" variant="text" @click.prevent="openEditVoucherDialog(selectedItem)">
+                  <v-btn
+                    icon
+                    size="small"
+                    variant="text"
+                    @click.prevent="openEditVoucherDialog(selectedItem)"
+                  >
                     <v-icon>bx-edit</v-icon>
                   </v-btn>
                 </div>
@@ -203,17 +314,34 @@
                     <v-card-section class="pa-4">
                       <v-row>
                         <v-col cols="12" md="9">
-                          <v-text-field v-model="editedVoucherDiskonText" label="Voucher Diskon" />
+                          <v-text-field
+                            v-model="editedVoucherDiskonText"
+                            label="Voucher Diskon"
+                          />
                         </v-col>
 
-                        <v-col cols="12" md="3" class="d-flex align-center" v-if="editedVoucherDiskonText">
-                          <v-btn color="primary" :loading="loadingDiskon"
-                            :disabled="loadingDiskon || !editedVoucherDiskonText"
-                            @click.prevent="applyVoucher(selectedItem)">
+                        <v-col
+                          cols="12"
+                          md="3"
+                          class="d-flex align-center"
+                          v-if="editedVoucherDiskonText"
+                        >
+                          <v-btn
+                            color="primary"
+                            :loading="loadingDiskon"
+                            :disabled="
+                              loadingDiskon || !editedVoucherDiskonText
+                            "
+                            @click.prevent="applyVoucher(selectedItem)"
+                          >
                             Terapkan Diskon
                           </v-btn>
                         </v-col>
-                        <v-col cols="12" v-if="diskonAppliedMessage" class="mt-2">
+                        <v-col
+                          cols="12"
+                          v-if="diskonAppliedMessage"
+                          class="mt-2"
+                        >
                           <v-alert type="success" dense text>
                             {{ diskonAppliedMessage }}
                           </v-alert>
@@ -221,7 +349,10 @@
                       </v-row>
 
                       <div class="mt-5 d-flex">
-                        <v-btn color="error" @click.prevent="closeEditVoucherDialog">
+                        <v-btn
+                          color="error"
+                          @click.prevent="closeEditVoucherDialog"
+                        >
                           Tutup
                         </v-btn>
                       </div>
@@ -236,7 +367,7 @@
                   <strong>Total Biaya Formulir : </strong>
                   {{
                     formatRupiah(
-                      selectedItem.biaya_admin - selectedItem.nominal_diskon
+                      selectedItem.biaya_admin - selectedItem.nominal_diskon,
                     )
                   }}
                 </p>
@@ -246,13 +377,23 @@
                 </p>
 
                 <!-- Thumbnail -->
-                <VImg :src="selectedItem.payment.bukti_transfer" height="120" contain style="cursor: zoom-in"
-                  @click="zoomDialog = true" />
+                <VImg
+                  :src="selectedItem.payment.bukti_transfer"
+                  height="120"
+                  contain
+                  style="cursor: zoom-in"
+                  @click="zoomDialog = true"
+                />
 
                 <!-- Dialog Zoom -->
                 <v-dialog v-model="zoomDialog" max-width="600">
                   <v-card>
-                    <v-img :src="selectedItem.payment.bukti_transfer" height="100%" max-height="90vh" contain />
+                    <v-img
+                      :src="selectedItem.payment.bukti_transfer"
+                      height="100%"
+                      max-height="90vh"
+                      contain
+                    />
                   </v-card>
                 </v-dialog>
               </VCol>
@@ -262,16 +403,34 @@
         <VCardActions>
           <v-row>
             <v-col cols="6" md="4">
-              <v-btn color="success" variant="flat" @click="approvalConfirm(selectedItem, '1')" block>Setujui</v-btn>
+              <v-btn
+                color="success"
+                variant="flat"
+                @click="approvalConfirm(selectedItem, '1')"
+                block
+                >Setujui</v-btn
+              >
             </v-col>
             <v-col cols="6" md="4">
-              <v-btn color="error" variant="flat" @click="approvalConfirm(selectedItem, '2')" block>Tolak</v-btn>
+              <v-btn
+                color="error"
+                variant="flat"
+                @click="approvalConfirm(selectedItem, '2')"
+                block
+                >Tolak</v-btn
+              >
             </v-col>
             <v-col cols="12" md="4">
-              <v-btn color="primary" variant="flat" @click="
-                dialogDetail = false;
-              getData();
-              " block>Tutup</v-btn>
+              <v-btn
+                color="primary"
+                variant="flat"
+                @click="
+                  dialogDetail = false;
+                  getData();
+                "
+                block
+                >Tutup</v-btn
+              >
             </v-col>
           </v-row>
         </VCardActions>
@@ -288,8 +447,14 @@
       {{ message }}
     </v-snackbar>
     <!-- Dialog konfirmasi hapus -->
-    <ConfirmDialog :modelValue="showConfirm" :title="titleConfirm" :message="messageConfirm" :color="color"
-      @confirm="HandleApproval(dataConfirm, typeConfirm)" @cancel="showConfirm = false" />
+    <ConfirmDialog
+      :modelValue="showConfirm"
+      :title="titleConfirm"
+      :message="messageConfirm"
+      :color="color"
+      @confirm="HandleApproval(dataConfirm, typeConfirm)"
+      @cancel="showConfirm = false"
+    />
   </div>
 </template>
 <script setup>
@@ -304,10 +469,11 @@ const loading = ref(false);
 const message = ref(null);
 const show = ref(false);
 
-
 const filter = ref({
   status: null,
   keyword: "",
+  sekolah_id: null,
+  grade_id: null,
   tanggal_awal: null,
   tanggal_akhir: null,
   tahun_periodik: null,
@@ -612,26 +778,25 @@ const formatRupiah = (value) => {
   }).format(value);
 };
 
-const loadingDiskon = ref(false)
-const diskonAppliedMessage = ref(null)
-const editedVoucherDiskonText = ref(null)
-const editVoucherDialog = ref(false)
-
+const loadingDiskon = ref(false);
+const diskonAppliedMessage = ref(null);
+const editedVoucherDiskonText = ref(null);
+const editVoucherDialog = ref(false);
 
 function openEditVoucherDialog(item) {
   editVoucherDialog.value = true;
-  editedVoucherDiskonText.value = item.voucher_diskon ?? '';
+  editedVoucherDiskonText.value = item.voucher_diskon ?? "";
   diskonAppliedMessage.value = null;
 }
 
 function closeEditVoucherDialog() {
   editVoucherDialog.value = false;
-  editedVoucherDiskonText.value = '';
+  editedVoucherDiskonText.value = "";
   diskonAppliedMessage.value = null;
 }
 
 function applyVoucher(item) {
-  console.log(item)
+  console.log(item);
   loadingDiskon.value = true;
   $api
     .post("/register-ppdb/apply-voucher", {
@@ -655,6 +820,32 @@ function applyVoucher(item) {
     });
 }
 
+const sekolahOptions = ref([]);
+
+async function getSekolah() {
+  loading.value = true;
+  try {
+    const data = await $api.get(`/master-data/sekolah/get-select`);
+    sekolahOptions.value = data.data.data;
+  } finally {
+    loading.value = false;
+  }
+}
+
+const gradeOptions = ref([]);
+
+async function getGrade() {
+  loading.value = true;
+  try {
+    const data = await $api.post(`/master-data/sekolah/get-select-grade`, {
+      sekolah_id: filter.value.sekolah_id,
+    });
+    gradeOptions.value = data.data.data;
+  } finally {
+    loading.value = false;
+  }
+}
+
 // Lifecycle
 onMounted(() => {
   if ($pusher) {
@@ -668,5 +859,6 @@ onMounted(() => {
     });
   }
   getTahunPeriodik();
+  getSekolah();
 });
 </script>

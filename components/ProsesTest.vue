@@ -1,9 +1,8 @@
 <template>
   <div>
-
     <VCard class="mb-6 pa-4">
       <VRow>
-        <VCol cols="12" md="3">
+        <VCol cols="12" md="4">
           <VSelect
             v-model="filter.status"
             :items="statusOptions"
@@ -13,7 +12,35 @@
             clearable
           />
         </VCol>
-        <VCol cols="12" md="3">
+        <VCol cols="12" md="4">
+          <VSelect
+            v-model="filter.sekolah_id"
+            :items="sekolahOptions"
+            label="Filter Sekolah"
+            dense
+            item-title="name"
+            item-value="id"
+            outlined
+            clearable
+            @update:model-value="
+              getGrade();
+              filter.grade_id = null;
+            "
+          />
+        </VCol>
+        <VCol cols="12" md="4">
+          <VSelect
+            v-model="filter.grade_id"
+            :items="gradeOptions"
+            label="Filter Grade"
+            dense
+            item-title="name"
+            item-value="id"
+            outlined
+            clearable
+          />
+        </VCol>
+        <VCol cols="12" md="4">
           <VTextField
             v-model="filter.keyword"
             label="Cari Nama / Email"
@@ -22,37 +49,72 @@
             clearable
           />
         </VCol>
-        <VCol cols="12" md="3">
-            <VSelect
-              v-model="filter.tahun_periodik"
-              :items="optionTahunPeriodik"
-              label="Tahun Periodik"
-              dense
-              outlined
-              clearable
-            />
-          </VCol>
-          <VCol cols="12">
-            <VBtn color="primary" :loading="loading" @click="getData();getStat();">Terapkan Filter</VBtn>
+        <VCol cols="12" md="4">
+          <VSelect
+            v-model="filter.tahun_periodik"
+            :items="optionTahunPeriodik"
+            label="Tahun Periodik"
+            dense
+            outlined
+            clearable
+          />
+        </VCol>
+        <VCol cols="12">
+          <VBtn
+            color="primary"
+            :loading="loading"
+            @click="
+              getData();
+              getStat();
+            "
+            >Terapkan Filter</VBtn
+          >
 
-            <VBtn color="warning" :loading="loading" class="ml-2" @click="getData(); getStat()">
-              <v-icon>bx-refresh</v-icon>
-            </VBtn>
+          <VBtn
+            color="warning"
+            :loading="loading"
+            class="ml-2"
+            @click="
+              getData();
+              getStat();
+            "
+          >
+            <v-icon>bx-refresh</v-icon>
+          </VBtn>
 
-            <VBtn color="success" :loading="loading" class="ml-2" @click="getFileExcel()">
-              <v-icon>bx bxs-file</v-icon> Print To Excel
-            </VBtn>
-            <VBtn color="secondary" :loading="loading" class="ml-2" @click="getFileBundle()">
-              <v-icon>bx bxs-file</v-icon> Print To Bundle
-            </VBtn>
-          </VCol>
+          <VBtn
+            color="success"
+            :loading="loading"
+            class="ml-2"
+            @click="getFileExcel()"
+          >
+            <v-icon>bx bxs-file</v-icon> Print To Excel
+          </VBtn>
+          <VBtn
+            color="secondary"
+            :loading="loading"
+            class="ml-2"
+            @click="getFileBundle()"
+          >
+            <v-icon>bx bxs-file</v-icon> Print To Bundle
+          </VBtn>
+        </VCol>
       </VRow>
     </VCard>
 
     <!-- Statistik Cards -->
     <VRow class="mb-6">
-      <VCol cols="12" sm="6" md="3" v-for="(card, index) in statsCards" :key="index">
-        <VCard class="text-center" :style="`background-color: ${card.bgColor}; color: ${card.textColor}`">
+      <VCol
+        cols="12"
+        sm="6"
+        md="3"
+        v-for="(card, index) in statsCards"
+        :key="index"
+      >
+        <VCard
+          class="text-center"
+          :style="`background-color: ${card.bgColor}; color: ${card.textColor}`"
+        >
           <VCardText>
             <VIcon size="36" class="mb-2">{{ card.icon }}</VIcon>
             <div class="text-h6">{{ card.title }}</div>
@@ -73,95 +135,110 @@
       >
         <!-- Custom Status Badge -->
         <template #item.status="{ item }">
-          <VChip
-            :color="getStatusColor(item.status_test)"
-            class="ma-1"
-            dark
-          >
+          <VChip :color="getStatusColor(item.status_test)" class="ma-1" dark>
             <VIcon left>{{ getStatusIcon(item.status_test) }}</VIcon>
             {{ getStatusLabel(item.status_test) }}
           </VChip>
         </template>
 
-        <template #item.code_pendaftaran="{ item }" >
-          <div style="min-width: 200px;">
+        <template #item.code_pendaftaran="{ item }">
+          <div style="min-width: 200px">
             {{ item.code_pendaftaran }}
           </div>
         </template>
 
-        <template #item.name_register="{ item }" >
-          <div style="min-width: 200px;">
-            {{ item.register.nama_depan + ' ' + item.register.nama_belakang }}
+        <template #item.name_register="{ item }">
+          <div style="min-width: 200px">
+            {{ item.register.nama_depan + " " + item.register.nama_belakang }}
           </div>
         </template>
 
         <template #item.name_siswa="{ item }">
-          <div style="min-width: 200px;">
-          {{ item.siswa.nama_depan + ' ' + item.siswa.nama_belakang }}
+          <div style="min-width: 200px">
+            {{ item.siswa.nama_depan + " " + item.siswa.nama_belakang }}
           </div>
         </template>
 
         <template #item.email="{ item }">
-          <div style="min-width: 200px;">
-          {{ item.register.email }}
+          <div style="min-width: 200px">
+            {{ item.register.email }}
           </div>
         </template>
 
         <template #item.no_handphone="{ item }">
-          <div style="min-width: 200px;">
-          {{ item.register.no_handphone }}
+          <div style="min-width: 200px">
+            {{ item.register.no_handphone }}
           </div>
         </template>
-
-
 
         <template #item.tgl_test="{ item }">
-          <div style="min-width: 200px;">
-          {{ item.tgl_test }}
+          <div style="min-width: 200px">
+            {{ item.tgl_test }}
           </div>
         </template>
 
-
         <template #item.hasil_test="{ item }">
-          <div style="min-width: 200px;">
-          <!-- {{ item.tgl_test }} -->
+          <div style="min-width: 200px">
+            <!-- {{ item.tgl_test }} -->
           </div>
         </template>
 
         <template #item.actions="{ item }">
-
-          <div style="min-width: 200px;">
-          <VBtn icon color="error" :disabled="item.status_test == '02'" @click="approvalConfirm(item,'Reject')" :loading="loading" class="mr-2">
-            <VIcon>bx-x</VIcon>
-          </VBtn>
-          <VBtn icon color="success" :disabled="item.status_test == '01'" @click="approvalConfirm(item,'Approve')" :loading="loading"  class="mr-2">
-            <VIcon>bx-check</VIcon>
-          </VBtn>
-          <VBtn icon color="primary" :loading="loading" @click="showDetail(item)">
-            <VIcon>bx-show</VIcon>
-          </VBtn>
+          <div style="min-width: 200px">
+            <VBtn
+              icon
+              color="error"
+              :disabled="item.status_test == '02'"
+              @click="approvalConfirm(item, 'Reject')"
+              :loading="loading"
+              class="mr-2"
+            >
+              <VIcon>bx-x</VIcon>
+            </VBtn>
+            <VBtn
+              icon
+              color="success"
+              :disabled="item.status_test == '01'"
+              @click="approvalConfirm(item, 'Approve')"
+              :loading="loading"
+              class="mr-2"
+            >
+              <VIcon>bx-check</VIcon>
+            </VBtn>
+            <VBtn
+              icon
+              color="primary"
+              :loading="loading"
+              @click="showDetail(item)"
+            >
+              <VIcon>bx-show</VIcon>
+            </VBtn>
           </div>
         </template>
       </VDataTable>
     </VCard>
 
-   <!-- Detail Dialog -->
+    <!-- Detail Dialog -->
     <VDialog v-model="dialogDetail" max-width="900px" persistent>
       <VCard class="pa-2">
         <VCardTitle class="text-h6">
           <VRow>
-            <VCol cols="10">
-              Detail Pendaftar 
-            </VCol>
+            <VCol cols="10"> Detail Pendaftar </VCol>
             <VCol cols="2" class="text-right">
-              <v-icon style="cursor: pointer" @click="dialogDetail = false;getData()">bx bx-x</v-icon>
+              <v-icon
+                style="cursor: pointer"
+                @click="
+                  dialogDetail = false;
+                  getData();
+                "
+                >bx bx-x</v-icon
+              >
             </VCol>
           </VRow>
           <VRow v-if="selectedItem">
-            <VCol cols="10">
-            </VCol>
+            <VCol cols="10"> </VCol>
             <VCol cols="2" class="text-right">
-               <div>
+              <div>
                 <v-icon
                   v-if="!loading"
                   style="cursor: pointer"
@@ -189,7 +266,14 @@
                 <img
                   :src="selectedItem.siswa.foto_siswa"
                   alt="Preview Foto"
-                  style="width: 220px;  height: 220px; object-fit: cover; border-radius: 8px; border: 2px solid #eee;cursor: pointer"
+                  style="
+                    width: 220px;
+                    height: 220px;
+                    object-fit: cover;
+                    border-radius: 8px;
+                    border: 2px solid #eee;
+                    cursor: pointer;
+                  "
                   @click="zoomDialogFoto = true"
                 />
 
@@ -206,23 +290,50 @@
                 </v-dialog>
               </VCol>
               <VCol cols="12" md="8">
-                <p><strong>No Formulir:</strong> {{ selectedItem.code_pendaftaran }}</p>
-                <p><strong>Nama Siswa:</strong> {{ selectedItem.siswa.nama_depan }} {{ selectedItem.siswa.nama_belakang }}</p>
-                <p><strong>Jenis Kelamin:</strong> {{ selectedItem.siswa.jenis_kelamin }}</p>
-                <p><strong>Tempat, Tanggal Lahir:</strong> {{ selectedItem.siswa.tempat_lahir }}, {{ formatDate(selectedItem.siswa.tgl_lahir) }}</p>
+                <p>
+                  <strong>No Formulir:</strong>
+                  {{ selectedItem.code_pendaftaran }}
+                </p>
+                <p>
+                  <strong>Nama Siswa:</strong>
+                  {{ selectedItem.siswa.nama_depan }}
+                  {{ selectedItem.siswa.nama_belakang }}
+                </p>
+                <p>
+                  <strong>Jenis Kelamin:</strong>
+                  {{ selectedItem.siswa.jenis_kelamin }}
+                </p>
+                <p>
+                  <strong>Tempat, Tanggal Lahir:</strong>
+                  {{ selectedItem.siswa.tempat_lahir }},
+                  {{ formatDate(selectedItem.siswa.tgl_lahir) }}
+                </p>
                 <p><strong>NISN:</strong> {{ selectedItem.siswa.nisn }}</p>
-                <p><strong>Bahasa Sehari-hari:</strong> {{ selectedItem.siswa.bahasa_sehari_hari }}</p>
-                <p v-if="selectedItem.sekolah.is_need_nem == '1'"><strong>NEM:</strong> {{ selectedItem.nem }}</p>
+                <p>
+                  <strong>Bahasa Sehari-hari:</strong>
+                  {{ selectedItem.siswa.bahasa_sehari_hari }}
+                </p>
+                <p v-if="selectedItem.sekolah.is_need_nem == '1'">
+                  <strong>NEM:</strong> {{ selectedItem.nem }}
+                </p>
               </VCol>
             </VRow>
-
 
             <VDivider class="my-4" />
 
             <VRow v-if="selectedItem.siswa_award">
               <VCol cols="12">
-                <p><strong>Prestasi Siswa:</strong> {{ selectedItem.siswa_award.award }} ({{ formatDate(selectedItem.siswa_award.tgl_didapat) }})</p>
-                <VImg :src="selectedItem.siswa_award.image" height="120" contain />
+                <p>
+                  <strong>Prestasi Siswa:</strong>
+                  {{ selectedItem.siswa_award.award }} ({{
+                    formatDate(selectedItem.siswa_award.tgl_didapat)
+                  }})
+                </p>
+                <VImg
+                  :src="selectedItem.siswa_award.image"
+                  height="120"
+                  contain
+                />
               </VCol>
             </VRow>
 
@@ -230,9 +341,17 @@
 
             <VRow>
               <VCol cols="12">
-                <p><strong>Sekolah Tujuan:</strong> {{ selectedItem.sekolah.name }} – {{ selectedItem.sekolah_grade.name }}</p>
-                <p><strong>Tanggal Pendaftaran:</strong> {{ formatDate(selectedItem.tanggal_pendaftaran) }}</p>
-                <p><strong>Status:</strong>
+                <p>
+                  <strong>Sekolah Tujuan:</strong>
+                  {{ selectedItem.sekolah.name }} –
+                  {{ selectedItem.sekolah_grade.name }}
+                </p>
+                <p>
+                  <strong>Tanggal Pendaftaran:</strong>
+                  {{ formatDate(selectedItem.tanggal_pendaftaran) }}
+                </p>
+                <p>
+                  <strong>Status:</strong>
                   {{ selectedItem.status_pendaftaran_siswa }}
                 </p>
               </VCol>
@@ -242,14 +361,20 @@
 
             <VRow v-if="selectedItem.siswa_address">
               <VCol cols="12">
-                <p><strong>Alamat:</strong> {{ selectedItem.siswa_address.alamat }}, RT {{ selectedItem.siswa_address.rt }} / RW {{ selectedItem.siswa_address.rw }} ({{ selectedItem.siswa_address.zip_code }})</p>
                 <p>
-                  DESA {{ selectedItem.siswa_address.desa }}<br>
-                  KEC/KEL. {{ selectedItem.siswa_address.district }}<br>
-                  KOTA/KAB. {{ selectedItem.siswa_address.kota }}<br>
+                  <strong>Alamat:</strong>
+                  {{ selectedItem.siswa_address.alamat }}, RT
+                  {{ selectedItem.siswa_address.rt }} / RW
+                  {{ selectedItem.siswa_address.rw }} ({{
+                    selectedItem.siswa_address.zip_code
+                  }})
+                </p>
+                <p>
+                  DESA {{ selectedItem.siswa_address.desa }}<br />
+                  KEC/KEL. {{ selectedItem.siswa_address.district }}<br />
+                  KOTA/KAB. {{ selectedItem.siswa_address.kota }}<br />
                   Prov. {{ selectedItem.siswa_address.provinsi }}
                 </p>
-
               </VCol>
             </VRow>
 
@@ -257,16 +382,40 @@
 
             <VRow>
               <VCol cols="12" md="6">
-                <p><strong>Nama Ayah:</strong> {{ selectedItem.siswa_parent.nama_ayah }}</p>
-                <p><strong>Pendidikan Ayah:</strong> {{ selectedItem.siswa_parent.pendidikan_terakhir_ayah }}</p>
-                <p><strong>Pekerjaan Ayah:</strong> {{ selectedItem.siswa_parent.pekerjaan_ayah }}</p>
-                <p><strong>Penghasilan Ayah:</strong> {{ selectedItem.siswa_parent.penghasilan_ayah }}</p>
+                <p>
+                  <strong>Nama Ayah:</strong>
+                  {{ selectedItem.siswa_parent.nama_ayah }}
+                </p>
+                <p>
+                  <strong>Pendidikan Ayah:</strong>
+                  {{ selectedItem.siswa_parent.pendidikan_terakhir_ayah }}
+                </p>
+                <p>
+                  <strong>Pekerjaan Ayah:</strong>
+                  {{ selectedItem.siswa_parent.pekerjaan_ayah }}
+                </p>
+                <p>
+                  <strong>Penghasilan Ayah:</strong>
+                  {{ selectedItem.siswa_parent.penghasilan_ayah }}
+                </p>
               </VCol>
               <VCol cols="12" md="6">
-                <p><strong>Nama Ibu:</strong> {{ selectedItem.siswa_parent.nama_ibu }}</p>
-                <p><strong>Pendidikan Ibu:</strong> {{ selectedItem.siswa_parent.pendidikan_terakhir_ibu }}</p>
-                <p><strong>Pekerjaan Ibu:</strong> {{ selectedItem.siswa_parent.pekerjaan_ibu }}</p>
-                <p><strong>Penghasilan Ibu:</strong> {{ selectedItem.siswa_parent.penghasilan_ibu }}</p>
+                <p>
+                  <strong>Nama Ibu:</strong>
+                  {{ selectedItem.siswa_parent.nama_ibu }}
+                </p>
+                <p>
+                  <strong>Pendidikan Ibu:</strong>
+                  {{ selectedItem.siswa_parent.pendidikan_terakhir_ibu }}
+                </p>
+                <p>
+                  <strong>Pekerjaan Ibu:</strong>
+                  {{ selectedItem.siswa_parent.pekerjaan_ibu }}
+                </p>
+                <p>
+                  <strong>Penghasilan Ibu:</strong>
+                  {{ selectedItem.siswa_parent.penghasilan_ibu }}
+                </p>
               </VCol>
             </VRow>
 
@@ -278,22 +427,39 @@
                 <VList dense>
                   <VListItem v-if="selectedItem.sekolah.is_need_nem == '1'">
                     <VListItemTitle>Ijazah</VListItemTitle>
-                    <VListItemSubtitle><a :href="selectedItem.file_raport" target="_blank">Lihat Ijazah</a></VListItemSubtitle>
+                    <VListItemSubtitle
+                      ><a :href="selectedItem.file_raport" target="_blank"
+                        >Lihat Ijazah</a
+                      ></VListItemSubtitle
+                    >
                   </VListItem>
                   <VListItem>
                     <VListItemTitle>Kartu Keluarga</VListItemTitle>
-                    <VListItemSubtitle><a :href="selectedItem.file_kartu_keluarga" target="_blank">Lihat KK</a></VListItemSubtitle>
+                    <VListItemSubtitle
+                      ><a
+                        :href="selectedItem.file_kartu_keluarga"
+                        target="_blank"
+                        >Lihat KK</a
+                      ></VListItemSubtitle
+                    >
                   </VListItem>
                   <VListItem>
                     <VListItemTitle>Akte Lahir</VListItemTitle>
-                    <VListItemSubtitle><a :href="selectedItem.file_akte_lahir" target="_blank">Lihat Akta</a></VListItemSubtitle>
+                    <VListItemSubtitle
+                      ><a :href="selectedItem.file_akte_lahir" target="_blank"
+                        >Lihat Akta</a
+                      ></VListItemSubtitle
+                    >
                   </VListItem>
                 </VList>
               </VCol>
 
               <VCol cols="12" md="6">
                 <p><strong>Pembayaran:</strong></p>
-                <p>Tanggal Transaksi: {{ formatDate(selectedItem.payment.tanggal_transaksi) }}</p>
+                <p>
+                  Tanggal Transaksi:
+                  {{ formatDate(selectedItem.payment.tanggal_transaksi) }}
+                </p>
 
                 <!-- Thumbnail -->
                 <VImg
@@ -333,27 +499,48 @@
         </VCardText>
         <VCardActions>
           <v-row>
-              <v-col cols="6" md="4">
-                <v-btn color="success" :loading="loading" variant="flat" @click="approvalConfirm(selectedItem,'Approve')" block>Setujui</v-btn>
-              </v-col>
-              <v-col cols="6" md="4">
-                <v-btn color="error":loading="loading" variant="flat" @click="approvalConfirm(selectedItem,'Reject')" block>Tolak</v-btn>
-              </v-col>
-              <v-col cols="12" md="4">
-                <v-btn color="primary":loading="loading" variant="flat" @click="dialogDetail = false;getData()" block>Tutup</v-btn>
-              </v-col>
+            <v-col cols="6" md="4">
+              <v-btn
+                color="success"
+                :loading="loading"
+                variant="flat"
+                @click="approvalConfirm(selectedItem, 'Approve')"
+                block
+                >Setujui</v-btn
+              >
+            </v-col>
+            <v-col cols="6" md="4">
+              <v-btn
+                color="error"
+                :loading="loading"
+                variant="flat"
+                @click="approvalConfirm(selectedItem, 'Reject')"
+                block
+                >Tolak</v-btn
+              >
+            </v-col>
+            <v-col cols="12" md="4">
+              <v-btn
+                color="primary"
+                :loading="loading"
+                variant="flat"
+                @click="
+                  dialogDetail = false;
+                  getData();
+                "
+                block
+                >Tutup</v-btn
+              >
+            </v-col>
           </v-row>
         </VCardActions>
       </VCard>
     </VDialog>
 
-
-
     <!-- Snackbar error -->
     <v-snackbar v-model="show" color="error" timeout="3000">
       {{ message }}
     </v-snackbar>
-
 
     <!-- Snackbar Sucess -->
     <v-snackbar v-model="showSuccess" color="success" timeout="3000">
@@ -373,28 +560,30 @@
 <script setup>
 // import Pusher from 'pusher-js';
 const { $pusher } = useNuxtApp();
-import { onMounted, ref } from 'vue';
-import ConfirmDialog from '~/components/ConfirmDialog.vue';
-const { $api } = useNuxtApp()
+import { onMounted, ref } from "vue";
+import ConfirmDialog from "~/components/ConfirmDialog.vue";
+const { $api } = useNuxtApp();
 
 // State
-const loading = ref(false)
-const message = ref(null)
-const show = ref(false)
+const loading = ref(false);
+const message = ref(null);
+const show = ref(false);
 
-const filter = ref({ 
-  status: null, 
-  keyword: '' ,
+const filter = ref({
+  status: null,
+  keyword: "",
+  sekolah_id: null,
+  grade_id: null,
   tanggal_awal: null,
   tanggal_akhir: null,
-  tahun_periodik: null
-})
+  tahun_periodik: null,
+});
 
-const dialogDetail = ref(false)
-const selectedItem = ref(null)
+const dialogDetail = ref(false);
+const selectedItem = ref(null);
 
 // Opsi status
-const statusOptions = ['Lulus', 'Tidak Lulus', 'Dalam Proses']
+const statusOptions = ["Lulus", "Tidak Lulus", "Dalam Proses"];
 
 const zoomDialog = ref(false);
 const zoomDialogFoto = ref(false);
@@ -404,265 +593,322 @@ const titleConfirm = ref(null);
 const messageConfirm = ref(null);
 const dataConfirm = ref(null);
 const typeConfirm = ref(null);
-const color = ref('error');
+const color = ref("error");
 const showSuccess = ref(false);
 
 // Kartu statistik
 const statsCards = ref([
-  { title: 'Total Pendaftar', count: 0, bgColor: '#E3F2FD', textColor: '#1E88E5', icon: 'bx-user' },
-  { title: 'Diterima', count: 0, bgColor: '#E8F5E9', textColor: '#43A047', icon: 'bx-check-circle' },
-  { title: 'Ditolak', count: 0, bgColor: '#FFEBEE', textColor: '#E53935', icon: 'bx-x-circle' },
-  { title: 'Dalam Proses', count: 0, bgColor: '#FFF8E1', textColor: '#FB8C00', icon: 'bx-time' }
-])
+  {
+    title: "Total Pendaftar",
+    count: 0,
+    bgColor: "#E3F2FD",
+    textColor: "#1E88E5",
+    icon: "bx-user",
+  },
+  {
+    title: "Diterima",
+    count: 0,
+    bgColor: "#E8F5E9",
+    textColor: "#43A047",
+    icon: "bx-check-circle",
+  },
+  {
+    title: "Ditolak",
+    count: 0,
+    bgColor: "#FFEBEE",
+    textColor: "#E53935",
+    icon: "bx-x-circle",
+  },
+  {
+    title: "Dalam Proses",
+    count: 0,
+    bgColor: "#FFF8E1",
+    textColor: "#FB8C00",
+    icon: "bx-time",
+  },
+]);
 
 // Header tabel
 const headers = [
-  { title: 'Aksi', value: 'actions', sortable: false, width: '200px'},
-  { title: 'Kode Pendaftaran', value: 'code_pendaftaran',width: '200px' },
-  { title: 'Status', value: 'status' },
-  { title: 'Nama Pendaftar', value: 'name_register',width: '200px' },
-  { title: 'Nama Siswa', value: 'name_siswa' },
-  { title: 'Email', value: 'email' },
-  { title: 'No Handphone', value: 'no_handphone' },
-  { title: 'Tanggal Test', value: 'tgl_test' },
-]
+  { title: "Aksi", value: "actions", sortable: false, width: "200px" },
+  { title: "Kode Pendaftaran", value: "code_pendaftaran", width: "200px" },
+  { title: "Status", value: "status" },
+  { title: "Nama Pendaftar", value: "name_register", width: "200px" },
+  { title: "Nama Siswa", value: "name_siswa" },
+  { title: "Email", value: "email" },
+  { title: "No Handphone", value: "no_handphone" },
+  { title: "Tanggal Test", value: "tgl_test" },
+];
 
 // Data tabel
-const data = ref([])
+const data = ref([]);
 
 // Fungsi menampilkan detail
 function showDetail(item) {
-  selectedItem.value = item
-  dialogDetail.value = true
+  selectedItem.value = item;
+  dialogDetail.value = true;
 }
 
 // Format tanggal
 function formatDate(dateStr) {
-  const options = { year: 'numeric', month: 'long', day: 'numeric' }
-  return new Date(dateStr).toLocaleDateString('id-ID', options)
+  const options = { year: "numeric", month: "long", day: "numeric" };
+  return new Date(dateStr).toLocaleDateString("id-ID", options);
 }
 
 // Label status pendaftaran
 function getStatusLabel(code) {
-  return code === '00' ? 'Menunggu Proses'
-    : code === '01' ? 'Lulus'
-    : code === '02' ? 'Tidak Lulus'
-    : 'Tidak Diketahui'
+  return code === "00"
+    ? "Menunggu Proses"
+    : code === "01"
+      ? "Lulus"
+      : code === "02"
+        ? "Tidak Lulus"
+        : "Tidak Diketahui";
 }
 
 // Warna status pendaftaran
 function getStatusColor(code) {
-  return code === '00' ? 'warning'
-    : code === '01' ? 'success'
-    : code === '02' ? 'error'
-    : 'grey'
+  return code === "00"
+    ? "warning"
+    : code === "01"
+      ? "success"
+      : code === "02"
+        ? "error"
+        : "grey";
 }
 
 // Ikon status pendaftaran
 function getStatusIcon(code) {
-  return code === '00' ? 'bx-time'
-    : code === '01' ? 'bx-check-circle'
-    : code === '02' ? 'bx-x-circle'
-    : 'bx-question-mark'
+  return code === "00"
+    ? "bx-time"
+    : code === "01"
+      ? "bx-check-circle"
+      : code === "02"
+        ? "bx-x-circle"
+        : "bx-question-mark";
 }
 
 // Ambil data dari API
 async function getData() {
-  loading.value = true
+  loading.value = true;
   try {
-    const response = await $api.post('/register-test/get-data',{
-      filter : filter.value
-    })
-    data.value = response.data.data
+    const response = await $api.post("/register-test/get-data", {
+      filter: filter.value,
+    });
+    data.value = response.data.data;
   } catch (error) {
-    show.value = true
-    message.value = error.response?.data?.message
+    show.value = true;
+    message.value = error.response?.data?.message;
   } finally {
-    loading.value = false
+    loading.value = false;
   }
 }
 
-function approvalConfirm(data,type) {
-    color.value = type == 'Approve' ? 'success' : 'error';
-    titleConfirm.value = 'Konfirmasi Tindakan';
-    messageConfirm.value = `Yakin ingin Apakah anda ingin ${type}?`;
-    dataConfirm.value = data;
-    typeConfirm.value = type;
-    showConfirm.value = true;
+function approvalConfirm(data, type) {
+  color.value = type == "Approve" ? "success" : "error";
+  titleConfirm.value = "Konfirmasi Tindakan";
+  messageConfirm.value = `Yakin ingin Apakah anda ingin ${type}?`;
+  dataConfirm.value = data;
+  typeConfirm.value = type;
+  showConfirm.value = true;
 }
 
 async function printData(data) {
-  loading.value = true
+  loading.value = true;
   try {
-    const response = await $api.post('/register-ppdb/generate-pdf', data)
+    const response = await $api.post("/register-ppdb/generate-pdf", data);
 
-    const downloadUrl = response.data.download_url
+    const downloadUrl = response.data.download_url;
     if (downloadUrl) {
-      window.open(downloadUrl, '_blank') // 👈 buka di tab baru
+      window.open(downloadUrl, "_blank"); // 👈 buka di tab baru
     } else {
-      show.value = true
-      message.value = 'Gagal mendapatkan link unduhan.'
+      show.value = true;
+      message.value = "Gagal mendapatkan link unduhan.";
     }
   } catch (error) {
-    show.value = true
-    message.value = error.response?.data?.message || 'Terjadi kesalahan saat mencetak.'
+    show.value = true;
+    message.value =
+      error.response?.data?.message || "Terjadi kesalahan saat mencetak.";
   } finally {
-    loading.value = false
+    loading.value = false;
   }
 }
 
 async function getStat() {
   try {
-     const {data} = await $api.get('/register-test/statistik',{
-      params : {
-        filter : filter.value
-      }
-    })
+    const { data } = await $api.get("/register-test/statistik", {
+      params: {
+        filter: filter.value,
+      },
+    });
     statsCards.value = [
       {
-        title: 'Total Pendaftar',
+        title: "Total Pendaftar",
         count: data.data.total,
-        bgColor: '#E3F2FD',
-        textColor: '#1E88E5',
-        icon: 'bx-user',
+        bgColor: "#E3F2FD",
+        textColor: "#1E88E5",
+        icon: "bx-user",
       },
       {
-        title: 'Diterima',
+        title: "Diterima",
         count: data.data.diterima,
-        bgColor: '#E8F5E9',
-        textColor: '#43A047',
-        icon: 'bx-check-circle',
+        bgColor: "#E8F5E9",
+        textColor: "#43A047",
+        icon: "bx-check-circle",
       },
       {
-        title: 'Ditolak',
+        title: "Ditolak",
         count: data.data.ditolak,
-        bgColor: '#FFEBEE',
-        textColor: '#E53935',
-        icon: 'bx-x-circle',
+        bgColor: "#FFEBEE",
+        textColor: "#E53935",
+        icon: "bx-x-circle",
       },
       {
-        title: 'Dalam Proses',
+        title: "Dalam Proses",
         count: data.data.diproses,
-        bgColor: '#FFF8E1',
-        textColor: '#FB8C00',
-        icon: 'bx-time',
+        bgColor: "#FFF8E1",
+        textColor: "#FB8C00",
+        icon: "bx-time",
       },
-    ]
+    ];
   } catch (error) {
-    show.value = true
-    message.value = error.response?.data?.message || 'Terjadi kesalahan.'
+    show.value = true;
+    message.value = error.response?.data?.message || "Terjadi kesalahan.";
   } finally {
-    loading.value = false
+    loading.value = false;
   }
 }
 
-
-
-async function HandleApproval(data,type) {
-  loading.value = true
+async function HandleApproval(data, type) {
+  loading.value = true;
   try {
-    const response = await $api.post('/register-test/approval', {
-      code_ppdb : data.code_pendaftaran,
-      siswa_id : data.siswa_id,
-      type : type
-    })
+    const response = await $api.post("/register-test/approval", {
+      code_ppdb: data.code_pendaftaran,
+      siswa_id: data.siswa_id,
+      type: type,
+    });
 
-    showSuccess.value = true
-    message.value = 'Data berhasil diubah.'
+    showSuccess.value = true;
+    message.value = "Data berhasil diubah.";
   } catch (error) {
-    show.value = true
-    message.value = error.response?.data?.message || 'Terjadi kesalahan saat mencetak.'
+    show.value = true;
+    message.value =
+      error.response?.data?.message || "Terjadi kesalahan saat mencetak.";
   } finally {
-    loading.value = false
-    dialogDetail.value = false
-    showConfirm.value = false
-    getData()
-    getStat()
+    loading.value = false;
+    dialogDetail.value = false;
+    showConfirm.value = false;
+    getData();
+    getStat();
   }
 }
-
-
 
 const optionTahunPeriodik = ref([]);
 
 async function getTahunPeriodik() {
   loading.value = true;
   try {
-    const {data} = await $api.get('/register-ppdb/ref-tahun-periodik');
-    optionTahunPeriodik.value = data.data
-    filter.value.tahun_periodik = optionTahunPeriodik.value.at(-1)
+    const { data } = await $api.get("/register-ppdb/ref-tahun-periodik");
+    optionTahunPeriodik.value = data.data;
+    filter.value.tahun_periodik = optionTahunPeriodik.value.at(-1);
 
-    if(filter.value.tahun_periodik != null){
+    if (filter.value.tahun_periodik != null) {
       getData();
       getStat();
     }
   } catch (error) {
     show.value = true;
-    message.value = 'Server Error.';
+    message.value = "Server Error.";
   } finally {
     loading.value = false;
   }
 }
 
-
-
 async function getFileExcel() {
-  loading.value = true
+  loading.value = true;
   try {
-    const response = await $api.post('/report/seleksi-ppdb/download-excel', {
-      filter : filter.value
-    })
+    const response = await $api.post("/report/seleksi-ppdb/download-excel", {
+      filter: filter.value,
+    });
 
-    const downloadUrl = response.data.download_url
+    const downloadUrl = response.data.download_url;
     if (downloadUrl) {
-      window.open(downloadUrl, '_blank') // 👈 buka di tab baru
+      window.open(downloadUrl, "_blank"); // 👈 buka di tab baru
     } else {
-      show.value = true
-      message.value = 'Gagal mendapatkan link unduhan.'
+      show.value = true;
+      message.value = "Gagal mendapatkan link unduhan.";
     }
   } catch (error) {
-    show.value = true
-    message.value = error.response?.data?.message || 'Terjadi kesalahan saat mencetak.'
+    show.value = true;
+    message.value =
+      error.response?.data?.message || "Terjadi kesalahan saat mencetak.";
   } finally {
-    loading.value = false
+    loading.value = false;
   }
 }
-
-
 
 async function getFileBundle() {
-  loading.value = true
+  loading.value = true;
   try {
-    const response = await $api.post('/report/seleksi-ppdb/download-bundle', {
-      filter : filter.value
-    })
+    const response = await $api.post("/report/seleksi-ppdb/download-bundle", {
+      filter: filter.value,
+    });
 
-    const downloadUrl = response.data.download_url
+    const downloadUrl = response.data.download_url;
     if (downloadUrl) {
-      window.open(downloadUrl, '_blank') // 👈 buka di tab baru
+      window.open(downloadUrl, "_blank"); // 👈 buka di tab baru
     } else {
-      show.value = true
-      message.value = 'Gagal mendapatkan link unduhan.'
+      show.value = true;
+      message.value = "Gagal mendapatkan link unduhan.";
     }
   } catch (error) {
-    show.value = true
-    message.value = error.response?.data?.message || 'Terjadi kesalahan saat mencetak.'
+    show.value = true;
+    message.value =
+      error.response?.data?.message || "Terjadi kesalahan saat mencetak.";
   } finally {
-    loading.value = false
+    loading.value = false;
   }
 }
+
+const sekolahOptions = ref([]);
+
+async function getSekolah() {
+  loading.value = true;
+  try {
+    const data = await $api.get(`/master-data/sekolah/get-select`);
+    sekolahOptions.value = data.data.data;
+  } finally {
+    loading.value = false;
+  }
+}
+
+const gradeOptions = ref([]);
+
+async function getGrade() {
+  loading.value = true;
+  try {
+    const data = await $api.post(`/master-data/sekolah/get-select-grade`, {
+      sekolah_id: filter.value.sekolah_id,
+    });
+    gradeOptions.value = data.data.data;
+  } finally {
+    loading.value = false;
+  }
+}
+
 // Lifecycle
 onMounted(() => {
   if ($pusher) {
-    const channel = $pusher.subscribe('ppdb')
-    channel.bind('reqform', (data) => {
-      const audio = new Audio('/sound/notifikasi.mp3')
-      audio.currentTime = 0
-      audio.play()
-      getData()
-      getStat()
-    })
+    const channel = $pusher.subscribe("ppdb");
+    channel.bind("reqform", (data) => {
+      const audio = new Audio("/sound/notifikasi.mp3");
+      audio.currentTime = 0;
+      audio.play();
+      getData();
+      getStat();
+    });
   }
-  getTahunPeriodik()
-})
+  getTahunPeriodik();
+  getSekolah();
+});
 </script>
