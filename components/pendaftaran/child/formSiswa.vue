@@ -217,10 +217,7 @@
             />
           </v-col>
           <v-col cols="12" md="12">
-            <div
-              v-if="fotoPreviewFotoSertifikat"
-              class="mt-2 text-center"
-            >
+            <div v-if="fotoPreviewFotoSertifikat" class="mt-2 text-center">
               <img
                 :src="fotoPreviewFotoSertifikat"
                 alt="Preview Foto"
@@ -387,10 +384,7 @@
           />
         </v-col>
         <v-col cols="12" v-if="dataPPDB.sekolah != null">
-          <div
-            class="mb-2"
-            v-if="dataPPDB.file_kartu_keluarga != null"
-          >
+          <div class="mb-2" v-if="dataPPDB.file_kartu_keluarga != null">
             <a :href="dataPPDB.file_kartu_keluarga" target="_blank" download
               ><v-icon>bx-file</v-icon> Kartu Keluarga</a
             >
@@ -414,12 +408,7 @@
           />
         </v-col>
 
-        <v-col
-          cols="12"
-          sm="12"
-          stlye="padding:0"
-          v-if="form.award == 'Ada'"
-        >
+        <v-col cols="12" sm="12" stlye="padding:0" v-if="form.award == 'Ada'">
           <div v-if="fotoPreview" class="mt-2 text-center">
             <img
               :src="fotoPreview"
@@ -493,7 +482,6 @@
       </v-row>
     </v-form>
 
-    
     <!-- Snackbar error -->
     <v-snackbar v-model="show" color="error" timeout="3000">
       {{ message }}
@@ -514,7 +502,6 @@
 </template>
 
 <script setup>
-
 import { ref } from "vue";
 
 const { $api } = useNuxtApp();
@@ -526,7 +513,7 @@ const message = ref(null);
 
 const props = defineProps({
   dataRegist: null,
-})
+});
 const emit = defineEmits(["update:step", "submit", "next-step"]);
 const dataPPDB = ref(null);
 const form = ref({
@@ -572,19 +559,17 @@ const form = ref({
   foto_sertifikat: null,
 });
 
-
 const fotoPreview = ref(null);
 const fotoPreviewFotoSiswa = ref(null);
 const fotoPreviewFotoSertifikat = ref(null);
 
-
 watch(
   () => props.dataRegist,
   (val) => {
-    if (val) form.value.id = props.dataRegist
+    if (val) form.value.id = props.dataRegist;
   },
-  { immediate: true }
-)
+  { immediate: true },
+);
 
 const formatRupiah = (value) => {
   if (!value) return "Rp 0";
@@ -598,8 +583,8 @@ const formatRupiah = (value) => {
 async function getDataRegister() {
   loading.value = true;
   try {
-    const data = await $api.post(`/register-ppdb/get-data`,{
-        ids : props.dataRegist
+    const data = await $api.post(`/register-ppdb/get-data`, {
+      ids: props.dataRegist,
     });
     dataPPDB.value = data.data.data[0];
 
@@ -625,15 +610,19 @@ async function getDataRegister() {
     form.value.berat_badan = dataPPDB.value.siswa.berat_badan;
     form.value.tinggi_badan = dataPPDB.value.siswa.tinggi_badan;
     form.value.riwayat_kesehatan = dataPPDB.value.siswa.riwayat_kesehatan;
-    form.value.kebutuhan_spesial =dataPPDB.value.siswa.kebutuhan_spesial == "1" ? true : false;
+    form.value.kebutuhan_spesial =
+      dataPPDB.value.siswa.kebutuhan_spesial == "1" ? true : false;
     form.value.is_alumni = dataPPDB.value.siswa.is_alumni;
     form.value.bahasa_sehari_hari = dataPPDB.value.siswa.bahasa_sehari_hari;
     form.value.asal_sekolah = dataPPDB.value.asal_sekolah;
     form.value.nama_prestasi = dataPPDB.value.siswa.nama_prestasi;
-    form.value.status_pendaftaran_siswa = dataPPDB.value.status_pendaftaran_siswa;
+    form.value.status_pendaftaran_siswa =
+      dataPPDB.value.status_pendaftaran_siswa;
 
-    fotoPreviewFotoSiswa.value = dataPPDB.value.siswa.foto_siswa || '/no-image.jpg';
-    fotoPreviewFotoSertifikat.value = dataPPDB.value.siswa.foto_sertifikat || '/no-image.jpg';
+    fotoPreviewFotoSiswa.value =
+      dataPPDB.value.siswa.foto_siswa || "/no-image.jpg";
+    fotoPreviewFotoSertifikat.value =
+      dataPPDB.value.siswa.foto_sertifikat || "/no-image.jpg";
 
     if (dataPPDB.value.siswa_award != null) {
       form.value.award_name = dataPPDB.value.siswa_award.award;
@@ -641,9 +630,7 @@ async function getDataRegister() {
       fotoPreview.value = dataPPDB.value.siswa_award.image;
     }
 
-
     form.value.award = dataPPDB.value.siswa_award != null ? "Ada" : "Tidak Ada";
-
   } catch (error) {
     // show.value = true
     // message.value = error.response?.data?.message || 'Gagal Mendapatkan Data.'
@@ -651,8 +638,6 @@ async function getDataRegister() {
     loading.value = false;
   }
 }
-
-
 
 function handleFotoChange(e) {
   let file;
@@ -668,7 +653,6 @@ function handleFotoChange(e) {
     fotoPreview.value = "/no-image.jpg";
   }
 }
-
 
 function handleFotoChangeFotoSiswa(e) {
   let file;
@@ -698,7 +682,6 @@ function handleFotoChangeFotoSertifikat(e) {
     fotoPreviewFotoSertifikat.value = "/no-image.jpg";
   }
 }
-
 
 function handleFileRaport(e) {
   let file;
@@ -739,6 +722,57 @@ function handleFileKK(e) {
   }
 }
 
+const errors = ref({});
+
+const fieldLabels = {
+  nama_depan: "Nama depan",
+  nama_belakang: "Nama belakang",
+  jenis_kelamin: "Jenis kelamin",
+  status_pendaftaran_siswa: "Status pendaftaran",
+  tempat_lahir: "Tempat lahir",
+  tgl_lahir: "Tanggal lahir",
+  bahasa_sehari_hari: "Bahasa sehari-hari",
+  agama: "Agama",
+  anak_ke: "Anak ke",
+  kewarganegaraan: "Kewarganegaraan",
+  goldarah: "Golongan darah",
+  jumlah_saudara: "Jumlah saudara",
+  nilai_nem: "Nilai NEM",
+  file_raport: "File raport",
+  sekolah_asal: "Sekolah asal",
+  jenjang_terakhir: "Jenjang terakhir",
+};
+
+const validateForm = () => {
+  errors.value = {};
+
+  for (const key in fieldLabels) {
+    const value = form.value[key];
+
+    // skip kondisi khusus
+    if (
+      ["nilai_nem", "file_raport"].includes(key) &&
+      dataPPDB.sekolah?.is_need_nem !== "1"
+    )
+      continue;
+    if (
+      ["sekolah_asal", "jenjang_terakhir"].includes(key) &&
+      form.value.status_pendaftaran_siswa !== "Siswa Pindahan"
+    )
+      continue;
+
+    if (
+      value === null ||
+      value === undefined ||
+      value === "" ||
+      (Array.isArray(value) && value.length === 0)
+    ) {
+      errors.value[key] = fieldLabels[key];
+    }
+  }
+
+  return Object.keys(errors.value).length === 0;
+};
 
 async function handleCreateData() {
   loading.value = true;
@@ -751,26 +785,12 @@ async function handleCreateData() {
         formData.append(key, form.value[key]);
       }
     }
-    
-    if (!form.value.nama_depan ||
-          !form.value.nama_belakang ||
-          !form.value.jenis_kelamin ||
-          !form.value.status_pendaftaran_siswa ||
-          !form.value.tempat_lahir ||
-          !form.value.tgl_lahir ||
-          !form.value.bahasa_sehari_hari ||
-          !form.value.agama ||
-          !form.value.anak_ke ||
-          !form.value.kewarganegaraan ||
-          !form.value.goldarah ||
-          !form.value.jumlah_saudara ||
-          (dataPPDB.sekolah?.is_need_nem === "1" &&
-            (!form.value.nilai_nem ||
-              (!dataPPDB.siswa?.file_raport && !form.value.file_raport))) ||
-          (form.value.status_pendaftaran_siswa === "Siswa Pindahan" &&
-            (!form.value.sekolah_asal || !form.value.jenjang_terakhir))) {
+
+    const isValid = validateForm();
+
+    if (!isValid) {
       show.value = true;
-      message.value = "Harap isi form dengan lengkap";
+      message.value = `Harap isi form dengan lengkap: ${Object.values(errors.value).join(", ")}`;
     } else {
       formData.append("step", 3);
       const { data } = await $api.post(`/register-ppdb/update-form`, formData, {
@@ -778,7 +798,7 @@ async function handleCreateData() {
           "Content-Type": "multipart/form-data",
         },
       });
-      emit("next-step", 4)
+      emit("next-step", 4);
       // emit("submit")
       getDataRegister();
     }
@@ -790,11 +810,11 @@ async function handleCreateData() {
   }
 }
 
-function backStep (steps){
-  emit("next-step", steps)
+function backStep(steps) {
+  emit("next-step", steps);
 }
 
-const downloadFile = (data,title) => {
+const downloadFile = (data, title) => {
   const link = document.createElement("a");
   link.href = data;
   link.setAttribute("download", title); // force download
@@ -808,5 +828,4 @@ onMounted(() => {
   fotoPreview.value = "/no-image.jpg";
   fotoPreviewFotoSiswa.value = "/no-image.jpg";
 });
-
 </script>
