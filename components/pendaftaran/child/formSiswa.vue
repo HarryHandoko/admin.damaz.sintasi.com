@@ -756,7 +756,7 @@ const validateForm = () => {
     )
       continue;
     if (
-      ["jenjang_terakhir"].includes(key) &&
+      ["asal_sekolah", "jenjang_terakhir"].includes(key) &&
       form.value.status_pendaftaran_siswa !== "Siswa Pindahan")
       continue;
 
