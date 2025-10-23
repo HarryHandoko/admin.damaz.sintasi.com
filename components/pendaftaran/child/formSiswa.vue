@@ -739,7 +739,7 @@ const fieldLabels = {
   jumlah_saudara: "Jumlah saudara",
   nilai_nem: "Nilai NEM",
   file_raport: "File raport",
-  sekolah_asal: "Sekolah asal",
+  asal_sekolah: "Asal Sekolah",
   jenjang_terakhir: "Jenjang terakhir",
 };
 
@@ -756,9 +756,8 @@ const validateForm = () => {
     )
       continue;
     if (
-      ["sekolah_asal", "jenjang_terakhir"].includes(key) &&
-      form.value.status_pendaftaran_siswa !== "Siswa Pindahan"
-    )
+      ["jenjang_terakhir"].includes(key) &&
+      form.value.status_pendaftaran_siswa !== "Siswa Pindahan")
       continue;
 
     if (
