@@ -549,7 +549,7 @@ const form = ref({
   award_name: null,
   award_date: null,
   foto_siswa: null,
-  nem: null,
+  nilai_nem: null,
   file_raport: null,
   file_akte_lahir: null,
   file_kartu_keluarga: null,
@@ -618,6 +618,8 @@ async function getDataRegister() {
     form.value.nama_prestasi = dataPPDB.value.siswa.nama_prestasi;
     form.value.status_pendaftaran_siswa =
       dataPPDB.value.status_pendaftaran_siswa;
+    form.value.nilai_nem =
+      dataPPDB.value.nem;
 
     fotoPreviewFotoSiswa.value =
       dataPPDB.value.siswa.foto_siswa || "/no-image.jpg";
