@@ -222,7 +222,7 @@ async function changePassword() {
 
   try {
     const response = await $api.post('/users/change-password', {
-      current_password: passwordForm.value.current_password,
+      old_password: passwordForm.value.current_password,
       new_password: passwordForm.value.new_password,
       confirm_password: passwordForm.value.confirm_password
     })
