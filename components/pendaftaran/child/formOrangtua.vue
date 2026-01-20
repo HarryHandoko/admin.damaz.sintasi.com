@@ -64,9 +64,7 @@
                 'Doktor (S3)',
               ]"
               label="Pendidikan Terakhir Ayah*"
-              :rules="[
-                (v) => !!v || 'Pendidikan Terakhir Ayah harus dipilih',
-              ]"
+              :rules="[(v) => !!v || 'Pendidikan Terakhir Ayah harus dipilih']"
               required
               return-object="false"
             />
@@ -197,9 +195,7 @@
                 'Doktor (S3)',
               ]"
               label="Pendidikan Terakhir Ibu*"
-              :rules="[
-                (v) => !!v || 'Pendidikan Terakhir Ibu harus dipilih',
-              ]"
+              :rules="[(v) => !!v || 'Pendidikan Terakhir Ibu harus dipilih']"
               required
               return-object="false"
             />
@@ -243,7 +239,6 @@
               return-object="false"
             />
           </v-col>
-
 
           <v-col cols="12" sm="12" stlye="padding:0">
             <div v-if="fotoKTPIbu" class="mt-2 text-center">
@@ -332,9 +327,7 @@
                 'Doktor (S3)',
               ]"
               label="Pendidikan Terakhir Wali*"
-              :rules="[
-                (v) => !!v || 'Pendidikan Terakhir Wali harus dipilih',
-              ]"
+              :rules="[(v) => !!v || 'Pendidikan Terakhir Wali harus dipilih']"
               required
               return-object="false"
             />
@@ -378,8 +371,6 @@
               return-object="false"
             />
           </v-col>
-
-
 
           <v-col cols="12" sm="12" stlye="padding:0">
             <div v-if="fotoKTPWali" class="mt-2 text-center">
@@ -453,7 +444,6 @@
       </v-row>
     </v-form>
 
-    
     <!-- Snackbar error -->
     <v-snackbar v-model="show" color="error" timeout="3000">
       {{ message }}
@@ -474,7 +464,6 @@
 </template>
 
 <script setup>
-
 import { ref } from "vue";
 
 const { $api } = useNuxtApp();
@@ -486,7 +475,7 @@ const message = ref(null);
 
 const props = defineProps({
   dataRegist: null,
-})
+});
 const emit = defineEmits(["update:step", "submit", "next-step"]);
 const dataPPDB = ref(null);
 const form = ref({
@@ -524,7 +513,6 @@ const form = ref({
   penghasilan_wali: null,
   alamat_wali: null,
   is_same_address_wali: null,
-
 });
 
 const fotoKTPAyah = ref(null);
@@ -534,33 +522,37 @@ const fotoKTPWali = ref(null);
 watch(
   () => props.dataRegist,
   (val) => {
-    if (val) form.value.id = props.dataRegist
+    if (val) form.value.id = props.dataRegist;
   },
-  { immediate: true }
-)
-
+  { immediate: true },
+);
 
 async function getDataRegister() {
   loading.value = true;
   try {
-    const data = await $api.post(`/register-ppdb/get-data`,{
-        ids : props.dataRegist
+    const data = await $api.post(`/register-ppdb/get-data`, {
+      ids: props.dataRegist,
     });
     dataPPDB.value = data.data.data[0];
     if (dataPPDB.value.siswa_parent != null) {
-      form.value.penanggung_jawab = dataPPDB.value.siswa_parent.penanggung_jawab;
+      form.value.penanggung_jawab =
+        dataPPDB.value.siswa_parent.penanggung_jawab;
       form.value.nama_ayah = dataPPDB.value.siswa_parent.nama_ayah;
       form.value.nik_ayah = dataPPDB.value.siswa_parent.nik_ayah;
       form.value.pekerjaan_ayah = dataPPDB.value.siswa_parent.pekerjaan_ayah;
       form.value.pendidikan_terakhir_ayah =
         dataPPDB.value.siswa_parent.pendidikan_terakhir_ayah;
-      form.value.penghasilan_ayah = dataPPDB.value.siswa_parent.penghasilan_ayah;
+      form.value.penghasilan_ayah =
+        dataPPDB.value.siswa_parent.penghasilan_ayah;
       form.value.no_hp_ayah = dataPPDB.value.siswa_parent.no_hp_ayah;
       form.value.no_telepon_ayah = dataPPDB.value.siswa_parent.no_telepon_ayah;
       form.value.alamat_ayah = dataPPDB.value.siswa_parent.alamat_ayah;
       form.value.is_same_address_ayah =
-        dataPPDB.value.siswa_parent.is_same_address_ayah == "true" ? true : false;
-      fotoKTPAyah.value = dataPPDB.value.siswa_parent.ktp_ayah || '/no-image.jpg';
+        dataPPDB.value.siswa_parent.is_same_address_ayah == "true"
+          ? true
+          : false;
+      fotoKTPAyah.value =
+        dataPPDB.value.siswa_parent.ktp_ayah || "/no-image.jpg";
 
       form.value.nama_ibu = dataPPDB.value.siswa_parent.nama_ibu;
       form.value.nik_ibu = dataPPDB.value.siswa_parent.nik_ibu;
@@ -572,25 +564,29 @@ async function getDataRegister() {
       form.value.no_telepon_ibu = dataPPDB.value.siswa_parent.no_telepon_ibu;
       form.value.alamat_ibu = dataPPDB.value.siswa_parent.alamat_ibu;
       form.value.is_same_address_ibu =
-        dataPPDB.value.siswa_parent.is_same_address_ibu == "true" ? true : false;
-      
-      fotoKTPIbu.value = dataPPDB.value.siswa_parent.ktp_ibu || '/no-image.jpg';
+        dataPPDB.value.siswa_parent.is_same_address_ibu == "true"
+          ? true
+          : false;
+
+      fotoKTPIbu.value = dataPPDB.value.siswa_parent.ktp_ibu || "/no-image.jpg";
 
       form.value.nama_wali = dataPPDB.value.siswa_parent.nama_wali;
       form.value.nik_wali = dataPPDB.value.siswa_parent.nik_wali;
       form.value.pekerjaan_wali = dataPPDB.value.siswa_parent.pekerjaan_wali;
       form.value.pendidikan_terakhir_wali =
         dataPPDB.value.siswa_parent.pendidikan_terakhir_wali;
-      form.value.penghasilan_wali = dataPPDB.value.siswa_parent.penghasilan_wali;
+      form.value.penghasilan_wali =
+        dataPPDB.value.siswa_parent.penghasilan_wali;
       form.value.no_hp_wali = dataPPDB.value.siswa_parent.no_hp_wali;
       form.value.no_telepon_wali = dataPPDB.value.siswa_parent.no_telepon_wali;
       form.value.alamat_wali = dataPPDB.value.siswa_parent.alamat_wali;
       form.value.is_same_address_wali =
-        dataPPDB.value.siswa_parent.is_same_address_wali == "true" ? true : false;
-      fotoKTPWali.value = dataPPDB.value.siswa_parent.ktp_wali || '/no-image.jpg';
+        dataPPDB.value.siswa_parent.is_same_address_wali == "true"
+          ? true
+          : false;
+      fotoKTPWali.value =
+        dataPPDB.value.siswa_parent.ktp_wali || "/no-image.jpg";
     }
-    
-
   } catch (error) {
   } finally {
     loading.value = false;
@@ -608,25 +604,29 @@ async function handleCreateData() {
         formData.append(key, form.value[key]);
       }
     }
-    
-    if (( (form.value.penanggung_jawab == 'Orang Tua' &&  ( form.value.nama_ayah == null ||
-        form.value.nik_ayah == null ||
-        form.value.pekerjaan_ayah == null ||
-        form.value.pendidikan_terakhir_ayah == null ||
-        form.value.penghasilan_ayah == null ||
-        form.value.alamat_ayah == null ||
-        form.value.nik_ibu == null ||
-        form.value.nama_ibu == null ||
-        form.value.pekerjaan_ibu == null ||
-        form.value.pendidikan_terakhir_ibu == null ||
-        form.value.penghasilan_ibu == null ||
-        form.value.alamat_ibu == null) ) ||
-        (form.value.penanggung_jawab != 'Orang Tua' && (form.value.nik_wali == null ||
-        form.value.nama_wali == null ||
-        form.value.pekerjaan_wali == null ||
-        form.value.pendidikan_terakhir_wali == null ||
-        form.value.penghasilan_wali == null ||
-        form.value.alamat_wali == null)))) {
+
+    if (
+      (form.value.penanggung_jawab == "Orang Tua" &&
+        (form.value.nama_ayah == null ||
+          form.value.nik_ayah == null ||
+          form.value.pekerjaan_ayah == null ||
+          form.value.pendidikan_terakhir_ayah == null ||
+          form.value.penghasilan_ayah == null ||
+          form.value.alamat_ayah == null ||
+          form.value.nik_ibu == null ||
+          form.value.nama_ibu == null ||
+          form.value.pekerjaan_ibu == null ||
+          form.value.pendidikan_terakhir_ibu == null ||
+          form.value.penghasilan_ibu == null ||
+          form.value.alamat_ibu == null)) ||
+      (form.value.penanggung_jawab != "Orang Tua" &&
+        (form.value.nik_wali == null ||
+          form.value.nama_wali == null ||
+          form.value.pekerjaan_wali == null ||
+          form.value.pendidikan_terakhir_wali == null ||
+          form.value.penghasilan_wali == null ||
+          form.value.alamat_wali == null))
+    ) {
       show.value = true;
       message.value = "Harap isi form dengan lengkap";
     } else {
@@ -636,18 +636,21 @@ async function handleCreateData() {
           "Content-Type": "multipart/form-data",
         },
       });
-      emit("next-step", 6)
+      emit("next-step", 6);
       // emit("submit")
       getDataRegister();
     }
   } catch (error) {
     show.value = true;
-    message.value = error.response.data.message;
+
+    message.value =
+      error?.response?.data?.message ||
+      error?.message ||
+      "Terjadi kesalahan pada sistem";
   } finally {
     loading.value = false;
   }
 }
-
 
 async function updateSameAddress(type) {
   const alamat =
@@ -674,10 +677,9 @@ async function updateSameAddress(type) {
   }
 }
 
-function backStep (steps){
-  emit("next-step", steps)
+function backStep(steps) {
+  emit("next-step", steps);
 }
-
 
 function handleFotoKTPAyah(e) {
   let file;
@@ -694,7 +696,6 @@ function handleFotoKTPAyah(e) {
   }
 }
 
-
 function handleFotoKTPIbu(e) {
   let file;
   if (Array.isArray(e)) file = e[0];
@@ -709,7 +710,6 @@ function handleFotoKTPIbu(e) {
     fotoKTPIbu.value = "/no-image.jpg";
   }
 }
-
 
 function handleFotoKTPWali(e) {
   let file;
@@ -727,11 +727,10 @@ function handleFotoKTPWali(e) {
 }
 
 onMounted(() => {
-  form.value.penanggung_jawab ='Orang Tua';
+  form.value.penanggung_jawab = "Orang Tua";
   fotoKTPAyah.value = "/no-image.jpg";
   fotoKTPIbu.value = "/no-image.jpg";
   fotoKTPWali.value = "/no-image.jpg";
   getDataRegister();
 });
-
 </script>
